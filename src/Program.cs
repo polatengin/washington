@@ -35,5 +35,11 @@ public class Program
 
         var template = JsonSerializer.Deserialize<ARMTemplate>(jsonFileContent);
 
+        if (template == null)
+        {
+            Console.WriteLine("Parsing input file failed...");
+
+            return;
+        }
     }
 }
