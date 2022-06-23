@@ -1,4 +1,4 @@
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.Text.Json;
 
 public class Program
@@ -67,6 +67,19 @@ public class Program
             {
                 buffer.Add(serviceName, result!);
             }
+        }
+
+        foreach (var resource in template!.resources)
+        {
+            var offers = buffer.GetValueOrDefault(resource.serviceName)?.offers;
+
+            var offer = offers?.GetValueOrDefault(resource.offer);
+
+            var perhour = offer?.prices.perhour.GetValueOrDefault("us-west")?.value;
+
+            resource.estimatedMonthlyCost = perhour * 24 * 30 ?? 0;
+
+            Console.WriteLine($"{resource.name}({resource.serviceName}/{resource.size}) estimated monthly cost: {string.Format("{0:C2}", resource.estimatedMonthlyCost)}");
         }
     }
 }
