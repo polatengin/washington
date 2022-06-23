@@ -30,5 +30,10 @@ public class Program
 
             await Bicep.Cli.Program.Main(bicepCliArgs);
         }
+
+        var jsonFileContent = File.ReadAllText(filename);
+
+        var template = JsonSerializer.Deserialize<ARMTemplate>(jsonFileContent);
+
     }
 }
