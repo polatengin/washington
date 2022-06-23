@@ -47,6 +47,9 @@ public class Program
         foreach (var resource in template.resources)
         {
             var properties = ResourceType.Types.FirstOrDefault(type => type.Name == resource.type);
+
+            if (properties == null) continue;
+
             resource.size = properties.Size(resource.properties);
             resource.serviceName = properties.ServiceName;
             resource.offer = properties.Offer(resource.size);
