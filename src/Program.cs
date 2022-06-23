@@ -43,5 +43,14 @@ public class Program
 
             return;
         }
+
+        foreach (var resource in template.resources)
+        {
+            var properties = ResourceType.Types.FirstOrDefault(type => type.Name == resource.type);
+            resource.size = properties.Size(resource.properties);
+            resource.serviceName = properties.ServiceName;
+            resource.offer = properties.Offer(resource.size);
+        }
+
     }
 }
