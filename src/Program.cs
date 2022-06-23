@@ -12,6 +12,7 @@ public class Program
         rootCommand.SetHandler(async (file) =>
         {
             Console.WriteLine($"File: {file}");
+            await ReadFile(file!);
         }, fileOption);
 
         return await rootCommand.InvokeAsync(args);
