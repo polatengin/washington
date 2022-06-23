@@ -7,5 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\bicep\src\Bicep.Cli\Bicep.Cli.csproj" />
+  </ItemGroup>
+
 
 </Project>
