@@ -16,4 +16,18 @@ public class Program
 
         return await rootCommand.InvokeAsync(args);
     }
+
+    public static async Task ReadFile(FileInfo file)
+    {
+        var filename = file.FullName;
+
+        if (file.Extension == ".bicep")
+        {
+            filename = Path.GetTempFileName();
+
+            var bicepCliArgs = new string[] { "build", file.FullName, "--outfile", filename };
+
+            await Bicep.Cli.Program.Main(bicepCliArgs);
+        }
+    }
 }
