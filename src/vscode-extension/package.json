@@ -10,6 +10,7 @@
     "Other"
   ],
   "activationEvents": [
+    "onLanguage:bicep",
     "onCommand:azure-cost-estimator.estimate"
   ],
   "main": "./dist/extension.js",
