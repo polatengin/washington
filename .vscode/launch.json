@@ -1,0 +1,42 @@
+{
+  "version": "2.0.0",
+  "configurations": [
+    {
+      "name": "VSCode Extension",
+      "type": "extensionHost",
+      "request": "launch",
+      "runtimeExecutable": "${execPath}",
+      "args": [
+        "--enable-proposed-api",
+        "--extensionDevelopmentPath=${workspaceRoot}/src/vscode-extension"
+      ],
+      "sourceMaps": true,
+      "outFiles": [
+        "${workspaceRoot}/out/src/**/*.js"
+      ]
+    },
+    {
+      "name": "CLI",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "Build CLI",
+      "program": "${workspaceFolder}/src/cli/bin/Debug/net6.0/cli.dll",
+      "args": [
+        "--file",
+        "../../samples/vm.bicep"
+      ],
+      "env": {
+        "BICEP_TRACING_ENABLED": "true"
+      },
+      "cwd": "${workspaceFolder}/src/cli",
+      "console": "internalConsole",
+      "stopAtEntry": false
+    },
+    {
+      "name": "Attach",
+      "type": "coreclr",
+      "request": "attach",
+      "processId": "${command:pickProcess}"
+    }
+  ]
+}
