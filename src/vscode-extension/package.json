@@ -29,9 +29,10 @@
       {
         "category": "Azure Cost Estimator",
         "command": "azure-cost-estimator.estimate",
-        "title": "Estimate"
+        "title": "Estimate",
+        "icon": "$(symbol-operator)"
       }
-    ]
+      ]
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
