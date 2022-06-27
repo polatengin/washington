@@ -10,14 +10,15 @@
     "Other"
   ],
   "activationEvents": [
-    "onCommand:azure-cost-estimator.helloWorld"
+    "onCommand:azure-cost-estimator.estimate"
   ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "azure-cost-estimator.helloWorld",
-        "title": "Hello World"
+        "category": "Azure Cost Estimator",
+        "command": "azure-cost-estimator.estimate",
+        "title": "Estimate"
       }
     ]
   },
