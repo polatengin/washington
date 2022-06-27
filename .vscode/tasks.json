@@ -3,8 +3,8 @@
   "tasks": [
     {
       "label": "Build CLI",
-      "command": "dotnet",
       "type": "process",
+      "command": "dotnet",
       "args": [
         "build",
         "${workspaceFolder}/src/cli/cli.csproj",
@@ -15,8 +15,8 @@
     },
     {
       "label": "watch",
-      "command": "dotnet",
       "type": "process",
+      "command": "dotnet",
       "args": [
         "watch",
         "run",
