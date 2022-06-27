@@ -15,6 +15,16 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "configurationDefaults": {
+      "[bicep]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true,
+        "files.insertFinalNewline": true,
+        "editor.suggestSelection": "first",
+        "editor.suggest.snippetsPreventQuickSuggestions": false,
+        "editor.suggest.showWords": false
+      }
+    },
     "commands": [
       {
         "category": "Azure Cost Estimator",
