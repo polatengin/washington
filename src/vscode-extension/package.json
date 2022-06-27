@@ -34,6 +34,13 @@
       }
     ],
     "menus": {
+      "editor/title": [
+        {
+          "command": "azure-cost-estimator.estimate",
+          "when": "editorLangId == bicep",
+          "group": "navigation"
+        }
+      ],
       "explorer/context": [
         {
           "command": "azure-cost-estimator.estimate",
