@@ -57,4 +57,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 }
 
-export function deactivate() { }
+export function deactivate() {
+  if (!client) {
+    return undefined;
+  }
+  return client.stop();
+}
