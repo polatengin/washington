@@ -25,7 +25,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     window.setStatusBarMessage(`Estimated cost of Azure resources for ${file}`, 3000);
 
-    window.showInformationMessage('Hello World from azure-cost-estimator!');
+    const serverModule = context.asAbsolutePath(
+      path.join("cli")
+    );
   }));
 
 }
