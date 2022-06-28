@@ -44,6 +44,13 @@ export function activate(context: vscode.ExtensionContext) {
         fileEvents: vscode.workspace.createFileSystemWatcher("**/.clientrc")
       }
     };
+
+    client = new LanguageClient(
+      "BicepCostEstimatorLanguageServer",
+      "Bicep Cost Estimator Language Server",
+      serverOptions,
+      clientOptions
+    );
   }));
 
 }
