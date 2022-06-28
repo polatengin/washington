@@ -37,6 +37,13 @@ export function activate(context: vscode.ExtensionContext) {
         options: { execArgv: ["--file", `${file}`] }
       }
     };
+
+    const clientOptions: LanguageClientOptions = {
+      documentSelector: [{ scheme: "file", language: "plaintext" }],
+      synchronize: {
+        fileEvents: vscode.workspace.createFileSystemWatcher("**/.clientrc")
+      }
+    };
   }));
 
 }
