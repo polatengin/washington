@@ -20,7 +20,7 @@
       "name": "CLI",
       "type": "coreclr",
       "request": "launch",
-      "preLaunchTask": "Build CLI",
+      "preLaunchTask": "BuildCLI",
       "program": "${workspaceFolder}/src/cli/bin/Debug/net6.0/cli.dll",
       "args": [
         "--file",
