@@ -51,6 +51,8 @@ export function activate(context: vscode.ExtensionContext) {
       serverOptions,
       clientOptions
     );
+
+    client.start();
   }));
 
 }
