@@ -28,6 +28,15 @@ export function activate(context: vscode.ExtensionContext) {
     const serverModule = context.asAbsolutePath(
       path.join("cli")
     );
+
+    const serverOptions: ServerOptions = {
+      run: { module: serverModule, transport: TransportKind.ipc },
+      debug: {
+        module: serverModule,
+        transport: TransportKind.ipc,
+        options: { execArgv: ["--file", `${file}`] }
+      }
+    };
   }));
 
 }
