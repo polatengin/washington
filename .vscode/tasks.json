@@ -33,7 +33,10 @@
       "path": "src/vscode-extension",
       "group": "build",
       "problemMatcher": [],
-      "detail": "webpack"
+      "detail": "webpack",
+      "dependsOn": [
+        "BuildCLI"
+      ]
     }
   ]
 }
