@@ -5,14 +5,12 @@ import { LanguageClient, LanguageClientOptions, ServerOptions, TransportKind } f
 
 let client: LanguageClient;
 
-const generateId = function* () {
+const generator = (function* () {
   let i = 0;
   while (true) {
     yield i++;
   }
-};
-
-const generator = generateId();
+})();
 
 export function activate(context: vscode.ExtensionContext) {
 
