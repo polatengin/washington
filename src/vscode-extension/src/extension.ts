@@ -26,6 +26,17 @@ export function activate(context: vscode.ExtensionContext) {
 
     window.setStatusBarMessage(`Estimated cost of Azure resources for ${file}`, 3000);
 
+    const _panel: WebviewPanel | undefined = window.createWebviewPanel(
+      `${file}`,
+      `Cost estimation for ${file}`,
+      { viewColumn: vscode.ViewColumn.Beside, preserveFocus: false },
+      {
+        retainContextWhenHidden: true,
+        enableFindWidget: true,
+        enableCommandUris: true,
+        enableScripts: true,
+      }
+    );
     const serverModule = context.asAbsolutePath(
       path.join("cli")
     );
