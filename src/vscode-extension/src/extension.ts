@@ -37,6 +37,10 @@ export function activate(context: vscode.ExtensionContext) {
         enableScripts: true,
       }
     );
+    _panel.iconPath = {
+      light: Uri.file(context.asAbsolutePath("light-panel-icon.svg")),
+      dark: Uri.file(context.asAbsolutePath("dark-panel-icon.svg"))
+    };
     const serverModule = context.asAbsolutePath(
       path.join("cli")
     );
