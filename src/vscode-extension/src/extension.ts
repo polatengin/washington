@@ -13,6 +13,7 @@ const generator = (function* () {
 })();
 
 export function activate(context: vscode.ExtensionContext) {
+  const insiders = context.extension.id.endsWith("-insiders");
 
   context.subscriptions.push(vscode.commands.registerCommand('azure-cost-estimator.estimate', (uri: vscode.Uri) => {
 
