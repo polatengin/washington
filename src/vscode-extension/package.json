@@ -11,7 +11,7 @@
   ],
   "activationEvents": [
     "onLanguage:bicep",
-    "onCommand:azure-cost-estimator.estimate"
+    "onCommand:azure-cost-estimator.estimateAll"
   ],
   "main": "./dist/extension.js",
   "contributes": {
@@ -28,7 +28,7 @@
     "commands": [
       {
         "category": "Azure Cost Estimator",
-        "command": "azure-cost-estimator.estimate",
+        "command": "azure-cost-estimator.estimateAll",
         "title": "Estimate",
         "icon": "$(symbol-operator)"
       }
@@ -36,35 +36,35 @@
     "menus": {
       "editor/title": [
         {
-          "command": "azure-cost-estimator.estimate",
+          "command": "azure-cost-estimator.estimateAll",
           "when": "editorLangId == bicep",
           "group": "navigation"
         }
       ],
       "explorer/context": [
         {
-          "command": "azure-cost-estimator.estimate",
+          "command": "azure-cost-estimator.estimateAll",
           "when": "resourceLangId == bicep",
           "group": "0_estimation"
         }
       ],
       "editor/title/context": [
         {
-          "command": "azure-cost-estimator.estimate",
+          "command": "azure-cost-estimator.estimateAll",
           "when": "resourceLangId == bicep",
           "group": "0_estimation"
         }
       ],
       "editor/context": [
         {
-          "command": "azure-cost-estimator.estimate",
+          "command": "azure-cost-estimator.estimateAll",
           "when": "resourceLangId == bicep",
           "group": "0_estimation"
         }
       ],
       "commandPalette": [
         {
-          "command": "azure-cost-estimator.estimate",
+          "command": "azure-cost-estimator.estimateAll",
           "group": "0_estimation"
         }
       ]

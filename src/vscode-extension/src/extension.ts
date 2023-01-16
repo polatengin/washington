@@ -40,7 +40,7 @@ export const activate = (context: vscode.ExtensionContext) => {
     console.log(initialRegexMatch);
   }));
 
-  context.subscriptions.push(vscode.commands.registerCommand('azure-cost-estimator.estimate', async (uri: vscode.Uri) => {
+  context.subscriptions.push(vscode.commands.registerCommand('azure-cost-estimator.estimateAll', async (uri: vscode.Uri) => {
     const window = vscode.window;
 
     const file = uri.fsPath;
