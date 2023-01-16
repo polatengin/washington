@@ -29,6 +29,16 @@ export const execShell = (cmd: string) => new Promise<string>((resolve, reject) 
   });
 });
 
+const getServiceName = (service: string) => {
+  switch (service) {
+    case "Microsoft.Compute/virtualMachines":
+      return "virtual-machines";
+    case "Microsoft.Storage/storageAccounts":
+      return "storage";
+    default:
+      return "";
+  }
+};
 export const sanitize = (text: string, template: ARMTemplateJson): string => {
   if (text.indexOf("parameters(") > -1) {
     const parameterName = text.replace("[parameters('", "").replace("')]", "");
