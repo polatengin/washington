@@ -36,8 +36,8 @@ export const activate = (context: vscode.ExtensionContext) => {
 
   context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(() => updateDecorators(context, findRegexEditor())));
 
-  context.subscriptions.push(vscode.commands.registerCommand('azure-cost-estimator.estimateResource', (initialRegexMatch?: RegexMatch) => {
-    console.log(initialRegexMatch);
+  context.subscriptions.push(vscode.commands.registerCommand('azure-cost-estimator.estimateResource', (resource: ResourceModel) => {
+    console.log("resource command", resource);
   }));
 
   context.subscriptions.push(vscode.commands.registerCommand('azure-cost-estimator.estimateAll', async (uri: vscode.Uri) => {
