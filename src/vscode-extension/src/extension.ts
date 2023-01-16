@@ -1,5 +1,49 @@
 import * as vscode from 'vscode';
-import { basename, createRegexMatch, execShell, findRegexEditor, generator, join, readFileSync, RegexMatch, regexRegex, sanitize, tmpdir, updateDecorators } from "./helpers";
+const getResourceDefinitions = (document: vscode.TextDocument): ResourceModel[] => {
+  const resourceDefinitions: ResourceModel[] = [];
+
+  const content = document.getText();
+  const lines = content.split("\n");
+
+  let openBraces = 0;
+  let closeBraces = 0;
+  let inResource = false;
+  let startIndex = content.indexOf('resource ');
+  let startLineIndex = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (line.includes('resource ')) {
+      startLineIndex = i;
+    }
+
+    if (line.includes('{')) {
+      openBraces++;
+      if (!inResource) {
+        inResource = true;
+      }
+    }
+
+    if (line.includes('}')) {
+      closeBraces++;
+      if (openBraces === closeBraces && inResource) {
+        inResource = false;
+        const resource = lines[startLineIndex].replaceAll("'", "").split(" ") ?? "";
+        resourceDefinitions.push({
+          startLineIndex,
+          endLineIndex: i,
+          name: resource ? resource[1] : "",
+          type: resource ? resource[2] : "",
+          properties: lines.slice(startLineIndex, i+1).join("\n")
+        });
+        startIndex = i+1;
+      }
+    }
+  }
+
+  return resourceDefinitions;
+};
 
 export const activate = (context: vscode.ExtensionContext) => {
   const insiders = context.extension.id.endsWith("-insiders");
