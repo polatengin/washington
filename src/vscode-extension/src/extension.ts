@@ -52,28 +52,20 @@ export const activate = (context: vscode.ExtensionContext) => {
   context.subscriptions.push(
     vscode.languages.registerCodeLensProvider("bicep", {
       provideCodeLenses: (document: vscode.TextDocument) => {
-        const matches: RegexMatch[] = [];
-        for (let i = 0; i < document.lineCount; i++) {
-          const line = document.lineAt(i);
-          let match: RegExpExecArray | null;
-          regexRegex.lastIndex = 0;
-          const text = line.text.substring(0, 1000);
-          while ((match = regexRegex.exec(text))) {
-            const result = createRegexMatch(document, i, match);
-            if (result) {
-              matches.push(result);
-            }
-          }
-        }
-        return matches.map(match => {
-          console.log(match);
-
-          return new vscode.CodeLens(match.range, {
-            title: `Estimated cost ${generator.next().value}$`,
+        const codeLensList: vscode.CodeLens[] = [];
+        const resources = getResourceDefinitions(document);
+        resources.forEach(resource => {
+          console.log(`resource: ${JSON.stringify(resource)}`);
+          const range = new vscode.Range(new vscode.Position(resource.startLineIndex, 0), new vscode.Position(resource.endLineIndex, 0));
+          const codeLens = new vscode.CodeLens(range);
+          codeLens.command = {
+            title: `Estimated cost for ${resource.name} : $`,
             command: 'azure-cost-estimator.estimateResource',
-            arguments: [match]
-          });
+            arguments: [resource]
+          };
+          codeLensList.push(codeLens);
         });
+        return codeLensList;
       }
     })
   );
