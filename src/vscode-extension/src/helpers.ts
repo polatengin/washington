@@ -39,7 +39,7 @@ export const sanitize = (text: string, template: ARMTemplateJson): string => {
   return text;
 };
 
-export const regexRegex = /resource /gm;
+export const documentLineRegex = /resource /gm;
 const regexHighlight = vscode.window.createTextEditorDecorationType({ backgroundColor: 'rgba(100,100,100,.35)' });
 const matchHighlight = vscode.window.createTextEditorDecorationType({ backgroundColor: 'rgba(255,255,0,.35)' });
 
@@ -174,8 +174,8 @@ export const findRegexAtCaret = (editor: vscode.TextEditor): RegexMatch | undefi
   const text = line.text.substring(0, 1000);
 
   let match: RegExpExecArray | null;
-  regexRegex.lastIndex = 0;
-  while ((match = regexRegex.exec(text)) && (match.index + match[1].length + match[2].length < anchor.character));
+  documentLineRegex.lastIndex = 0;
+  while ((match = documentLineRegex.exec(text)) && (match.index + match[1].length + match[2].length < anchor.character));
   if (match && match.index + match[1].length <= anchor.character) {
     return createRegexMatch(editor.document, anchor.line, match);
   }
@@ -197,7 +197,7 @@ export const createRegexMatch = (document: vscode.TextDocument, line: number, ma
 export const findMatches = (regexMatch: RegexMatch, document: vscode.TextDocument) => {
   const text = document.getText();
   const matches: Match[] = [];
-  const regex = regexRegex;
+  const regex = documentLineRegex;
   let match: RegExpExecArray | null;
   while ((regex.global || !matches.length) && (match = regex.exec(text))) {
     matches.push({
