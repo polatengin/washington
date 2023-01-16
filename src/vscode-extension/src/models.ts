@@ -13,3 +13,11 @@ interface Resource {
   location: string;
   [key: string]: any;
 }
+
+interface ResourceModel {
+  startLineIndex: number;
+  endLineIndex: number;
+  name: string;
+  type: string;
+  properties: string;
+}
