@@ -1,4 +1,6 @@
 import * as vscode from 'vscode';
+import { basename, execShell, findRegexEditor, join, readFileSync, sanitize, tmpdir, updateDecorators } from "./helpers";
+
 const getResourceDefinitions = (document: vscode.TextDocument): ResourceModel[] => {
   const resourceDefinitions: ResourceModel[] = [];
 
