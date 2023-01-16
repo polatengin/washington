@@ -39,6 +39,14 @@ const getServiceName = (service: string) => {
       return "";
   }
 };
+
+async function getCost(serviceName: string) {
+  const response = await fetch(`https://azure.microsoft.com/api/v3/pricing/${serviceName}/calculator/`);
+  const json: any = await response.json();
+  console.log({ json });
+  return 0;
+}
+
 export const sanitize = (text: string, template: ARMTemplateJson): string => {
   if (text.indexOf("parameters(") > -1) {
     const parameterName = text.replace("[parameters('", "").replace("')]", "");
