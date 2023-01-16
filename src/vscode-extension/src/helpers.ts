@@ -1,3 +1,4 @@
+import fetch from "node-fetch";
 import * as cp from "child_process";
 import { readFileSync as fsReadFileSync } from "fs";
 import * as os from 'os';
