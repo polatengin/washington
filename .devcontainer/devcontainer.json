@@ -13,5 +13,17 @@
       "npm-check-updates": "latest"
     }
   },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-labs",
+        "EditorConfig.EditorConfig",
+        "ms-vscode.azurecli",
+        "ms-azuretools.vscode-bicep",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
   "remoteUser": "root"
 }
