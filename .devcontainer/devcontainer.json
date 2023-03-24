@@ -1,5 +1,17 @@
 {
   "name": "Washington Development Environment",
   "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "features": {
+    "ghcr.io/devcontainers/features/azure-cli:1": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {},
+    "ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {},
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/dotnet:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers-contrib/features/npm-package:1": {
+      "npm-check-updates": "latest"
+    }
+  },
   "remoteUser": "root"
 }
