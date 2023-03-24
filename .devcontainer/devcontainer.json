@@ -25,5 +25,6 @@
       ]
     }
   },
+  "postCreateCommand": "az bicep upgrade",
   "remoteUser": "root"
 }
