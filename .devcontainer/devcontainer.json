@@ -1,0 +1,5 @@
+{
+  "name": "Washington Development Environment",
+  "image": "mcr.microsoft.com/devcontainers/base:bullseye",
+  "remoteUser": "root"
+}
