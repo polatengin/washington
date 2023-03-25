@@ -44,7 +44,6 @@ const getServiceName = (service: string) => {
 async function getCost(serviceName: string) {
   const response = await fetch(`https://azure.microsoft.com/api/v3/pricing/${serviceName}/calculator/`);
   const json: any = await response.json();
-  console.log({ json });
   return 0;
 }
 
