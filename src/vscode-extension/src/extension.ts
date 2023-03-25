@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { basename, execShell, findRegexEditor, join, readFileSync, sanitize, tmpdir, updateDecorators } from "./helpers";
+import { getEstimatedCost } from './cost_estimator';
 
 const getResourceDefinitions = (document: vscode.TextDocument): ResourceModel[] => {
   const resourceDefinitions: ResourceModel[] = [];
@@ -58,6 +59,7 @@ export const activate = (context: vscode.ExtensionContext) => {
         const resources = getResourceDefinitions(document);
         resources.forEach(resource => {
           console.log(`resource: ${JSON.stringify(resource)}`);
+          getEstimatedCost();
           const range = new vscode.Range(new vscode.Position(resource.startLineIndex, 0), new vscode.Position(resource.endLineIndex, 0));
           const codeLens = new vscode.CodeLens(range);
           codeLens.command = {
