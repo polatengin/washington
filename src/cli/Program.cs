@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 using System.Text.Json;
 
 public class Program
@@ -24,9 +24,7 @@ public class Program
     {
       filename = Path.GetTempFileName();
 
-      var bicepCliArgs = new string[] { "build", file.FullName, "--outfile", filename };
-
-      await Bicep.Cli.Program.Main(bicepCliArgs);
+      await Bicep.Cli.Program.Main(new[] { "build", file.FullName, "--outfile", filename });
     }
 
     var jsonFileContent = File.ReadAllText(filename);
