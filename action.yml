@@ -1,0 +1,18 @@
+name: 'Azure Cost Estimator'
+description: 'Cost estimation for Azure resources'
+inputs:
+  file:
+    description: 'Path to the infrastructure as code file (like ARM template, bicep file, terraform file, etc)'
+    required: true
+outputs:
+  estimation-result:
+    description: "Cost estimation result"
+    value: ${{ steps.cost-estimator.outputs.estimation-result }}
+runs:
+  using: "composite"
+  steps:
+    - name: 'Cost Estimation'
+      id: cost-estimator
+      shell: pwsh
+      run: |
+        Write-Host "github.action_path=${{ github.action_path }}"
