@@ -51,9 +51,10 @@ public class Program
 
     var buffer = new Dictionary<string, PriceResultRoot>();
 
+    var client = new HttpClient();
+
     foreach (var serviceName in template.resources.Select(resource => resource.serviceName).Distinct())
     {
-      var client = new HttpClient();
       var stream = await client.GetStreamAsync($"https://azure.microsoft.com/api/v3/pricing/{serviceName}/calculator/");
       var result = await JsonSerializer.DeserializeAsync<PriceResultRoot>(stream);
 
