@@ -1,5 +1,6 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 using System.Text.Json;
+using Spectre.Console;
 
 public class Program
 {
