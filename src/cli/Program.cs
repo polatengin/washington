@@ -6,6 +6,8 @@ public class Program
 {
   public static async Task<int> Main(string[] args)
   {
+    AnsiConsole.Write(new FigletText("Azure Cost Estimator").Centered().Color(Color.Green));
+
     var fileOption = new Option<FileInfo?>(name: "--file", description: "The file to read and display on the console.") { IsRequired = true };
 
     var rootCommand = new RootCommand("Azure Cost Estimator");
