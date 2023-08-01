@@ -10,7 +10,9 @@ public class ResourceType
 
     public Func<JsonElement, string> Size { get; set; }
 
-    public Func<string, string> Offer { get; set; }
+    public Func<string, string> Kind { get; set; }
+
+    public Func<string> Location { get; set; }
   }
 
   public static AzureResourceType[] Types = {
