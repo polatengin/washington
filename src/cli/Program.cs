@@ -73,7 +73,13 @@ public class Program
 
       if (!buffer.ContainsKey(serviceName))
       {
-        buffer.Add(serviceName, result!);
+        var response = await client.GetAsync($"https://azure.microsoft.com/api/v3/pricing/{serviceName}/calculator/");
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        var result = JsonSerializer.Deserialize<PriceResultRoot>(content);
+
+        buffer.TryAdd(serviceName, result!);
       }
     }
 
