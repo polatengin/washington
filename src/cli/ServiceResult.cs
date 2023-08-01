@@ -47,8 +47,31 @@ public class ResourceType
     {
       Name = "Microsoft.Storage/storageAccounts",
       ServiceName = "storage",
-      Size = (element) => element.ValueKind == JsonValueKind.Undefined ? element.Deserialize<ManagedClusterProperties>()?.agentPoolProfiles?[0]?.vmSize ?? "" : "",
-      Offer = (size) =>
+      Location = () => "us-west",
+      Size = (element) => "TEST HERE",
+      Kind = (size) =>
+      {
+        return $"linux";
+      }
+    },
+    new AzureResourceType()
+    {
+      Name = "Microsoft.Storage/storageAccounts/blobServices",
+      ServiceName = "",
+      Location = () => "us-west",
+      Size = (element) => "TEST HERE",
+      Kind = (size) =>
+      {
+        return $"linux";
+      }
+    },
+    new AzureResourceType()
+    {
+      Name = "Microsoft.Storage/storageAccounts/blobServices/containers",
+      ServiceName = "",
+      Location = () => "us-west",
+      Size = (element) => "TEST HERE",
+      Kind = (size) =>
       {
         return $"linux";
       }
