@@ -89,7 +89,7 @@ public class Program
 
       var offer = offers?.GetValueOrDefault(resource.kind);
 
-      var perhour = offer?.prices.perhour.GetValueOrDefault("us-west")?.value;
+      var perhour = offer?.prices.perhour.GetValueOrDefault(resource.location)?.value;
 
       resource.estimatedMonthlyCost = perhour * 24 * 30 ?? 0;
 
