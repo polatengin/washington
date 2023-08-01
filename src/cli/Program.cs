@@ -1,6 +1,6 @@
 using System.CommandLine;
 using System.Text.Json;
-using Spectre.Console;
+using System.Collections.Concurrent;
 
 public class Program
 {
