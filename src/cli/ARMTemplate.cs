@@ -10,11 +10,11 @@ public class Resource
   public string type { get; set; }
   public string apiVersion { get; set; }
   public string name { get; set; }
-  public string location { get; set; }
   public JsonElement properties { get; set; }
+  public string location { get; set; }
   public string size { get; set; }
   public string serviceName { get; set; }
-  public string offer { get; set; }
+  public string kind { get; set; }
   public decimal estimatedMonthlyCost { get; set; }
 }
 
