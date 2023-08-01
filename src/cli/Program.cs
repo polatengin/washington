@@ -69,8 +69,7 @@ public class Program
 
     foreach (var serviceName in template.resources.Select(resource => resource.serviceName).Distinct())
     {
-      var stream = await client.GetStreamAsync($"https://azure.microsoft.com/api/v3/pricing/{serviceName}/calculator/");
-      var result = await JsonSerializer.DeserializeAsync<PriceResultRoot>(stream);
+      if (string.IsNullOrWhiteSpace(serviceName)) continue;
 
       if (!buffer.ContainsKey(serviceName))
       {
