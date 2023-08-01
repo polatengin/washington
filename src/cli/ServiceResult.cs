@@ -20,8 +20,9 @@ public class ResourceType
     {
       Name = "Microsoft.Compute/virtualMachines",
       ServiceName = "virtual-machines",
-      Size = (element) => JsonSerializer.Deserialize<VirtualMachineProperties>(element)?.hardwareProfile.vmSize ?? "",
-      Offer = (size) =>
+      Location = () => "us-west",
+      Size = (element) => element.Deserialize<VirtualMachineProperties>()?.hardwareProfile.vmSize ?? "",
+      Kind = (size) =>
       {
         var parts = size.ToLower().Split('_');
         if (parts.Length < 2)
@@ -35,8 +36,9 @@ public class ResourceType
     {
       Name = "Microsoft.ContainerService/managedClusters",
       ServiceName = "kubernetes-service",
-      Size = (element) => element.Deserialize<ManagedClusterProperties>()?.agentPoolProfiles?[0]?.vmSize ?? "",
-      Offer = (size) =>
+      Location = () => "us-west",
+      Size = (element) => element.Deserialize<ManagedClusterProperties>()?.agentPoolProfiles?[0]?.vmSize ?? "", //element.Deserialize<ManagedClusterProperties>()?.agentPoolProfiles?[0]?.vmSize ??
+      Kind = (size) =>
       {
         return $"linux";
       }
