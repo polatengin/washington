@@ -87,7 +87,7 @@ public class Program
     {
       var offers = buffer.GetValueOrDefault(resource.serviceName)?.offers;
 
-      var offer = offers?.GetValueOrDefault(resource.offer);
+      var offer = offers?.GetValueOrDefault(resource.kind);
 
       var perhour = offer?.prices.perhour.GetValueOrDefault("us-west")?.value;
 
