@@ -24,12 +24,12 @@ public class Program
     rootCommand.AddOption(fileOption);
     rootCommand.AddOption(locationOption);
 
-    rootCommand.SetHandler(async (file) => await ReadFile(file!), fileOption);
+    rootCommand.SetHandler(async (file, location) => await CalculateCostEstimation(file!, location), fileOption, locationOption);
 
     return await rootCommand.InvokeAsync(args);
   }
 
-  public static async Task ReadFile(FileInfo file)
+  private static async Task CalculateCostEstimation(FileInfo file, string location)
   {
     var filename = file.FullName;
 
