@@ -51,18 +51,19 @@ public class Program
       return;
     }
 
+    var buffer = new ConcurrentDictionary<string, PriceResultRoot>();
+
     foreach (var resource in template.resources)
     {
       var properties = ResourceType.Types.FirstOrDefault(type => type.Name == resource.type);
 
       if (properties == null) continue;
 
-      resource.size = properties.Size(resource.properties);
       resource.serviceName = properties.ServiceName;
-      resource.offer = properties.Offer(resource.size);
+      resource.location = properties.Location();
+      resource.size = properties.Size(resource.properties);
+      resource.kind = properties.Kind(resource.size);
     }
-
-    var buffer = new Dictionary<string, PriceResultRoot>();
 
     var client = new HttpClient();
 
