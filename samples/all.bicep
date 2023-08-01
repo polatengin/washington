@@ -1,6 +1,6 @@
 resource vm 'Microsoft.Compute/virtualMachines@2020-06-01' = {
   name: 'SampleVM'
-  location: resourceGroup().location
+  location: location
   properties: {
     osProfile: {
       computerName: 'SampleVM'
