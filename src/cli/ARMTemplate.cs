@@ -1,9 +1,6 @@
 using System.Text.Json;
 
-public class ARMTemplate
-{
-  public List<Resource> resources { get; set; }
-}
+public record ARMTemplate(List<Resource> resources);
 
 public class Resource
 {
