@@ -37,7 +37,7 @@ public class ResourceType
       Name = "Microsoft.ContainerService/managedClusters",
       ServiceName = "kubernetes-service",
       Location = () => "us-west",
-      Size = (element) => element.properties.Deserialize<ManagedClusterProperties>()?.agentPoolProfiles?[0]?.vmSize ?? "", //element.Deserialize<ManagedClusterProperties>()?.agentPoolProfiles?[0]?.vmSize ??
+      Size = (element) => element.properties.Deserialize<ManagedClusterProperties>()?.agentPoolProfiles?[0]?.vmSize ?? "",
       Kind = (element) =>
       {
         return $"linux";
