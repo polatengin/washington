@@ -23,6 +23,8 @@
       "preLaunchTask": "BuildCLI",
       "program": "${workspaceFolder}/src/cli/bin/Debug/net8.0/cli.dll",
       "args": [
+        "--location",
+        "westus",
         "--file",
         "../../samples/vm.bicep"
       ],
