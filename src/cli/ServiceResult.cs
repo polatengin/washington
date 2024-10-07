@@ -4,9 +4,9 @@ public class ResourceType
 {
   public class AzureResourceType
   {
-    public string Name { get; set; }
+    public required string Name { get; set; }
 
-    public string ServiceName { get; set; }
+    public required string ServiceName { get; set; }
 
     public Func<JsonElement, string> Size { get; set; }
 
