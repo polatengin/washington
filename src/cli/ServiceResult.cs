@@ -8,9 +8,9 @@ public class ResourceType
 
     public required string ServiceName { get; set; }
 
-    public Func<JsonElement, string> Size { get; set; }
+    public required Func<Resource, string> Size { get; set; }
 
-    public Func<string, string> Kind { get; set; }
+    public Func<Resource, string> Kind { get; set; }
 
     public Func<string> Location { get; set; }
   }
@@ -21,13 +21,13 @@ public class ResourceType
       Name = "Microsoft.Compute/virtualMachines",
       ServiceName = "virtual-machines",
       Location = () => "us-west",
-      Size = (element) => element.Deserialize<VirtualMachineProperties>()?.hardwareProfile.vmSize ?? "",
-      Kind = (size) =>
+      Size = (element) => element.properties.Deserialize<VirtualMachineProperties>()?.hardwareProfile.vmSize ?? "",
+      Kind = (element) =>
       {
-        var parts = size.ToLower().Split('_');
+        var parts = element.size.ToLower().Split('_');
         if (parts.Length < 2)
         {
-          return size;
+          return element.size;
         }
         return $"linux-{parts[1]}{parts[2]}-{parts[0]}";
       }
@@ -37,8 +37,8 @@ public class ResourceType
       Name = "Microsoft.ContainerService/managedClusters",
       ServiceName = "kubernetes-service",
       Location = () => "us-west",
-      Size = (element) => element.Deserialize<ManagedClusterProperties>()?.agentPoolProfiles?[0]?.vmSize ?? "", //element.Deserialize<ManagedClusterProperties>()?.agentPoolProfiles?[0]?.vmSize ??
-      Kind = (size) =>
+      Size = (element) => element.properties.Deserialize<ManagedClusterProperties>()?.agentPoolProfiles?[0]?.vmSize ?? "", //element.Deserialize<ManagedClusterProperties>()?.agentPoolProfiles?[0]?.vmSize ??
+      Kind = (element) =>
       {
         return $"linux";
       }
@@ -49,7 +49,7 @@ public class ResourceType
       ServiceName = "storage",
       Location = () => "us-west",
       Size = (element) => "TEST HERE",
-      Kind = (size) =>
+      Kind = (element) =>
       {
         return $"linux";
       }
@@ -60,7 +60,7 @@ public class ResourceType
       ServiceName = "",
       Location = () => "us-west",
       Size = (element) => "TEST HERE",
-      Kind = (size) =>
+      Kind = (element) =>
       {
         return $"linux";
       }
@@ -71,7 +71,7 @@ public class ResourceType
       ServiceName = "",
       Location = () => "us-west",
       Size = (element) => "TEST HERE",
-      Kind = (size) =>
+      Kind = (element) =>
       {
         return $"linux";
       }
