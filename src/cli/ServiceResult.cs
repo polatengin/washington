@@ -48,7 +48,7 @@ public class ResourceType
       Name = "Microsoft.Storage/storageAccounts",
       ServiceName = "storage",
       Location = () => "us-west",
-      Size = (element) => "TEST HERE",
+      Size = (element) => "storageAccount",
       Kind = (element) =>
       {
         return $"linux";
@@ -59,7 +59,7 @@ public class ResourceType
       Name = "Microsoft.Storage/storageAccounts/blobServices",
       ServiceName = "",
       Location = () => "us-west",
-      Size = (element) => "TEST HERE",
+      Size = (element) => "0",
       Kind = (element) =>
       {
         return $"linux";
@@ -70,7 +70,7 @@ public class ResourceType
       Name = "Microsoft.Storage/storageAccounts/blobServices/containers",
       ServiceName = "",
       Location = () => "us-west",
-      Size = (element) => "TEST HERE",
+      Size = (element) => "0",
       Kind = (element) =>
       {
         return $"linux";
