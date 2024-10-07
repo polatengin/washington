@@ -55,7 +55,7 @@ public class Program
     {
       var properties = ResourceType.Types.FirstOrDefault(type => type.Name == resource.type);
 
-      if (properties == null) continue;
+      if (properties == null) return;
 
       resource.name = EvaluateFormatExpression(resource.name);
       resource.serviceName = properties.ServiceName;
@@ -67,7 +67,7 @@ public class Program
       {
         Console.WriteLine($"Resource {resource.name}({resource.type}) is skipped for cost estimation.");
 
-        continue;
+        return;
       }
 
       var response = await client.GetAsync($"https://azure.microsoft.com/api/v3/pricing/{resource.serviceName}/calculator/");
