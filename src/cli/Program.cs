@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 using System.Text.Json;
 using System.Collections.Concurrent;
 
@@ -16,19 +16,17 @@ public class Program
     ");
 
     var fileOption = new Option<FileInfo?>(name: "--file", description: "The file to read and display on the console.") { IsRequired = true };
-    var locationOption = new Option<string>(name: "--location", description: "Azure location to deploy resources to") { IsRequired = true };
 
     var rootCommand = new RootCommand("Azure Cost Estimator");
 
     rootCommand.AddOption(fileOption);
-    rootCommand.AddOption(locationOption);
 
-    rootCommand.SetHandler(async (file, location) => await CalculateCostEstimation(file!, location), fileOption, locationOption);
+    rootCommand.SetHandler(async file => await CalculateCostEstimation(file!), fileOption);
 
     return await rootCommand.InvokeAsync(args);
   }
 
-  private static async Task CalculateCostEstimation(FileInfo file, string location)
+  private static async Task CalculateCostEstimation(FileInfo file)
   {
     var filename = file.FullName;
 
