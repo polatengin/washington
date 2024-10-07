@@ -86,34 +86,6 @@ public class Program
     });
   }
 
-  private static string EvaluateParametersExpression(string input)
-  {
-    var pattern = @"\[\s*parameters\(\s*'([^']+)'(?:\s*,\s*'([^']+)')*\s*\)\s*\]";
-
-    var match = Regex.Match(input, pattern);
-
-    if (match.Success)
-    {
-      var parameter = match.Groups[1].Value;
-
-      var argumentPattern = @"'([^']+)'";
-
-      var argumentMatches = Regex.Matches(input, argumentPattern);
-
-      var arguments = new List<string>();
-      for (int i = 1; i < argumentMatches.Count; i++)
-      {
-        arguments.Add(argumentMatches[i].Groups[1].Value);
-      }
-
-      return string.Format(parameter, arguments.ToArray());
-    }
-    else
-    {
-      return input;
-    }
-  }
-
   private static string EvaluateFormatExpression(string input)
   {
     var pattern = @"\[\s*format\(\s*'([^']+)'(?:\s*,\s*'([^']+)')*\s*\)\s*\]";
