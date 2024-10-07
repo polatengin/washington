@@ -24,7 +24,7 @@
       "program": "${workspaceFolder}/src/cli/bin/Debug/net8.0/cli.dll",
       "args": [
         "--file",
-        "../../samples/vm.bicep"
+        "../../samples/all.bicep"
       ],
       "env": {
         "BICEP_TRACING_ENABLED": "true"
