@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 using System.Text.Json;
 using System.Collections.Concurrent;
 
@@ -60,6 +60,13 @@ public class Program
       resource.location = properties.Location();
       resource.size = properties.Size(resource);
       resource.kind = properties.Kind(resource);
+
+      if (string.IsNullOrEmpty(resource.serviceName))
+      {
+        Console.WriteLine($"Resource {resource.name}({resource.type}) is skipped for cost estimation.");
+
+        continue;
+      }
 
       var response = await client.GetAsync($"https://azure.microsoft.com/api/v3/pricing/{resource.serviceName}/calculator/");
 
