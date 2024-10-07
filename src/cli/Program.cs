@@ -56,6 +56,7 @@ public class Program
 
       if (properties == null) continue;
 
+      resource.name = EvaluateFormatExpression(resource.name);
       resource.serviceName = properties.ServiceName;
       resource.location = properties.Location();
       resource.size = properties.Size(resource);
