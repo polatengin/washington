@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.CommandLine;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -51,7 +51,7 @@ public class Program
 
     var client = new HttpClient();
 
-    foreach (var resource in template.resources)
+    await Parallel.ForEachAsync(template.resources, async (resource, cancellationToken) =>
     {
       var properties = ResourceType.Types.FirstOrDefault(type => type.Name == resource.type);
 
@@ -83,6 +83,35 @@ public class Program
       resource.estimatedMonthlyCost = perhour * 24 * 30 ?? 0;
 
       Console.WriteLine($"{resource.name}({resource.serviceName}/{resource.size}) estimated monthly cost: {string.Format("{0:C2}", resource.estimatedMonthlyCost)}");
+    });
+  }
+
+  private static string EvaluateParametersExpression(string input)
+  {
+    var pattern = @"\[\s*parameters\(\s*'([^']+)'(?:\s*,\s*'([^']+)')*\s*\)\s*\]";
+
+    var match = Regex.Match(input, pattern);
+
+    if (match.Success)
+    {
+      var parameter = match.Groups[1].Value;
+
+      var argumentPattern = @"'([^']+)'";
+
+      var argumentMatches = Regex.Matches(input, argumentPattern);
+
+      var arguments = new List<string>();
+      for (int i = 1; i < argumentMatches.Count; i++)
+      {
+        arguments.Add(argumentMatches[i].Groups[1].Value);
+      }
+
+      return string.Format(parameter, arguments.ToArray());
+    }
+    else
+    {
+      return input;
+    }
   }
 
   private static string EvaluateFormatExpression(string input)
