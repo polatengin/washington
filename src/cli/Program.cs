@@ -1,4 +1,4 @@
-using System.CommandLine;
+﻿using System.CommandLine;
 using System.Text.Json;
 using System.Collections.Concurrent;
 
@@ -48,7 +48,7 @@ public class Program
       return;
     }
 
-    var buffer = new ConcurrentDictionary<string, PriceResultRoot>();
+    var client = new HttpClient();
 
     foreach (var resource in template.resources)
     {
@@ -58,33 +58,16 @@ public class Program
 
       resource.serviceName = properties.ServiceName;
       resource.location = properties.Location();
-      resource.size = properties.Size(resource.properties);
-      resource.kind = properties.Kind(resource.size);
-    }
+      resource.size = properties.Size(resource);
+      resource.kind = properties.Kind(resource);
 
-    var client = new HttpClient();
+      var response = await client.GetAsync($"https://azure.microsoft.com/api/v3/pricing/{resource.serviceName}/calculator/");
 
-    foreach (var serviceName in template.resources.Select(resource => resource.serviceName).Distinct())
-    {
-      if (string.IsNullOrWhiteSpace(serviceName)) continue;
+      var content = await response.Content.ReadAsStringAsync();
 
-      if (!buffer.ContainsKey(serviceName))
-      {
-        var response = await client.GetAsync($"https://azure.microsoft.com/api/v3/pricing/{serviceName}/calculator/");
+      var result = JsonSerializer.Deserialize<PriceResultRoot>(content);
 
-        var content = await response.Content.ReadAsStringAsync();
-
-        var result = JsonSerializer.Deserialize<PriceResultRoot>(content);
-
-        buffer.TryAdd(serviceName, result!);
-      }
-    }
-
-    foreach (var resource in template!.resources)
-    {
-      var offers = buffer.GetValueOrDefault(resource.serviceName)?.offers;
-
-      var offer = offers?.GetValueOrDefault(resource.kind);
+      var offer = result.offers?.GetValueOrDefault(resource.kind);
 
       var perhour = offer?.prices.perhour.GetValueOrDefault(resource.location)?.value;
 
