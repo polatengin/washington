@@ -72,7 +72,7 @@ public class Program
 
       var content = await response.Content.ReadAsStringAsync();
 
-      var result = JsonSerializer.Deserialize<PriceResultRoot>(content);
+      var result = JsonSerializer.Deserialize<PriceResultRoot>(content)!;
 
       var offer = result.offers?.GetValueOrDefault(resource.kind);
 
