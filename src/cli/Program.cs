@@ -51,6 +51,8 @@ public class Program
 
     var client = new HttpClient();
 
+    var table = new ConsoleOutput("Type", "Name", "Location", "Size", "Service", "Estimated Monthly Cost");
+
     await Parallel.ForEachAsync(template.resources, async (resource, cancellationToken) =>
     {
       var properties = ResourceType.Types.FirstOrDefault(type => type.Name == resource.type);
@@ -65,7 +67,7 @@ public class Program
 
       if (string.IsNullOrEmpty(resource.serviceName))
       {
-        Console.WriteLine($"Resource {resource.name}({resource.type}) is skipped for cost estimation.");
+        table.AddRow($"Resource {resource.name}({resource.type}) is skipped for cost estimation.");
 
         return;
       }
@@ -82,8 +84,10 @@ public class Program
 
       resource.estimatedMonthlyCost = perhour * 24 * 30 ?? 0;
 
-      Console.WriteLine($"{resource.name}({resource.serviceName}/{resource.size}) estimated monthly cost: {string.Format("{0:C2}", resource.estimatedMonthlyCost)}");
+      table.AddRow(resource.type, resource.name, resource.location, resource.size, resource.serviceName, string.Format("{0:C2}", resource.estimatedMonthlyCost));
     });
+
+    table.Write();
   }
 
   private static string EvaluateFormatExpression(string input)
