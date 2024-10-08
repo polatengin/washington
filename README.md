@@ -8,3 +8,9 @@ Azure Cost Estimator
 git clone
 git submodule update --init --recursive
 ```
+
+## Executing using example bicep and bicepparam files
+
+```bash
+dotnet run --project ./src/cli/cli.csproj -- --file ./samples/all.bicep --params-file ./samples/all.bicepparam
+```
