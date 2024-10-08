@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.CommandLine;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -44,7 +44,7 @@ public class Program
 
     var deploymentParamFileContent = await ReadDeploymentParamFileContent(fileParam);
 
-    var parameters = JsonSerializer.Deserialize<Dictionary<string, object>>(deploymentParamFileContent);
+    var parameters = JsonSerializer.Deserialize<ARMParameter>(deploymentParamFileContent);
 
     if (parameters == null)
     {
