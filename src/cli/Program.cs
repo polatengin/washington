@@ -42,6 +42,17 @@ public class Program
       return;
     }
 
+    var deploymentParamFileContent = ReadDeploymentParamFileContent(fileParam);
+
+    var parameters = JsonSerializer.Deserialize<Dictionary<string, object>>(deploymentParamFileContent);
+
+    if (parameters == null)
+    {
+      Console.WriteLine("Parsing input parameter file failed...");
+
+      return;
+    }
+
     var client = new HttpClient();
 
     var table = new ConsoleOutput("Type", "Name", "Location", "Size", "Service", "Estimated Monthly Cost");
@@ -90,6 +101,20 @@ public class Program
       var filename = Path.GetTempFileName();
 
       await Bicep.Cli.Program.Main(new[] { "build", file.FullName, "--outfile", filename });
+
+      return File.ReadAllText(filename);
+    }
+
+    return File.ReadAllText(file.FullName);
+  }
+
+  private static async string ReadDeploymentParamFileContent(FileInfo file)
+  {
+    if (file.Extension == ".bicepparam")
+    {
+      var filename = Path.GetTempFileName();
+
+      await Bicep.Cli.Program.Main(new[] { "build-params", file.FullName, "--outfile", filename });
 
       return File.ReadAllText(filename);
     }
