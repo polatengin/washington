@@ -154,7 +154,7 @@ public class Program
 
     string _EvaluateParametersExpressions(string input)
     {
-      var pattern = @"\[\s*parameters\(\s*'([^']+)'(?:\s*,\s*'([^']+)')*\s*\)\s*\]";
+      var pattern = @"\[\s*parameters\(\s*'([^']+)'\s*\)\s*\]";
 
       var match = Regex.Match(input, pattern);
 
@@ -162,17 +162,7 @@ public class Program
       {
         var parameterName = match.Groups[1].Value;
 
-        var argumentPattern = @"'([^']+)'";
-
-        var argumentMatches = Regex.Matches(input, argumentPattern);
-
-        var arguments = new List<string>();
-        for (int i = 1; i < argumentMatches.Count; i++)
-        {
-          arguments.Add(argumentMatches[i].Groups[1].Value);
-        }
-
-        return arguments.FirstOrDefault();
+        return parameterName;
       }
       else
       {
