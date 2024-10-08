@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.CommandLine;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -71,7 +71,7 @@ public class Program
 
       if (string.IsNullOrEmpty(resource.serviceName))
       {
-        table.AddRow($"Resource {resource.name}({resource.type}) is skipped for cost estimation.");
+        table.AddRow($"Resource {resource.name}({resource.type}) is skipped for cost estimation (Free).");
 
         return;
       }
