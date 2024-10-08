@@ -1,0 +1,5 @@
+GET https://prices.azure.com/api/retail/prices?$filter=serviceName eq 'Virtual Machines'
+
+###
+
+GET https://prices.azure.com/api/retail/prices?$filter=serviceName eq 'Virtual Machines' and armSkuName eq 'Standard_D2s_v3'
