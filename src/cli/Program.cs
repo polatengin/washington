@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.CommandLine;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -24,6 +24,10 @@ public class Program
 
   private static async Task CalculateCostEstimation(FileInfo file, FileInfo fileParam, bool grandTotal)
   {
+    var console = new ConsoleOutput("Type", "Name", "Location", "Size", "Service", "Estimated Monthly Cost");
+
+    console.PrintLogo();
+
     var deploymentFileContent = await ReadDeploymentFileContent(file);
 
     var template = JsonSerializer.Deserialize<ARMTemplate>(deploymentFileContent);
@@ -46,8 +50,6 @@ public class Program
       return;
     }
 
-    var table = new ConsoleOutput("Type", "Name", "Location", "Size", "Service", "Estimated Monthly Cost");
-
     await Parallel.ForEachAsync(template.resources, async (resource, cancellationToken) =>
     {
       var properties = ResourceType.Types.FirstOrDefault(type => type.Name == resource.type);
@@ -62,19 +64,19 @@ public class Program
 
       if (string.IsNullOrEmpty(resource.serviceName))
       {
-        table.AddRow($"Resource {resource.name}({resource.type}) is skipped for cost estimation (Free).");
+        console.AddRow($"Resource {resource.name}({resource.type}) is skipped for cost estimation (Free).");
 
         return;
       }
 
       resource.estimatedMonthlyCost = await GetPriceEstimation(resource.serviceName, resource.kind, resource.location);
 
-      table.AddRow(resource.type, resource.name, resource.location, resource.size, resource.serviceName, string.Format("{0:C2}", resource.estimatedMonthlyCost));
+      console.AddRow(resource.type, resource.name, resource.location, resource.size, resource.serviceName, string.Format("{0:C2}", resource.estimatedMonthlyCost));
     });
 
-    table.AddGrandTotalRow(template.resources.Sum(r => r.estimatedMonthlyCost));
+    console.AddGrandTotalRow(template.resources.Sum(r => r.estimatedMonthlyCost));
 
-    table.Write();
+    console.Write();
   }
 
   private static async Task<decimal> GetPriceEstimation(string serviceName, string kind, string location)
