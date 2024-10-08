@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.CommandLine;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -18,18 +18,20 @@ public class Program
 
     var fileOption = new Option<FileInfo?>(name: "--file", description: "Deployment file (.bicep)") { IsRequired = true };
     var paramsFileOption = new Option<FileInfo?>(name: "--params-file", description: "Deployment configuration file (.bicepparam)") { IsRequired = true };
+    var grandTotalOption = new Option<bool>(name: "--grand-total", description: "Show grand total") { IsRequired = false };
 
     var rootCommand = new RootCommand("Azure Cost Estimator");
 
     rootCommand.AddOption(fileOption);
     rootCommand.AddOption(paramsFileOption);
+    rootCommand.AddOption(grandTotalOption);
 
-    rootCommand.SetHandler(async (file, paramFile) => await CalculateCostEstimation(file!, paramFile!), fileOption, paramsFileOption);
+    rootCommand.SetHandler(async (file, paramFile, grandTotal) => await CalculateCostEstimation(file!, paramFile!, grandTotal!), fileOption, paramsFileOption, grandTotalOption);
 
     return await rootCommand.InvokeAsync(args);
   }
 
-  private static async Task CalculateCostEstimation(FileInfo file, FileInfo fileParam)
+  private static async Task CalculateCostEstimation(FileInfo file, FileInfo fileParam, bool grandTotal)
   {
     var deploymentFileContent = await ReadDeploymentFileContent(file);
 
