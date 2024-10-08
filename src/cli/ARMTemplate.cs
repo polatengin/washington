@@ -6,9 +6,9 @@ public record ARMParameter(Dictionary<string, Parameter> parameters);
 
 public class Resource
 {
-  public string type { get; set; }
-  public string apiVersion { get; set; }
-  public string name { get; set; }
+  public required string type { get; set; }
+  public required string apiVersion { get; set; }
+  public required string name { get; set; }
   public JsonElement properties { get; set; }
   public string location { get; set; }
   public string size { get; set; }
@@ -22,53 +22,52 @@ public class Parameter
   public string Value { get; set; }
 }
 
-
 public class VirtualMachineProperties
 {
   public class HardwareProfile
   {
-    public string vmSize { get; set; }
+    public required string vmSize { get; set; }
   }
 
-  public HardwareProfile hardwareProfile { get; set; }
+  public required HardwareProfile hardwareProfile { get; set; }
 }
 
 public class ManagedClusterProperties
 {
-  public string dnsPrefix { get; set; }
-  public AgentPoolProfile[] agentPoolProfiles { get; set; }
-  public LinuxProfile linuxProfile { get; set; }
-  public ServicePrincipalProfile servicePrincipalProfile { get; set; }
+  public required string dnsPrefix { get; set; }
+  public required AgentPoolProfile[] agentPoolProfiles { get; set; }
+  public required LinuxProfile linuxProfile { get; set; }
+  public required ServicePrincipalProfile servicePrincipalProfile { get; set; }
 
   public class LinuxProfile
   {
-    public string adminUsername { get; set; }
-    public Ssh ssh { get; set; }
+    public required string adminUsername { get; set; }
+    public required Ssh ssh { get; set; }
   }
 
   public class Ssh
   {
-    public Publickey[] publicKeys { get; set; }
+    public required Publickey[] publicKeys { get; set; }
   }
 
   public class Publickey
   {
-    public string keyData { get; set; }
+    public required string keyData { get; set; }
   }
 
   public class ServicePrincipalProfile
   {
-    public string clientId { get; set; }
+    public required string clientId { get; set; }
     public string secret { get; set; }
   }
 
   public class AgentPoolProfile
   {
-    public string name { get; set; }
-    public string osDiskSizeGB { get; set; }
-    public string count { get; set; }
-    public string vmSize { get; set; }
-    public string osType { get; set; }
-    public string mode { get; set; }
+    public required string name { get; set; }
+    public required string osDiskSizeGB { get; set; }
+    public required string count { get; set; }
+    public required string vmSize { get; set; }
+    public required string osType { get; set; }
+    public required string mode { get; set; }
   }
 }
