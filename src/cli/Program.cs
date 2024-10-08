@@ -94,7 +94,7 @@ public class Program
     table.Write();
   }
 
-  private static async string ReadDeploymentFileContent(FileInfo file)
+  private static string ReadDeploymentFileContent(FileInfo file)
   {
     if (file.Extension == ".bicep")
     {
@@ -108,7 +108,7 @@ public class Program
     return File.ReadAllText(file.FullName);
   }
 
-  private static async string ReadDeploymentParamFileContent(FileInfo file)
+  private static string ReadDeploymentParamFileContent(FileInfo file)
   {
     if (file.Extension == ".bicepparam")
     {
