@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.CommandLine;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -16,7 +16,7 @@ public class Program
 /_/    \_\/___|\__,_|_|  \___|  \_____\___/|___/\__| |______|___/\__|_|_| |_| |_|\__,_|\__\___/|_|
     ");
 
-    var fileOption = new Option<FileInfo?>(name: "--file", description: "The file to read and display on the console.") { IsRequired = true };
+    var fileOption = new Option<FileInfo?>(name: "--file", description: "Deployment file (.bicep)") { IsRequired = true };
 
     var rootCommand = new RootCommand("Azure Cost Estimator");
 
