@@ -25,7 +25,11 @@ public class ConsoleOutput
       }
     }
 
-    var totalWidth = columnWidths.Sum() + columnWidths.Count * 3 + 1;
+    var longestContent = _rows.Where(e => e.Length == 1).Select(e => e[0].Length).Max() + 4;
+
+    var columnWidth = columnWidths.Sum() + columnWidths.Count * 3 + 1;
+
+    var totalWidth = Math.Max(columnWidth, longestContent);
 
     Console.WriteLine(new string('-', totalWidth));
 
@@ -33,7 +37,21 @@ public class ConsoleOutput
 
     for (var i = 0; i < _columns.Count(); i++)
     {
-      Console.Write($" {_columns[i].PadRight(columnWidths[i])} |");
+      if (i == 0)
+      {
+        if (longestContent > columnWidth)
+        {
+          Console.Write($" {_columns[i].PadRight(columnWidths[i] + (longestContent - columnWidth))} |");
+        }
+        else
+        {
+          Console.Write($" {_columns[i].PadRight(columnWidths[i])} |");
+        }
+      }
+      else
+      {
+        Console.Write($" {_columns[i].PadRight(columnWidths[i])} |");
+      }
     }
 
     Console.WriteLine();
@@ -46,7 +64,21 @@ public class ConsoleOutput
 
       for (var i = 0; i < row.Length; i++)
       {
-        Console.Write($" {row[i].PadRight(columnWidths[i])}");
+        if (i == 0)
+        {
+          if (longestContent > columnWidth)
+          {
+            Console.Write($" {row[i].PadRight(columnWidths[i] + (longestContent - columnWidth))}");
+          }
+          else
+          {
+            Console.Write($" {row[i].PadRight(columnWidths[i])}");
+          }
+        }
+        else
+        {
+          Console.Write($" {row[i].PadRight(columnWidths[i])}");
+        }
 
         if (row.Length > 1)
         {
