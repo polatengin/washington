@@ -31,7 +31,7 @@ public class Program
 
   private static async Task CalculateCostEstimation(FileInfo file, FileInfo fileParam)
   {
-    var deploymentFileContent = ReadDeploymentFileContent(file);
+    var deploymentFileContent = await ReadDeploymentFileContent(file);
 
     var template = JsonSerializer.Deserialize<ARMTemplate>(deploymentFileContent);
 
@@ -42,7 +42,7 @@ public class Program
       return;
     }
 
-    var deploymentParamFileContent = ReadDeploymentParamFileContent(fileParam);
+    var deploymentParamFileContent = await ReadDeploymentParamFileContent(fileParam);
 
     var parameters = JsonSerializer.Deserialize<Dictionary<string, object>>(deploymentParamFileContent);
 
@@ -94,7 +94,7 @@ public class Program
     table.Write();
   }
 
-  private static string ReadDeploymentFileContent(FileInfo file)
+  private static async Task<string> ReadDeploymentFileContent(FileInfo file)
   {
     if (file.Extension == ".bicep")
     {
@@ -108,7 +108,7 @@ public class Program
     return File.ReadAllText(file.FullName);
   }
 
-  private static string ReadDeploymentParamFileContent(FileInfo file)
+  private static async Task<string> ReadDeploymentParamFileContent(FileInfo file)
   {
     if (file.Extension == ".bicepparam")
     {
