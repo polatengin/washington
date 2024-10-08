@@ -152,7 +152,7 @@ public class Program
       }
     }
 
-    string _EvaluateParameterExpressions(string input)
+    string _EvaluateParametersExpressions(string input)
     {
       var pattern = @"\[\s*parameters\(\s*'([^']+)'(?:\s*,\s*'([^']+)')*\s*\)\s*\]";
 
@@ -183,7 +183,7 @@ public class Program
     var output = input;
 
     output = _EvaluateFormatExpressions(output);
-    output = _EvaluateParameterExpressions(output);
+    output = _EvaluateParametersExpressions(output);
 
     return output;
   }
