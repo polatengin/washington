@@ -55,8 +55,6 @@ public class Program
       return;
     }
 
-    var client = new HttpClient();
-
     var table = new ConsoleOutput("Type", "Name", "Location", "Size", "Service", "Estimated Monthly Cost");
 
     await Parallel.ForEachAsync(template.resources, async (resource, cancellationToken) =>
@@ -78,17 +76,7 @@ public class Program
         return;
       }
 
-      var response = await client.GetAsync($"https://azure.microsoft.com/api/v3/pricing/{resource.serviceName}/calculator/");
-
-      var content = await response.Content.ReadAsStringAsync();
-
-      var result = JsonSerializer.Deserialize<PriceResultRoot>(content)!;
-
-      var offer = result.offers?.GetValueOrDefault(resource.kind);
-
-      var perhour = offer?.prices.perhour.GetValueOrDefault(resource.location)?.value;
-
-      resource.estimatedMonthlyCost = perhour * 24 * 30 ?? 0;
+      resource.estimatedMonthlyCost = await GetPriceEstimation(resource.serviceName, resource.kind, resource.location);
 
       table.AddRow(resource.type, resource.name, resource.location, resource.size, resource.serviceName, string.Format("{0:C2}", resource.estimatedMonthlyCost));
     });
@@ -96,6 +84,23 @@ public class Program
     table.AddGrandTotalRow(template.resources.Sum(r => r.estimatedMonthlyCost));
 
     table.Write();
+  }
+
+  private static async Task<decimal> GetPriceEstimation(string serviceName, string kind, string location)
+  {
+    var client = new HttpClient();
+
+    var response = await client.GetAsync($"https://azure.microsoft.com/api/v3/pricing/{serviceName}/calculator/");
+
+    var content = await response.Content.ReadAsStringAsync();
+
+    var result = JsonSerializer.Deserialize<PriceResultRoot>(content)!;
+
+    var offer = result.offers?.GetValueOrDefault(kind);
+
+    var perhour = offer?.prices.perhour.GetValueOrDefault(location)?.value;
+
+    return perhour * 24 * 30 ?? 0;
   }
 
   private static async Task<string> ReadDeploymentFileContent(FileInfo file)
