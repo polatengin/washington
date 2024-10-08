@@ -125,5 +125,20 @@ public class ConsoleOutput
     }
 
     Console.WriteLine(new string('-', totalWidth));
+
+    if (_grandTotal > 0)
+    {
+      Console.Write("|");
+
+      Console.ForegroundColor = ConsoleColor.Yellow;
+      var grandTotalText = _grandTotal.ToString("C2");
+      Console.Write(" Grand Total: ".PadRight(columnWidth + 1));
+      Console.Write($"{grandTotalText} ");
+      Console.ForegroundColor = ConsoleColor.White;
+
+      Console.WriteLine("|");
+
+      Console.WriteLine(new string('-', totalWidth));
+    }
   }
 }
