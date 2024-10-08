@@ -66,7 +66,7 @@ public class Program
       resource.name = EvaluateExpressions(resource.name);
       resource.serviceName = properties.ServiceName;
       resource.location = properties.Location();
-      resource.size = properties.Size(resource);
+      resource.size = EvaluateExpressions(properties.Size(resource));
       resource.kind = properties.Kind(resource);
 
       if (string.IsNullOrEmpty(resource.serviceName))
