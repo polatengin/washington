@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.CommandLine;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -124,29 +124,67 @@ public class Program
 
   private static string EvaluateExpressions(string input)
   {
-    var pattern = @"\[\s*format\(\s*'([^']+)'(?:\s*,\s*'([^']+)')*\s*\)\s*\]";
-
-    var match = Regex.Match(input, pattern);
-
-    if (match.Success)
+    string _EvaluateFormatExpressions(string input)
     {
-      var format = match.Groups[1].Value;
+      var pattern = @"\[\s*format\(\s*'([^']+)'(?:\s*,\s*'([^']+)')*\s*\)\s*\]";
 
-      var argumentPattern = @"'([^']+)'";
+      var match = Regex.Match(input, pattern);
 
-      var argumentMatches = Regex.Matches(input, argumentPattern);
-
-      var arguments = new List<string>();
-      for (int i = 1; i < argumentMatches.Count; i++)
+      if (match.Success)
       {
-        arguments.Add(argumentMatches[i].Groups[1].Value);
-      }
+        var format = match.Groups[1].Value;
 
-      return string.Format(format, arguments.ToArray());
+        var argumentPattern = @"'([^']+)'";
+
+        var argumentMatches = Regex.Matches(input, argumentPattern);
+
+        var arguments = new List<string>();
+        for (int i = 1; i < argumentMatches.Count; i++)
+        {
+          arguments.Add(argumentMatches[i].Groups[1].Value);
+        }
+
+        return string.Format(format, arguments.ToArray());
+      }
+      else
+      {
+        return input;
+      }
     }
-    else
+
+    string _EvaluateParameterExpressions(string input)
     {
-      return input;
+      var pattern = @"\[\s*parameters\(\s*'([^']+)'(?:\s*,\s*'([^']+)')*\s*\)\s*\]";
+
+      var match = Regex.Match(input, pattern);
+
+      if (match.Success)
+      {
+        var parameterName = match.Groups[1].Value;
+
+        var argumentPattern = @"'([^']+)'";
+
+        var argumentMatches = Regex.Matches(input, argumentPattern);
+
+        var arguments = new List<string>();
+        for (int i = 1; i < argumentMatches.Count; i++)
+        {
+          arguments.Add(argumentMatches[i].Groups[1].Value);
+        }
+
+        return arguments.FirstOrDefault();
+      }
+      else
+      {
+        return input;
+      }
     }
+
+    var output = input;
+
+    output = _EvaluateFormatExpressions(output);
+    output = _EvaluateParameterExpressions(output);
+
+    return output;
   }
 }
