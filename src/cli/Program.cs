@@ -59,7 +59,7 @@ public class Program
 
       if (properties == null) return;
 
-      resource.name = EvaluateFormatExpression(resource.name);
+      resource.name = EvaluateExpressions(resource.name);
       resource.serviceName = properties.ServiceName;
       resource.location = properties.Location();
       resource.size = properties.Size(resource);
@@ -90,7 +90,7 @@ public class Program
     table.Write();
   }
 
-  private static string EvaluateFormatExpression(string input)
+  private static string EvaluateExpressions(string input)
   {
     var pattern = @"\[\s*format\(\s*'([^']+)'(?:\s*,\s*'([^']+)')*\s*\)\s*\]";
 
