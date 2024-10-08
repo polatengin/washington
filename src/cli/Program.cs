@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.CommandLine;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -17,17 +17,19 @@ public class Program
     ");
 
     var fileOption = new Option<FileInfo?>(name: "--file", description: "Deployment file (.bicep)") { IsRequired = true };
+    var paramFileOption = new Option<FileInfo?>(name: "--param-file", description: "Deployment configuration file (.bicepparam)") { IsRequired = true };
 
     var rootCommand = new RootCommand("Azure Cost Estimator");
 
     rootCommand.AddOption(fileOption);
+    rootCommand.AddOption(paramFileOption);
 
-    rootCommand.SetHandler(async file => await CalculateCostEstimation(file!), fileOption);
+    rootCommand.SetHandler(async (file, paramFile) => await CalculateCostEstimation(file!, paramFile!), fileOption, paramFileOption);
 
     return await rootCommand.InvokeAsync(args);
   }
 
-  private static async Task CalculateCostEstimation(FileInfo file)
+  private static async Task CalculateCostEstimation(FileInfo file, FileInfo fileParam)
   {
     var filename = file.FullName;
 
