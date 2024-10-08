@@ -17,14 +17,14 @@ public class Program
     ");
 
     var fileOption = new Option<FileInfo?>(name: "--file", description: "Deployment file (.bicep)") { IsRequired = true };
-    var paramFileOption = new Option<FileInfo?>(name: "--param-file", description: "Deployment configuration file (.bicepparam)") { IsRequired = true };
+    var paramsFileOption = new Option<FileInfo?>(name: "--params-file", description: "Deployment configuration file (.bicepparam)") { IsRequired = true };
 
     var rootCommand = new RootCommand("Azure Cost Estimator");
 
     rootCommand.AddOption(fileOption);
-    rootCommand.AddOption(paramFileOption);
+    rootCommand.AddOption(paramsFileOption);
 
-    rootCommand.SetHandler(async (file, paramFile) => await CalculateCostEstimation(file!, paramFile!), fileOption, paramFileOption);
+    rootCommand.SetHandler(async (file, paramFile) => await CalculateCostEstimation(file!, paramFile!), fileOption, paramsFileOption);
 
     return await rootCommand.InvokeAsync(args);
   }
