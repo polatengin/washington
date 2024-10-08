@@ -2,6 +2,8 @@ using System.Text.Json;
 
 public record ARMTemplate(List<Resource> resources);
 
+public record ARMParameter(Dictionary<string, Parameter> parameters);
+
 public class Resource
 {
   public string type { get; set; }
@@ -14,6 +16,12 @@ public class Resource
   public string kind { get; set; }
   public decimal estimatedMonthlyCost { get; set; }
 }
+
+public class Parameter
+{
+  public string Value { get; set; }
+}
+
 
 public class VirtualMachineProperties
 {
