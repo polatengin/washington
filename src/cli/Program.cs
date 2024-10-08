@@ -31,18 +31,9 @@ public class Program
 
   private static async Task CalculateCostEstimation(FileInfo file, FileInfo fileParam)
   {
-    var filename = file.FullName;
+    var deploymentFileContent = ReadDeploymentFileContent(file);
 
-    if (file.Extension == ".bicep")
-    {
-      filename = Path.GetTempFileName();
-
-      await Bicep.Cli.Program.Main(new[] { "build", file.FullName, "--outfile", filename });
-    }
-
-    var jsonFileContent = File.ReadAllText(filename);
-
-    var template = JsonSerializer.Deserialize<ARMTemplate>(jsonFileContent);
+    var template = JsonSerializer.Deserialize<ARMTemplate>(deploymentFileContent);
 
     if (template == null)
     {
@@ -90,6 +81,20 @@ public class Program
     });
 
     table.Write();
+  }
+
+  private static async string ReadDeploymentFileContent(FileInfo file)
+  {
+    if (file.Extension == ".bicep")
+    {
+      var filename = Path.GetTempFileName();
+
+      await Bicep.Cli.Program.Main(new[] { "build", file.FullName, "--outfile", filename });
+
+      return File.ReadAllText(filename);
+    }
+
+    return File.ReadAllText(file.FullName);
   }
 
   private static string EvaluateExpressions(string input)
