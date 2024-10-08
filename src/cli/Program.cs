@@ -93,6 +93,8 @@ public class Program
       table.AddRow(resource.type, resource.name, resource.location, resource.size, resource.serviceName, string.Format("{0:C2}", resource.estimatedMonthlyCost));
     });
 
+    table.AddGrandTotalRow(template.resources.Sum(r => r.estimatedMonthlyCost));
+
     table.Write();
   }
 
