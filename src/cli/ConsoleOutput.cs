@@ -13,6 +13,12 @@ public class ConsoleOutput
     _rows.Add(values);
   }
 
+  private decimal _grandTotal = 0;
+  public void AddGrandTotalRow(decimal total)
+  {
+    _grandTotal = total;
+  }
+
   public void Write()
   {
     var columnWidths = _columns.Select(c => c.Length).ToList();
