@@ -28,6 +28,8 @@ public class Program
 
     console.PrintLogo();
 
+    await PrepareDeploymentTempFolder(Path.Combine(Path.GetTempPath(), "washington"));
+
     var deploymentFileContent = await ReadDeploymentFileContent(file);
 
     var template = JsonSerializer.Deserialize<ARMTemplate>(deploymentFileContent);
@@ -96,15 +98,31 @@ public class Program
     return perhour * 24 * 30 ?? 0;
   }
 
+  private static async Task PrepareDeploymentTempFolder(string path)
+  {
+    Directory.CreateDirectory(path);
+
+    foreach (var file in Directory.GetFiles(path))
+    {
+      File.Delete(file);
+    }
+
+    File.WriteAllText(Path.Combine(path, "bicepconfig.json"), "{ \"analyzers\": { \"core\": { \"enabled\": false } } }");
+  }
+
   private static async Task<string> ReadDeploymentFileContent(FileInfo file)
   {
     if (file.Extension == ".bicep")
     {
-      var filename = Path.GetTempFileName();
+      var path = Path.Combine(Path.GetTempPath(), "washington");
 
-      await Bicep.Cli.Program.Main(new[] { "build", file.FullName, "--outfile", filename });
+      File.Copy(file.FullName, Path.Combine(path, file.Name));
 
-      return File.ReadAllText(filename);
+      var outputFilename = Path.Combine(path, Path.GetRandomFileName());
+
+      await Bicep.Cli.Program.Main(new[] { "build", Path.Combine(path, file.Name), "--outfile", outputFilename });
+
+      return File.ReadAllText(outputFilename);
     }
 
     return File.ReadAllText(file.FullName);
@@ -114,11 +132,15 @@ public class Program
   {
     if (file.Extension == ".bicepparam")
     {
-      var filename = Path.GetTempFileName();
+      var path = Path.Combine(Path.GetTempPath(), "washington");
 
-      await Bicep.Cli.Program.Main(new[] { "build-params", file.FullName, "--outfile", filename });
+      File.Copy(file.FullName, Path.Combine(path, file.Name));
 
-      return File.ReadAllText(filename);
+      var outputFilename = Path.Combine(path, Path.GetRandomFileName());
+
+      await Bicep.Cli.Program.Main(new[] { "build-params", Path.Combine(path, file.Name), "--outfile", outputFilename });
+
+      return File.ReadAllText(outputFilename);
     }
 
     return File.ReadAllText(file.FullName);
