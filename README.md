@@ -12,5 +12,5 @@ git submodule update --init --recursive
 ## Executing using example bicep and bicepparam files
 
 ```bash
-dotnet run --project ./src/cli/cli.csproj -- --file ./samples/all.bicep --params-file ./samples/all.bicepparam
+dotnet run --project ./src/cli/cli.csproj --verbosity quiet -- --file ./samples/all.bicep --params-file ./samples/all.bicepparam
 ```
