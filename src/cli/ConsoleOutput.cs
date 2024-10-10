@@ -31,6 +31,8 @@ public class ConsoleOutput
     _grandTotal = total;
   }
 
+  private string _rowSeperator = string.Empty;
+
   public void Write()
   {
     var columnWidths = _columns.Select(c => c.Length).ToList();
@@ -49,7 +51,9 @@ public class ConsoleOutput
 
     var totalWidth = Math.Max(columnWidth, longestContent);
 
-    Console.WriteLine(new string('-', totalWidth));
+    this._rowSeperator = new string('-', totalWidth);
+
+    Console.WriteLine(this._rowSeperator);
 
     Console.Write("|");
 
@@ -74,7 +78,7 @@ public class ConsoleOutput
 
     Console.WriteLine();
 
-    Console.WriteLine(new string('-', totalWidth));
+    Console.WriteLine(this._rowSeperator);
 
     foreach (var row in _rows.Where(e => e.Length > 1))
     {
@@ -111,7 +115,7 @@ public class ConsoleOutput
       Console.WriteLine();
     }
 
-    Console.WriteLine(new string('-', totalWidth));
+    Console.WriteLine(this._rowSeperator);
 
     foreach (var row in _rows.Where(e => e.Length == 1))
     {
@@ -136,7 +140,7 @@ public class ConsoleOutput
       Console.WriteLine();
     }
 
-    Console.WriteLine(new string('-', totalWidth));
+    Console.WriteLine(this._rowSeperator);
 
     if (_grandTotal > -1)
     {
@@ -150,7 +154,7 @@ public class ConsoleOutput
 
       Console.WriteLine("|");
 
-      Console.WriteLine(new string('-', totalWidth));
+      Console.WriteLine(this._rowSeperator);
     }
   }
 }
