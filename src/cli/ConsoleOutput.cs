@@ -25,7 +25,7 @@ public class ConsoleOutput
     _rows.Add(values);
   }
 
-  private decimal _grandTotal = 0;
+  private decimal _grandTotal = -1;
   public void AddGrandTotalRow(decimal total)
   {
     _grandTotal = total;
@@ -138,7 +138,7 @@ public class ConsoleOutput
 
     Console.WriteLine(new string('-', totalWidth));
 
-    if (_grandTotal > 0)
+    if (_grandTotal > -1)
     {
       Console.Write("|");
 
