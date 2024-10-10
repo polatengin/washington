@@ -14,3 +14,9 @@ git submodule update --init --recursive
 ```bash
 dotnet run --project ./src/cli/cli.csproj --verbosity quiet -- --file ./samples/all.bicep --params-file ./samples/all.bicepparam
 ```
+
+## Using example bicep and bicepparam files, with Grand Total line
+
+```bash
+dotnet run --project ./src/cli/cli.csproj --verbosity quiet -- --file ./samples/all.bicep --params-file ./samples/all.bicepparam --grand-total
+```
