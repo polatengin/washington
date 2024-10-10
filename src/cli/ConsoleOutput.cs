@@ -97,6 +97,10 @@ public class ConsoleOutput
             Console.Write($" {row[i].PadRight(columnWidths[i])}");
           }
         }
+        else if (i == row.Length - 1)
+        {
+          Console.Write($" {row[i].PadLeft(columnWidths[i])}");
+        }
         else
         {
           Console.Write($" {row[i].PadRight(columnWidths[i])}");
