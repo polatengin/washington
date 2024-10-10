@@ -101,7 +101,9 @@ public class ConsoleOutput
         }
         else if (i == row.Length - 1)
         {
+          Console.ForegroundColor = ConsoleColor.Yellow;
           Console.Write($" {row[i].PadLeft(columnWidths[i])}");
+          Console.ForegroundColor = ConsoleColor.White;
         }
         else
         {
