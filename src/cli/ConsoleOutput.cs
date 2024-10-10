@@ -10,6 +10,7 @@ public class ConsoleOutput
 
   public void PrintLogo()
   {
+    Console.ForegroundColor = ConsoleColor.DarkBlue;
     Console.WriteLine(@"
                                  _____          _     ______     _   _                 _
     /\                          / ____|        | |   |  ____|   | | (_)               | |
@@ -18,6 +19,7 @@ public class ConsoleOutput
  / ____ \  / /| |_| | | |  __/ | |___| (_) \__ \ |_  | |____\__ \ |_| | | | | | | (_| | || (_) | |
 /_/    \_\/___|\__,_|_|  \___|  \_____\___/|___/\__| |______|___/\__|_|_| |_| |_|\__,_|\__\___/|_|
   ");
+    Console.ForegroundColor = ConsoleColor.White;
   }
 
   public void AddRow(params string[] values)
