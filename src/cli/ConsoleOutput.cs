@@ -148,7 +148,7 @@ public class ConsoleOutput
 
       Console.ForegroundColor = ConsoleColor.Yellow;
       var grandTotalText = _grandTotal.ToString("C2");
-      Console.Write(" Grand Total: ".PadRight(columnWidth + 1));
+      Console.Write(" Grand Total: ".PadRight(totalWidth - grandTotalText.Length - 3));
       Console.Write($"{grandTotalText} ");
       Console.ForegroundColor = ConsoleColor.White;
 
