@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.CommandLine;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -28,7 +28,7 @@ public class Program
 
     console.PrintLogo();
 
-    await PrepareDeploymentTempFolder(Path.Combine(Path.GetTempPath(), "washington"));
+    PrepareDeploymentTempFolder(Path.Combine(Path.GetTempPath(), "washington"));
 
     var deploymentFileContent = await ReadDeploymentFileContent(file);
 
@@ -88,7 +88,7 @@ public class Program
   {
     var client = new HttpClient();
 
-    var response = await client.GetAsync($"https://azure.microsoft.com/api/v3/pricing/{serviceName}/calculator/");
+    var response = await client.GetAsync($"https://prices.azure.com/api/retail/prices?$filter=serviceName eq '{serviceName}'");
 
     var content = await response.Content.ReadAsStringAsync();
 
@@ -101,7 +101,7 @@ public class Program
     return perhour * 24 * 30 ?? 0;
   }
 
-  private static async Task PrepareDeploymentTempFolder(string path)
+  private static void PrepareDeploymentTempFolder(string path)
   {
     Directory.CreateDirectory(path);
 

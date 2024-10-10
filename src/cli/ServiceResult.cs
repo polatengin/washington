@@ -19,7 +19,7 @@ public class ResourceType
     new AzureResourceType()
     {
       Name = "Microsoft.Compute/virtualMachines",
-      ServiceName = "virtual-machines",
+      ServiceName = "Virtual Machines",
       Location = () => "us-west",
       Size = (element) => element.properties.Deserialize<VirtualMachineProperties>()?.hardwareProfile.vmSize ?? "",
       Kind = (element) =>
