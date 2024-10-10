@@ -1,4 +1,4 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
 using System.CommandLine;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -76,7 +76,10 @@ public class Program
       console.AddRow(resource.type, resource.name, resource.location, resource.size, resource.serviceName, string.Format("{0:C2}", resource.estimatedMonthlyCost));
     });
 
-    console.AddGrandTotalRow(template.resources.Sum(r => r.estimatedMonthlyCost));
+    if (grandTotal)
+    {
+      console.AddGrandTotalRow(template.resources.Sum(r => r.estimatedMonthlyCost));
+    }
 
     console.Write();
   }
