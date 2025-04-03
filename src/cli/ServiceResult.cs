@@ -10,9 +10,9 @@ public class ResourceType
 
     public required Func<Resource, string> Size { get; set; }
 
-    public Func<Resource, string> Kind { get; set; }
+    public required Func<Resource, string> Kind { get; set; }
 
-    public Func<string> Location { get; set; }
+    public required Func<string> Location { get; set; }
   }
 
   public static AzureResourceType[] Types = {
