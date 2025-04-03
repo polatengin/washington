@@ -20,3 +20,9 @@ dotnet run --project ./src/cli/cli.csproj --verbosity quiet -- --file ./samples/
 ```bash
 dotnet run --project ./src/cli/cli.csproj --verbosity quiet -- --file ./samples/all.bicep --params-file ./samples/all.bicepparam --grand-total
 ```
+
+## Using example bicep and bicepparam files, with Grand Total line, saved to a Markdown file
+
+```bash
+dotnet run --project ./src/cli/cli.csproj --verbosity quiet -- --file ./samples/all.bicep --params-file ./samples/all.bicepparam --grand-total --output-file ./samples/all.md
+```
