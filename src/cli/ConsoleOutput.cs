@@ -1,3 +1,5 @@
+using System.Text;
+
 public class ConsoleOutput
 {
   private List<string> _columns = new();
@@ -164,5 +166,51 @@ public class ConsoleOutput
 
       Console.WriteLine(this._rowSeperator);
     }
+  }
+
+  public override string ToString()
+  {
+    var sb = new StringBuilder();
+
+    sb.Append("|");
+
+    for (var i = 0; i < _columns.Count(); i++)
+    {
+      sb.Append($" {_columns[i].PadRight(_columns[i].Length)} |");
+    }
+
+    sb.AppendLine();
+
+    sb.Append("|");
+
+    for (var i = 0; i < _columns.Count(); i++)
+    {
+      sb.Append(" --- |");
+    }
+
+    sb.AppendLine();
+
+    foreach (var row in _rows.Where(e => e.Length > 1))
+    {
+      sb.Append("|");
+
+      for (var i = 0; i < row.Length; i++)
+      {
+        sb.Append($" {row[i].PadRight(row[i].Length)} |");
+      }
+
+      sb.AppendLine();
+    }
+
+    if (_grandTotal > -1)
+    {
+      sb.Append("| | | | |");
+
+      sb.Append($" Grand Total | {_grandTotal.ToString("C2")} |");
+
+      sb.AppendLine();
+    }
+
+    return sb.ToString();
   }
 }
