@@ -10,20 +10,29 @@ public class Program
     var fileOption = new Option<FileInfo?>(name: "--file", description: "Deployment file (.bicep)") { IsRequired = true };
     var paramsFileOption = new Option<FileInfo?>(name: "--params-file", description: "Deployment configuration file (.bicepparam)") { IsRequired = true };
     var grandTotalOption = new Option<bool>(name: "--grand-total", description: "Show grand total") { IsRequired = false };
+    var outputFilePathOption = new Option<string?>(name: "--output-file", description: "Output file path") { IsRequired = false };
 
     var rootCommand = new RootCommand("Azure Cost Estimator");
 
     rootCommand.AddOption(fileOption);
     rootCommand.AddOption(paramsFileOption);
     rootCommand.AddOption(grandTotalOption);
+    rootCommand.AddOption(outputFilePathOption);
 
-    rootCommand.SetHandler(async (file, paramFile, grandTotal) => await CalculateCostEstimation(file!, paramFile!, grandTotal!), fileOption, paramsFileOption, grandTotalOption);
+    rootCommand.SetHandler(async (file, paramFile, grandTotal, outputFilePath) => await CalculateCostEstimation(file!, paramFile!, grandTotal!, outputFilePath!), fileOption, paramsFileOption, grandTotalOption, outputFilePathOption);
 
     return await rootCommand.InvokeAsync(args);
   }
 
-  private static async Task CalculateCostEstimation(FileInfo file, FileInfo fileParam, bool grandTotal)
+  private static async Task CalculateCostEstimation(FileInfo file, FileInfo fileParam, bool grandTotal, string? outputFilePath)
   {
+    if (!file.Exists || !fileParam.Exists)
+    {
+      Console.WriteLine("Input file or parameter file does not exist.");
+
+      return;
+    }
+
     var console = new ConsoleOutput("Type", "Name", "Location", "Size", "Service", "Estimated Monthly Cost");
 
     console.PrintLogo();
@@ -82,6 +91,11 @@ public class Program
     }
 
     console.Write();
+
+    if (!string.IsNullOrEmpty(outputFilePath))
+    {
+      File.WriteAllText(outputFilePath, console.ToString());
+    }
   }
 
   private static async Task<decimal> GetPriceEstimation(string serviceName, string kind, string location)
