@@ -1,5 +1,5 @@
-﻿using System.Collections.Concurrent;
-using System.CommandLine;
+﻿using System.CommandLine;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -37,9 +37,11 @@ public class Program
 
     console.PrintLogo();
 
-    PrepareDeploymentTempFolder(Path.Combine(Path.GetTempPath(), "washington"));
+    var path = Path.Combine(Path.GetTempPath(), "washington");
 
-    var deploymentFileContent = await ReadDeploymentFileContent(file);
+    PrepareDeploymentTempFolder(path);
+
+    var deploymentFileContent = await ReadDeploymentFileContent(path, file);
 
     var template = JsonSerializer.Deserialize<ARMTemplate>(deploymentFileContent);
 
@@ -50,7 +52,7 @@ public class Program
       return;
     }
 
-    var deploymentParamFileContent = await ReadDeploymentParamFileContent(fileParam);
+    var deploymentParamFileContent = await ReadDeploymentParamFileContent(path, fileParam);
 
     var parameters = JsonSerializer.Deserialize<ARMParameter>(deploymentParamFileContent);
 
@@ -102,13 +104,9 @@ public class Program
   {
     var client = new HttpClient();
 
-    var response = await client.GetAsync($"https://prices.azure.com/api/retail/prices?$filter=serviceName eq '{serviceName}'");
+    var result = await client.GetFromJsonAsync<PriceResultRoot>($"https://prices.azure.com/api/retail/prices?$filter=serviceName eq '{serviceName}'");
 
-    var content = await response.Content.ReadAsStringAsync();
-
-    var result = JsonSerializer.Deserialize<PriceResultRoot>(content)!;
-
-    var offer = result.offers?.GetValueOrDefault(kind);
+    var offer = result?.offers?.GetValueOrDefault(kind);
 
     var perhour = offer?.prices?.perhour?.GetValueOrDefault(location)?.value;
 
@@ -127,17 +125,15 @@ public class Program
     File.WriteAllText(Path.Combine(path, "bicepconfig.json"), "{ \"analyzers\": { \"core\": { \"enabled\": false } } }");
   }
 
-  private static async Task<string> ReadDeploymentFileContent(FileInfo file)
+  private static async Task<string> ReadDeploymentFileContent(string path, FileInfo file)
   {
     if (file.Extension == ".bicep")
     {
-      var path = Path.Combine(Path.GetTempPath(), "washington");
-
       File.Copy(file.FullName, Path.Combine(path, file.Name));
 
       var outputFilename = Path.Combine(path, Path.GetRandomFileName());
 
-      await Bicep.Cli.Program.Main(new[] { "build", Path.Combine(path, file.Name), "--outfile", outputFilename });
+      await Bicep.Cli.Program.Main([ "build", Path.Combine(path, file.Name), "--outfile", outputFilename ]);
 
       return File.ReadAllText(outputFilename);
     }
@@ -145,17 +141,15 @@ public class Program
     return File.ReadAllText(file.FullName);
   }
 
-  private static async Task<string> ReadDeploymentParamFileContent(FileInfo file)
+  private static async Task<string> ReadDeploymentParamFileContent(string path, FileInfo file)
   {
     if (file.Extension == ".bicepparam")
     {
-      var path = Path.Combine(Path.GetTempPath(), "washington");
-
       File.Copy(file.FullName, Path.Combine(path, file.Name));
 
       var outputFilename = Path.Combine(path, Path.GetRandomFileName());
 
-      await Bicep.Cli.Program.Main(new[] { "build-params", Path.Combine(path, file.Name), "--outfile", outputFilename });
+      await Bicep.Cli.Program.Main([ "build-params", Path.Combine(path, file.Name), "--outfile", outputFilename ]);
 
       return File.ReadAllText(outputFilename);
     }
