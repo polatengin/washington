@@ -110,7 +110,7 @@ public class Program
 
     var offer = result.offers?.GetValueOrDefault(kind);
 
-    var perhour = offer?.prices.perhour.GetValueOrDefault(location)?.value;
+    var perhour = offer?.prices?.perhour?.GetValueOrDefault(location)?.value;
 
     return perhour * 24 * 30 ?? 0;
   }

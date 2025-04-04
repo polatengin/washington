@@ -24,10 +24,10 @@ public class ResourceType
       Size = (element) => element.properties.Deserialize<VirtualMachineProperties>()?.hardwareProfile.vmSize ?? "",
       Kind = (element) =>
       {
-        var parts = element.size.ToLower().Split('_');
+        var parts = element.size?.ToLower().Split('_') ?? [];
         if (parts.Length < 2)
         {
-          return element.size;
+          return element.size ?? "";
         }
         return $"linux-{parts[1]}{parts[2]}-{parts[0]}";
       }
