@@ -20,7 +20,7 @@ public class ResourceType
     {
       Name = "Microsoft.Compute/virtualMachines",
       ServiceName = "Virtual Machines",
-      Location = () => "us-west",
+      Location = () => "westus",
       Size = (element) => element.properties.Deserialize<VirtualMachineProperties>()?.hardwareProfile.vmSize ?? "",
       Kind = (element) =>
       {
@@ -36,7 +36,7 @@ public class ResourceType
     {
       Name = "Microsoft.ContainerService/managedClusters",
       ServiceName = "kubernetes-service",
-      Location = () => "us-west",
+      Location = () => "westus",
       Size = (element) => element.properties.Deserialize<ManagedClusterProperties>()?.agentPoolProfiles?[0]?.vmSize ?? "",
       Kind = (element) =>
       {
@@ -47,7 +47,7 @@ public class ResourceType
     {
       Name = "Microsoft.Storage/storageAccounts",
       ServiceName = "storage",
-      Location = () => "us-west",
+      Location = () => "westus",
       Size = (element) => "storageAccount",
       Kind = (element) =>
       {
@@ -58,7 +58,7 @@ public class ResourceType
     {
       Name = "Microsoft.Storage/storageAccounts/blobServices",
       ServiceName = "",
-      Location = () => "us-west",
+      Location = () => "westus",
       Size = (element) => "0",
       Kind = (element) =>
       {
@@ -69,7 +69,7 @@ public class ResourceType
     {
       Name = "Microsoft.Storage/storageAccounts/blobServices/containers",
       ServiceName = "",
-      Location = () => "us-west",
+      Location = () => "westus",
       Size = (element) => "0",
       Kind = (element) =>
       {
