@@ -77,7 +77,7 @@ public class Program
 
       if (string.IsNullOrEmpty(resource.serviceName))
       {
-        console.AddRow($"Resource {resource.name}({resource.type}) is skipped for cost estimation (Free).");
+        console.AddRow($"Resource {resource.name}({resource.type}) is skipped from cost estimation (Free).");
 
         return;
       }
