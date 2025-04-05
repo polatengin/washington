@@ -2,8 +2,8 @@ using System.Text;
 
 public class ConsoleOutput
 {
-  private List<string> _columns = new();
-  private List<string[]> _rows = new();
+  private List<string> _columns = [];
+  private List<string[]> _rows = [];
 
   public ConsoleOutput(params string[] columns)
   {
@@ -29,8 +29,8 @@ public class ConsoleOutput
     _rows.Add(values);
   }
 
-  private decimal _grandTotal = -1;
-  public void AddGrandTotalRow(decimal total)
+  private double _grandTotal = -1;
+  public void AddGrandTotalRow(double total)
   {
     _grandTotal = total;
   }

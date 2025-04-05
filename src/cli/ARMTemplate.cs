@@ -14,7 +14,7 @@ public class Resource
   public string? size { get; set; }
   public string? serviceName { get; set; }
   public string? kind { get; set; }
-  public decimal estimatedMonthlyCost { get; set; }
+  public double estimatedMonthlyCost { get; set; }
 }
 
 public class Parameter
