@@ -100,17 +100,15 @@ public class Program
     }
   }
 
-  private static async Task<decimal> GetPriceEstimation(string serviceName, string kind, string location)
+  private static async Task<double> GetPriceEstimation(string serviceName, string kind, string location)
   {
     var client = new HttpClient();
 
-    var result = await client.GetFromJsonAsync<PriceResultRoot>($"https://prices.azure.com/api/retail/prices?$filter=serviceName eq '{serviceName}'");
+    var result = await client.GetFromJsonAsync<PriceResultRoot>($"https://prices.azure.com/api/retail/prices?$filter=serviceName eq '{serviceName}'") ?? new PriceResultRoot();
 
-    var offer = result?.offers?.GetValueOrDefault(kind);
+    var hourlyPrice = result.Items.Where(e => e.currencyCode == "USD" && e.serviceName == serviceName && e.armRegionName == location).Select(e => e.unitPrice).FirstOrDefault();
 
-    var perhour = offer?.prices?.perhour?.GetValueOrDefault(location)?.value;
-
-    return perhour * 24 * 30 ?? 0;
+    return hourlyPrice * 24 * 30;
   }
 
   private static void PrepareDeploymentTempFolder(string path)
