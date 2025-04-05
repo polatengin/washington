@@ -15,8 +15,8 @@ public class ResourceType
     public required Func<string> Location { get; set; }
   }
 
-  public static AzureResourceType[] Types = {
-    new AzureResourceType()
+  public static AzureResourceType[] Types = [
+    new()
     {
       Name = "Microsoft.Compute/virtualMachines",
       ServiceName = "Virtual Machines",
@@ -32,7 +32,7 @@ public class ResourceType
         return $"linux-{parts[1]}{parts[2]}-{parts[0]}";
       }
     },
-    new AzureResourceType()
+    new()
     {
       Name = "Microsoft.ContainerService/managedClusters",
       ServiceName = "kubernetes-service",
@@ -43,7 +43,7 @@ public class ResourceType
         return $"linux";
       }
     },
-    new AzureResourceType()
+    new()
     {
       Name = "Microsoft.Storage/storageAccounts",
       ServiceName = "storage",
@@ -54,7 +54,7 @@ public class ResourceType
         return $"linux";
       }
     },
-    new AzureResourceType()
+    new()
     {
       Name = "Microsoft.Storage/storageAccounts/blobServices",
       ServiceName = "",
@@ -65,7 +65,7 @@ public class ResourceType
         return $"linux";
       }
     },
-    new AzureResourceType()
+    new()
     {
       Name = "Microsoft.Storage/storageAccounts/blobServices/containers",
       ServiceName = "",
@@ -76,5 +76,5 @@ public class ResourceType
         return $"linux";
       }
     }
-  };
+  ];
 }
