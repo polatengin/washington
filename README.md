@@ -1,6 +1,9 @@
-# washington
+# Azure Deployments Cost Estimator
 
-Azure Cost Estimator
+_Azure Deployments Cost Estimator_ project is a `FinOps` solution.
+
+`FinOps` combines financial management, operations, and engineering best practices to help organizations understand, control, and optimize their cloud expenses. It encourages a culture where teams take ownership of their cloud usage, enabling faster product delivery while staying within budget.
+
 
 ## Cloning the repository
 
