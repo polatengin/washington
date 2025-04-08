@@ -20,4 +20,5 @@ interface ResourceModel {
   name: string;
   type: string;
   properties: string;
+  estimatedCost: string;
 }
