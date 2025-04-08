@@ -4,6 +4,15 @@ _Azure Deployments Cost Estimator_ project is a `FinOps` solution.
 
 `FinOps` combines financial management, operations, and engineering best practices to help organizations understand, control, and optimize their cloud expenses. It encourages a culture where teams take ownership of their cloud usage, enabling faster product delivery while staying within budget.
 
+## Key Concepts
+
+_Visibility_: Understand who is spending what in the cloud.
+
+_Accountability_: Encourage teams to take responsibility for their usage.
+
+_Optimization_: Find ways to reduce waste and save costs.
+
+_Collaboration_: Finance, engineering, and product teams work together.
 
 ## Cloning the repository
 
