@@ -1,4 +1,4 @@
-﻿using System.CommandLine;
+using System.CommandLine;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -131,7 +131,7 @@ public class Program
 
       var outputFilename = Path.Combine(path, Path.GetRandomFileName());
 
-      await Bicep.Cli.Program.Main([ "build", Path.Combine(path, file.Name), "--outfile", outputFilename ]);
+      await Bicep.Cli.Program.Main(["build", Path.Combine(path, file.Name), "--outfile", outputFilename]);
 
       return File.ReadAllText(outputFilename);
     }
@@ -147,7 +147,7 @@ public class Program
 
       var outputFilename = Path.Combine(path, Path.GetRandomFileName());
 
-      await Bicep.Cli.Program.Main([ "build-params", Path.Combine(path, file.Name), "--outfile", outputFilename ]);
+      await Bicep.Cli.Program.Main(["build-params", Path.Combine(path, file.Name), "--outfile", outputFilename]);
 
       return File.ReadAllText(outputFilename);
     }
