@@ -1,6 +1,6 @@
 public class PriceResultRoot
 {
-  public PriceResultItem[] Items { get; set; }
+  public PriceResultItem[]? Items { get; set; }
 }
 
 public record PriceResultItem
