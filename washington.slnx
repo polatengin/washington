@@ -2,4 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/cli/cli.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/cli.tests/cli.tests.csproj" />
+  </Folder>
 </Solution>
