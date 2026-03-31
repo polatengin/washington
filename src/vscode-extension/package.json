@@ -1,10 +1,10 @@
 {
-  "name": "azure-cost-estimator",
-  "displayName": "azure-cost-estimator",
-  "description": "",
-  "version": "0.0.1",
+  "name": "washington",
+  "displayName": "Washington — Azure Cost Estimator",
+  "description": "Estimate monthly Azure costs from Bicep files",
+  "version": "0.1.0",
   "engines": {
-    "vscode": "^1.68.0"
+    "vscode": "^1.76.0"
   },
   "categories": [
     "Other"
@@ -14,57 +14,96 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
-    "configurationDefaults": {
-      "[bicep]": {
-        "editor.tabSize": 2,
-        "editor.insertSpaces": true,
-        "files.insertFinalNewline": true,
-        "editor.suggestSelection": "first",
-        "editor.suggest.snippetsPreventQuickSuggestions": false,
-        "editor.suggest.showWords": false
+    "configuration": {
+      "title": "Washington Cost Estimator",
+      "properties": {
+        "washington.currency": {
+          "type": "string",
+          "default": "USD",
+          "description": "Currency code for cost estimates (e.g., USD, EUR)"
+        },
+        "washington.defaultRegion": {
+          "type": "string",
+          "default": "eastus",
+          "description": "Default Azure region when not specified in resource"
+        },
+        "washington.cliPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to the washington CLI binary. Auto-detected if empty."
+        },
+        "washington.estimateOnSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically estimate costs when saving .bicep files"
+        },
+        "washington.showCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show cost estimates as CodeLens above resources"
+        },
+        "washington.showStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show total estimated cost in the status bar"
+        },
+        "washington.cacheTtlHours": {
+          "type": "number",
+          "default": 24,
+          "description": "Pricing cache time-to-live in hours"
+        }
       }
     },
     "commands": [
       {
-        "category": "Azure Cost Estimator",
-        "command": "azure-cost-estimator.estimateAll",
-        "title": "Estimate",
-        "icon": "$(symbol-operator)"
+        "command": "washington.estimateFile",
+        "title": "Estimate File Cost",
+        "category": "Washington"
+      },
+      {
+        "command": "washington.estimateWorkspace",
+        "title": "Estimate Workspace Cost",
+        "category": "Washington"
+      },
+      {
+        "command": "washington.clearCache",
+        "title": "Clear Pricing Cache",
+        "category": "Washington"
       }
     ],
     "menus": {
       "editor/title": [
         {
-          "command": "azure-cost-estimator.estimateAll",
+          "command": "washington.estimateFile",
           "when": "editorLangId == bicep",
           "group": "navigation"
         }
       ],
       "explorer/context": [
         {
-          "command": "azure-cost-estimator.estimateAll",
-          "when": "resourceLangId == bicep",
-          "group": "0_estimation"
-        }
-      ],
-      "editor/title/context": [
-        {
-          "command": "azure-cost-estimator.estimateAll",
-          "when": "resourceLangId == bicep",
-          "group": "0_estimation"
-        }
-      ],
-      "editor/context": [
-        {
-          "command": "azure-cost-estimator.estimateAll",
+          "command": "washington.estimateFile",
           "when": "resourceLangId == bicep",
           "group": "0_estimation"
         }
       ],
       "commandPalette": [
         {
-          "command": "azure-cost-estimator.estimateAll",
-          "group": "0_estimation"
+          "command": "washington.estimateFile"
+        },
+        {
+          "command": "washington.estimateWorkspace"
+        },
+        {
+          "command": "washington.clearCache"
+        }
+      ]
+    },
+    "views": {
+      "explorer": [
+        {
+          "id": "washingtonCostBreakdown",
+          "name": "Cost Breakdown",
+          "when": "resourceLangId == bicep || editorLangId == bicep"
         }
       ]
     }
@@ -81,25 +120,20 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
-    "@azure/arm-consumption": "9.2.0",
-    "@azure/identity": "4.2.1",
-    "@types/glob": "8.1.0",
     "@types/mocha": "10.0.1",
     "@types/node": "18.x",
     "@types/vscode": "1.76.0",
     "@typescript-eslint/eslint-plugin": "5.56.0",
     "@typescript-eslint/parser": "5.56.0",
     "@vscode/test-electron": "2.3.0",
-    "@vscode/webview-ui-toolkit": "1.2.2",
     "eslint": "8.36.0",
-    "glob": "9.3.2",
     "mocha": "10.8.2",
-    "ms-rest-js": "1.0.1",
-    "node-fetch": "3.3.1",
     "ts-loader": "9.4.2",
     "typescript": "5.0.2",
-    "vscode-languageclient": "8.1.0",
     "webpack": "5.98.0",
     "webpack-cli": "5.0.1"
+  },
+  "dependencies": {
+    "vscode-languageclient": "8.1.0"
   }
 }
