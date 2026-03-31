@@ -27,6 +27,6 @@
       ]
     }
   },
-  "postCreateCommand": "az bicep upgrade",
+  "postCreateCommand": "az bicep upgrade && git submodule update",
   "remoteUser": "root"
 }
