@@ -17,7 +17,8 @@ public class CostEstimationService
     }
 
     public async Task<CostReport> EstimateFromBicepAsync(
-        string bicepFilePath, string? paramsFilePath = null, string currency = "USD")
+        string bicepFilePath, string? paramsFilePath = null, string currency = "USD",
+        Dictionary<string, string>? paramOverrides = null)
     {
         // Compile bicep to ARM JSON
         var armJson = await _compiler.CompileBicepToArm(bicepFilePath);
