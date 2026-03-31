@@ -315,7 +315,6 @@ public class CostEstimatorLanguageServer
                 var markdown = $"### 💰 Cost Estimate: {line.ResourceName}\n\n" +
                                $"| Field | Value |\n|-------|-------|\n" +
                                $"| **Type** | {line.ResourceType} |\n" +
-                               $"| **Location** | {line.Location} |\n" +
                                $"| **Details** | {line.PricingDetails} |\n" +
                                $"| **Monthly Cost** | ${line.MonthlyCost:N2} |\n";
 

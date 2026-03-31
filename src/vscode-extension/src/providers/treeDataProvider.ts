@@ -56,7 +56,6 @@ export class CostTreeDataProvider implements vscode.TreeDataProvider<CostTreeIte
       const line = element.resourceLine;
       return [
         new CostTreeItem(`Type: ${line.resourceType}`, ''),
-        new CostTreeItem(`Location: ${line.location}`, ''),
         new CostTreeItem(`Details: ${line.pricingDetails}`, ''),
         new CostTreeItem(`Monthly Cost: $${line.monthlyCost.toFixed(2)}`, ''),
       ];

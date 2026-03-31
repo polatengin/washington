@@ -18,14 +18,12 @@ suite('TreeDataProvider', () => {
         {
           resourceType: 'Microsoft.Compute/virtualMachines',
           resourceName: 'test-vm',
-          location: 'eastus',
           pricingDetails: 'Standard_D2s_v3 @ $0.0960/hr × 730 hrs',
           monthlyCost: 70.08,
         },
         {
           resourceType: 'Microsoft.Storage/storageAccounts',
           resourceName: 'mystorage',
-          location: 'eastus',
           pricingDetails: 'StorageV2 Standard_LRS Hot ~100 GB',
           monthlyCost: 5.2,
         },
@@ -70,7 +68,6 @@ suite('TreeDataProvider', () => {
         {
           resourceType: 'Microsoft.Compute/virtualMachines',
           resourceName: 'test-vm',
-          location: 'eastus',
           pricingDetails: 'Standard_D2s_v3',
           monthlyCost: 70.08,
         },
@@ -86,9 +83,8 @@ suite('TreeDataProvider', () => {
     const resourceItem = children[1];
     const details = provider.getChildren(resourceItem);
 
-    assert.ok(details.length === 4);
+    assert.ok(details.length === 3);
     assert.ok(details.some(d => d.label?.toString().includes('Type:')));
-    assert.ok(details.some(d => d.label?.toString().includes('Location:')));
     assert.ok(details.some(d => d.label?.toString().includes('Details:')));
     assert.ok(details.some(d => d.label?.toString().includes('Monthly Cost:')));
   });

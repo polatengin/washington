@@ -28,10 +28,6 @@ public class EstimateCommand
             getDefaultValue: () => "table",
             description: "Output format: table, json, csv, markdown");
 
-        var outputFileOption = new Option<string?>(
-            name: "--output-file",
-            description: "Write output to file instead of stdout");
-
         var paramOption = new Option<string[]>(
             name: "--param",
             description: "Parameter value override in key=value format (can be specified multiple times)")
@@ -43,21 +39,20 @@ public class EstimateCommand
             paramsFileOption,
             currencyOption,
             outputFormatOption,
-            outputFileOption,
             paramOption
         };
 
-        command.SetHandler(async (file, paramsFile, currency, outputFormat, outputFile, paramOverrides) =>
+        command.SetHandler(async (file, paramsFile, currency, outputFormat, paramOverrides) =>
         {
-            await RunAsync(file, paramsFile, currency, outputFormat, outputFile, paramOverrides);
-        }, fileOption, paramsFileOption, currencyOption, outputFormatOption, outputFileOption, paramOption);
+            await RunAsync(file, paramsFile, currency, outputFormat, paramOverrides);
+        }, fileOption, paramsFileOption, currencyOption, outputFormatOption, paramOption);
 
         return command;
     }
 
     private static async Task RunAsync(
         FileInfo file, FileInfo? paramsFile, string currency,
-        string outputFormat, string? outputFile, string[] paramOverrides)
+        string outputFormat, string[] paramOverrides)
     {
         if (!file.Exists)
         {
@@ -91,15 +86,6 @@ public class EstimateCommand
             paramDict);
 
         var output = OutputFormatter.Format(report, outputFormat, file.FullName);
-
-        if (!string.IsNullOrEmpty(outputFile))
-        {
-            File.WriteAllText(outputFile, output);
-            Console.WriteLine($"Output written to {outputFile}");
-        }
-        else
-        {
-            Console.Write(output);
-        }
+        Console.Write(output);
     }
 }

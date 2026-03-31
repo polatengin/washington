@@ -45,7 +45,6 @@ public class CostAggregator
             lines.Add(new ResourceCostLine(
                 ResourceType: resource.ResourceType,
                 ResourceName: resource.Name,
-                Location: resource.Location,
                 PricingDetails: cost.Details,
                 MonthlyCost: cost.Amount
             ));

@@ -22,7 +22,7 @@ public class OutputFormatterTests
         var report = CreateSampleReport();
         var output = OutputFormatter.Format(report, "csv");
 
-        Assert.StartsWith("ResourceName,ResourceType,Location,PricingDetails,MonthlyCost", output);
+        Assert.StartsWith("ResourceName,ResourceType,PricingDetails,MonthlyCost", output);
         Assert.Contains("test-vm", output);
     }
 
@@ -51,7 +51,7 @@ public class OutputFormatterTests
         return new CostReport(
             Lines: new List<ResourceCostLine>
             {
-                new("Microsoft.Compute/virtualMachines", "test-vm", "eastus",
+                new("Microsoft.Compute/virtualMachines", "test-vm",
                     "Standard_D2s_v3 @ $0.0960/hr × 730 hrs", 70.08m)
             },
             GrandTotal: 70.08m,

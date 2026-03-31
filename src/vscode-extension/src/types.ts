@@ -8,7 +8,6 @@ export interface CostReport {
 export interface ResourceCostLine {
   resourceType: string;
   resourceName: string;
-  location: string;
   pricingDetails: string;
   monthlyCost: number;
 }
