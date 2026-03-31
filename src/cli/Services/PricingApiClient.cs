@@ -15,7 +15,7 @@ public class PricingApiClient
         _cache = cache;
     }
 
-    public async Task<List<PriceRecord>> QueryPricesAsync(PricingQuery query)
+    public virtual async Task<List<PriceRecord>> QueryPricesAsync(PricingQuery query)
     {
         var cacheKey = query.ToCacheKey();
         var cached = _cache.Get(cacheKey);
