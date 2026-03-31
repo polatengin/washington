@@ -3,6 +3,7 @@ import { createLspClient, deactivateClient } from './lspClient';
 import { CostTreeDataProvider } from './providers/treeDataProvider';
 import { createStatusBarItem, updateStatusBar } from './statusBar';
 import { CostReport } from './types';
+import { getConfig } from './config';
 
 let statusBarItem: vscode.StatusBarItem;
 let treeDataProvider: CostTreeDataProvider;
@@ -27,13 +28,16 @@ export async function activate(context: vscode.ExtensionContext) {
       }
 
       try {
+        const config = getConfig();
         const report = await client.sendRequest<CostReport>('washington/estimateFile', {
           uri: editor.document.uri.toString(),
-          currency: getConfig('currency'),
+          currency: config.currency,
         });
         if (report) {
           treeDataProvider.update(report);
-          updateStatusBar(statusBarItem, report);
+          if (config.showStatusBar) {
+            updateStatusBar(statusBarItem, report);
+          }
         }
       } catch (err: any) {
         vscode.window.showErrorMessage(`Cost estimation failed: ${err.message}`);
@@ -45,12 +49,15 @@ export async function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('washington.estimateWorkspace', async () => {
       try {
+        const config = getConfig();
         const report = await client.sendRequest<CostReport>('washington/estimateWorkspace', {
-          currency: getConfig('currency'),
+          currency: config.currency,
         });
         if (report) {
           treeDataProvider.update(report);
-          updateStatusBar(statusBarItem, report);
+          if (config.showStatusBar) {
+            updateStatusBar(statusBarItem, report);
+          }
         }
       } catch (err: any) {
         vscode.window.showErrorMessage(`Workspace estimation failed: ${err.message}`);
@@ -74,7 +81,8 @@ export async function activate(context: vscode.ExtensionContext) {
   // Update status bar when active editor changes
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor(async (editor) => {
-      if (editor && editor.document.fileName.endsWith('.bicep')) {
+      const config = getConfig();
+      if (editor && editor.document.fileName.endsWith('.bicep') && config.showStatusBar) {
         statusBarItem.show();
       } else {
         statusBarItem.hide();
@@ -86,16 +94,13 @@ export async function activate(context: vscode.ExtensionContext) {
   await client.start();
 
   // Show status bar for current editor if bicep
-  if (vscode.window.activeTextEditor?.document.fileName.endsWith('.bicep')) {
+  const config = getConfig();
+  if (vscode.window.activeTextEditor?.document.fileName.endsWith('.bicep') && config.showStatusBar) {
     statusBarItem.show();
   }
 }
 
 export async function deactivate() {
   await deactivateClient();
-}
-
-function getConfig(key: string): string {
-  return vscode.workspace.getConfiguration('washington').get<string>(key) ?? 'USD';
 }
 
