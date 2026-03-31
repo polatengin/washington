@@ -32,25 +32,32 @@ public class EstimateCommand
             name: "--output-file",
             description: "Write output to file instead of stdout");
 
+        var paramOption = new Option<string[]>(
+            name: "--param",
+            description: "Parameter value override in key=value format (can be specified multiple times)")
+        { AllowMultipleArgumentsPerToken = true };
+
         var command = new Command("estimate", "Estimate monthly Azure costs from a Bicep file")
         {
             fileOption,
             paramsFileOption,
             currencyOption,
             outputFormatOption,
-            outputFileOption
+            outputFileOption,
+            paramOption
         };
 
-        command.SetHandler(async (file, paramsFile, currency, outputFormat, outputFile) =>
+        command.SetHandler(async (file, paramsFile, currency, outputFormat, outputFile, paramOverrides) =>
         {
-            await RunAsync(file, paramsFile, currency, outputFormat, outputFile);
-        }, fileOption, paramsFileOption, currencyOption, outputFormatOption, outputFileOption);
+            await RunAsync(file, paramsFile, currency, outputFormat, outputFile, paramOverrides);
+        }, fileOption, paramsFileOption, currencyOption, outputFormatOption, outputFileOption, paramOption);
 
         return command;
     }
 
     private static async Task RunAsync(
-        FileInfo file, FileInfo? paramsFile, string currency, string outputFormat, string? outputFile)
+        FileInfo file, FileInfo? paramsFile, string currency,
+        string outputFormat, string? outputFile, string[] paramOverrides)
     {
         if (!file.Exists)
         {
@@ -66,10 +73,22 @@ public class EstimateCommand
         var aggregator = new CostAggregator(mapperRegistry, pricingClient);
         var service = new CostEstimationService(compiler, extractor, aggregator);
 
+        // Parse param overrides into dictionary
+        var paramDict = new Dictionary<string, string>();
+        foreach (var p in paramOverrides ?? Array.Empty<string>())
+        {
+            var eqIndex = p.IndexOf('=');
+            if (eqIndex > 0)
+            {
+                paramDict[p[..eqIndex]] = p[(eqIndex + 1)..];
+            }
+        }
+
         var report = await service.EstimateFromBicepAsync(
             file.FullName,
             paramsFile?.FullName,
-            currency);
+            currency,
+            paramDict);
 
         var output = OutputFormatter.Format(report, outputFormat, file.FullName);
 
