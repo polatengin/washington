@@ -66,19 +66,31 @@ Unmapped resource types produce a warning: `⚠ No pricing mapper for Microsoft.
 ### Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
+- GNU Make
 
 ### Clone the Repository
 
 ```bash
 git clone https://github.com/polatengin/washington.git
 cd washington
-git submodule update --init --recursive
+make setup-cli
 ```
 
 ### Build
 
 ```bash
-dotnet build src/cli/washington.csproj
+make build-cli
+make test-cli
+```
+
+For other surfaces, install and build them explicitly:
+
+```bash
+make setup-extension
+make build-extension
+
+make setup-website
+make build-website
 ```
 
 ---
