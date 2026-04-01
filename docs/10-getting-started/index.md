@@ -11,6 +11,7 @@ This guide walks you through installing Washington and running your first cost e
 
 - An Azure subscription (for pricing API access)
 - [.NET 10 SDK](https://dotnet.microsoft.com/download) (for building from source) or use the pre-built binary
+- GNU Make (for building from source)
 
 ## Installation
 
@@ -25,10 +26,11 @@ curl -sL https://bicepcostestimator.net/install.sh | bash
 ```bash
 git clone https://github.com/polatengin/washington.git
 cd washington
-dotnet build src/cli/cli.csproj
+make setup-cli
+make build-cli
 ```
 
-The built binary will be at `src/cli/bin/Debug/net10.0/cli`.
+The built binary will be at `src/cli/bin/Release/net10.0/washington`.
 
 ## First Estimate
 
