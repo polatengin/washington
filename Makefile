@@ -51,6 +51,9 @@ build-extension: clean ## Build the VS Code extension
 build-website: clean ## Build the documentation website
 	npm --prefix src/website run build
 
+dev-website: clean ## Run the documentation website locally with live reload
+	npm --prefix src/website run dev
+
 test-cli: build-cli ## Run the CLI test suite
 	dotnet test tests/cli.tests/washington.tests.csproj --configuration Release
 
