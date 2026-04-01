@@ -72,7 +72,7 @@ git submodule update --init --recursive
 ### Build
 
 ```bash
-dotnet build src/cli/cli.csproj
+dotnet build src/cli/washington.csproj
 ```
 
 ---
@@ -83,16 +83,16 @@ dotnet build src/cli/cli.csproj
 
 ```bash
 # Basic estimate
-dotnet run --project ./src/cli/cli.csproj -- estimate --file main.bicep
+dotnet run --project ./src/cli/washington.csproj -- estimate --file main.bicep
 
 # With parameters file
-dotnet run --project ./src/cli/cli.csproj -- estimate --file main.bicep --params-file params.bicepparam
+dotnet run --project ./src/cli/washington.csproj -- estimate --file main.bicep --params-file params.bicepparam
 
 # Override parameter values
-dotnet run --project ./src/cli/cli.csproj -- estimate --file main.bicep --param vmSize=Standard_D4s_v3 --param env=prod
+dotnet run --project ./src/cli/washington.csproj -- estimate --file main.bicep --param vmSize=Standard_D4s_v3 --param env=prod
 
 # Choose output format
-dotnet run --project ./src/cli/cli.csproj -- estimate --file main.bicep --output json
+dotnet run --project ./src/cli/washington.csproj -- estimate --file main.bicep --output json
 ```
 
 **Options:**
@@ -115,29 +115,29 @@ dotnet run --project ./src/cli/cli.csproj -- estimate --file main.bicep --output
 
 ```bash
 # 1. Estimate a single VM (default table output)
-dotnet run --project ./src/cli/cli.csproj -- estimate --file ./tests/fixtures/simple-vm.bicep
+dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/simple-vm.bicep
 
 # 2. Estimate all resources with a params file, output as markdown
-dotnet run --project ./src/cli/cli.csproj -- estimate --file ./tests/fixtures/all.bicep --params-file ./tests/fixtures/all.bicepparam --output markdown
+dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/all.bicep --params-file ./tests/fixtures/all.bicepparam --output markdown
 
 # 3. Estimate an AKS cluster, output as JSON
-dotnet run --project ./src/cli/cli.csproj -- estimate --file ./tests/fixtures/aks.bicep --output json
+dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/aks.bicep --output json
 
 # 4. Estimate AKS + VM together, output as CSV
-dotnet run --project ./src/cli/cli.csproj -- estimate --file ./tests/fixtures/aks-vm.bicep --output csv
+dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/aks-vm.bicep --output csv
 
 # 5. Estimate from a pre-compiled ARM template
-dotnet run --project ./src/cli/cli.csproj -- estimate --file ./tests/fixtures/multi-resource.arm.json --output table
+dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/multi-resource.arm.json --output table
 ```
 
 ### Cache Management
 
 ```bash
 # View cache statistics (entry count and size)
-dotnet run --project ./src/cli/cli.csproj -- cache info
+dotnet run --project ./src/cli/washington.csproj -- cache info
 
 # Clear all cached pricing data
-dotnet run --project ./src/cli/cli.csproj -- cache clear
+dotnet run --project ./src/cli/washington.csproj -- cache clear
 ```
 
 Cache is stored at `~/.bicep-cost-estimator/cache/` with a default 24-hour TTL.
@@ -145,7 +145,7 @@ Cache is stored at `~/.bicep-cost-estimator/cache/` with a default 24-hour TTL.
 ### LSP Server Mode
 
 ```bash
-dotnet run --project ./src/cli/cli.csproj -- lsp
+dotnet run --project ./src/cli/washington.csproj -- lsp
 ```
 
 Starts a Language Server Protocol server over stdin/stdout (JSON-RPC). Used by editors for real-time cost estimation.
