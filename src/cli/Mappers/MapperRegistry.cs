@@ -52,6 +52,7 @@ public class MapperRegistry
         // P4: Networking
         Register(new VirtualNetworkMapper());
         Register(new NatGatewayMapper());
+        Register(new NetworkInterfaceMapper());
         Register(new PrivateDnsZoneMapper());
         Register(new TrafficManagerMapper());
         Register(new BastionHostMapper());
