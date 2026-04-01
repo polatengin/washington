@@ -254,7 +254,7 @@ public class CostEstimatorLanguageServer
                     },
                     Command = new LspCommand
                     {
-                        Title = $"💰 Estimated Monthly Total: ${report.GrandTotal:N2}",
+                        Title = $"💰 Estimated Monthly Total (all resources): ${report.GrandTotal:N2}",
                         CommandId = "washington.showCostDetails"
                     }
                 });
