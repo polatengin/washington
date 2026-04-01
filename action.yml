@@ -44,19 +44,28 @@ runs:
     - name: Build CLI
       shell: bash
       run: |
-        dotnet build "${{ github.action_path }}/src/cli/cli.csproj" -c Release -o "${{ runner.temp }}/washington"
+        dotnet build "${{ github.action_path }}/src/cli/washington.csproj" -c Release
+
+    - name: Resolve CLI path
+      shell: bash
+      run: |
+        CLI_BIN="${{ github.action_path }}/src/cli/bin/Release/net10.0/washington"
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          CLI_BIN="${CLI_BIN}.exe"
+        fi
+        echo "CLI_BIN=${CLI_BIN}" >> "$GITHUB_ENV"
 
     - name: Run Cost Estimation
       id: cost-estimator
       shell: bash
       run: |
-        ARGS="estimate --file ${{ inputs.file }}"
+        ARGS=(estimate --file "${{ inputs.file }}")
         if [ -n "${{ inputs.params-file }}" ]; then
-          ARGS="$ARGS --params-file ${{ inputs.params-file }}"
+          ARGS+=(--params-file "${{ inputs.params-file }}")
         fi
-        ARGS="$ARGS --output ${{ inputs.output-format }}"
+        ARGS+=(--output "${{ inputs.output-format }}")
 
-        RESULT=$("${{ runner.temp }}/washington/cli" $ARGS)
+        RESULT=$("$CLI_BIN" "${ARGS[@]}")
 
         echo "estimation-result<<EOF" >> $GITHUB_OUTPUT
         echo "$RESULT" >> $GITHUB_OUTPUT
@@ -70,13 +79,13 @@ runs:
       if: inputs.base-file != ''
       shell: bash
       run: |
-        ARGS="estimate --file ${{ inputs.base-file }}"
+        ARGS=(estimate --file "${{ inputs.base-file }}")
         if [ -n "${{ inputs.base-params-file }}" ]; then
-          ARGS="$ARGS --params-file ${{ inputs.base-params-file }}"
+          ARGS+=(--params-file "${{ inputs.base-params-file }}")
         fi
-        ARGS="$ARGS --output json"
+        ARGS+=(--output json)
 
-        BASE_RESULT=$("${{ runner.temp }}/washington/cli" $ARGS 2>/dev/null || echo '{"grandTotal": 0}')
+        BASE_RESULT=$("$CLI_BIN" "${ARGS[@]}" 2>/dev/null || echo '{"grandTotal": 0}')
 
         BASE_TOTAL=$(echo "$BASE_RESULT" | jq -r '.grandTotal // empty' 2>/dev/null || echo "0")
         echo "base-cost=$BASE_TOTAL" >> $GITHUB_OUTPUT
