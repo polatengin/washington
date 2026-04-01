@@ -24,6 +24,25 @@ public class MapperRegistry
         Register(new KeyVaultMapper());
         Register(new ContainerRegistryMapper());
         Register(new LoadBalancerMapper());
+
+        // P3: Extended resource types
+        Register(new ManagedDiskMapper());
+        Register(new FunctionAppMapper());
+        Register(new SqlManagedInstanceMapper());
+        Register(new VirtualNetworkGatewayMapper());
+        Register(new AzureFirewallMapper());
+        Register(new PrivateEndpointMapper());
+        Register(new LogAnalyticsWorkspaceMapper());
+        Register(new RedisCacheMapper());
+        Register(new EventHubMapper());
+        Register(new ServiceBusMapper());
+        Register(new FrontDoorMapper());
+        Register(new ContainerAppMapper());
+        Register(new PostgreSqlFlexibleServerMapper());
+        Register(new MySqlFlexibleServerMapper());
+        Register(new ApiManagementMapper());
+        Register(new StaticWebAppMapper());
+        Register(new SignalRMapper());
     }
 
     public void Register(IResourceCostMapper mapper) => _mappers.Add(mapper);
