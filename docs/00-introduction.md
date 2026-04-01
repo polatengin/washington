@@ -27,7 +27,7 @@ Washington is an open-source tool that estimates the cost of your Azure infrastr
 
 ```bash
 # Install the CLI
-curl -sL https://bicepcostestimate.net/install.sh | bash
+curl -sL https://bicepcostestimator.net/install.sh | bash
 
 # Estimate costs for a Bicep file
 washington estimate main.bicep
