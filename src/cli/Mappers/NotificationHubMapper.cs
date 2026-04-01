@@ -11,7 +11,7 @@ public class NotificationHubMapper : IResourceCostMapper
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase) ||
         resource.ResourceType.Equals("Microsoft.NotificationHubs/namespaces/notificationHubs", StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
 
@@ -20,7 +20,6 @@ public class NotificationHubMapper : IResourceCostMapper
             new PricingQuery(
                 ServiceName: "Notification Hubs",
                 ArmRegionName: region,
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

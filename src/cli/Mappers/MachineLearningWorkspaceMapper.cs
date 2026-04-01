@@ -12,7 +12,7 @@ public class MachineLearningWorkspaceMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
 
@@ -21,7 +21,6 @@ public class MachineLearningWorkspaceMapper : IResourceCostMapper
             new PricingQuery(
                 ServiceName: "Azure Machine Learning",
                 ArmRegionName: region,
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

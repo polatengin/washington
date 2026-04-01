@@ -26,7 +26,7 @@ export class CostTreeDataProvider implements vscode.TreeDataProvider<CostTreeIte
       const items: CostTreeItem[] = [];
 
       items.push(new CostTreeItem(
-        `Total: $${this.report.grandTotal.toFixed(2)} ${this.report.currency}/month`,
+        `Total: $${this.report.grandTotal.toFixed(2)}/month`,
         '',
         vscode.TreeItemCollapsibleState.None
       ));

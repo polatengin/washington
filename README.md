@@ -26,7 +26,6 @@ It ships as a **CLI tool**, a **VS Code extension**, and a **GitHub Action**, gi
 | Delta cost comparison (current vs base branch) | — | — | ✅ |
 | Cost threshold failure gate | — | — | ✅ |
 | Pricing cache (24h TTL, file-based) | ✅ | ✅ | ✅ |
-| Multi-currency support | ✅ | ✅ | ✅ |
 | Parameter-aware (`.bicepparam` files) | ✅ | ✅ | ✅ |
 
 ---
@@ -92,8 +91,8 @@ dotnet run --project ./src/cli/cli.csproj -- estimate --file main.bicep --params
 # Override parameter values
 dotnet run --project ./src/cli/cli.csproj -- estimate --file main.bicep --param vmSize=Standard_D4s_v3 --param env=prod
 
-# Choose currency and output format
-dotnet run --project ./src/cli/cli.csproj -- estimate --file main.bicep --currency EUR --output json
+# Choose output format
+dotnet run --project ./src/cli/cli.csproj -- estimate --file main.bicep --output json
 ```
 
 **Options:**
@@ -103,15 +102,33 @@ dotnet run --project ./src/cli/cli.csproj -- estimate --file main.bicep --curren
 | `--file <path>` | Path to `.bicep` or ARM JSON file | *(required)* |
 | `--params-file <path>` | Path to `.bicepparam` file | — |
 | `--param <key=value>` | Override a parameter value (repeatable) | — |
-| `--currency <code>` | ISO 4217 currency code | `USD` |
 | `--output <format>` | `table`, `json`, `csv`, or `markdown` | `table` |
 
 ### Output Formats
 
 - **`table`** — Human-readable ASCII table with resource names, types, pricing details, and monthly costs
-- **`json`** — Machine-readable JSON with `lines`, `grandTotal`, `currency`, and `warnings`
+- **`json`** — Machine-readable JSON with `lines`, `grandTotal`, and `warnings`
 - **`csv`** — RFC 4180 CSV with headers and a TOTAL row
 - **`markdown`** — GitHub-flavored markdown table
+
+### Sample Commands
+
+```bash
+# 1. Estimate a single VM (table output, default USD)
+dotnet run --project ./src/cli/cli.csproj -- estimate --file ./tests/fixtures/simple-vm.bicep
+
+# 2. Estimate all resources with a params file, output as markdown
+dotnet run --project ./src/cli/cli.csproj -- estimate --file ./tests/fixtures/all.bicep --params-file ./tests/fixtures/all.bicepparam --output markdown
+
+# 3. Estimate an AKS cluster, output as JSON
+dotnet run --project ./src/cli/cli.csproj -- estimate --file ./tests/fixtures/aks.bicep --output json
+
+# 4. Estimate AKS + VM together, output as CSV
+dotnet run --project ./src/cli/cli.csproj -- estimate --file ./tests/fixtures/aks-vm.bicep --output csv
+
+# 5. Estimate from a pre-compiled ARM template
+dotnet run --project ./src/cli/cli.csproj -- estimate --file ./tests/fixtures/multi-resource.arm.json --output table
+```
 
 ### Cache Management
 
@@ -159,7 +176,6 @@ The extension activates on `.bicep` files and communicates with the CLI in LSP m
 
 | Setting | Description | Default |
 | --- | --- | --- |
-| `washington.currency` | Currency code for estimates | `USD` |
 | `washington.defaultRegion` | Default Azure region | `eastus` |
 | `washington.cliPath` | Path to CLI binary (auto-detected if empty) | `""` |
 | `washington.estimateOnSave` | Auto-estimate on save | `true` |
@@ -184,7 +200,6 @@ Integrate cost estimation into your CI/CD pipeline and PR review workflow.
     params-file: infra/main.bicepparam
     base-file: base-branch/infra/main.bicep        # optional: enables delta comparison
     base-params-file: base-branch/infra/main.bicepparam
-    currency: USD
     output-format: json
     fail-on-threshold: 1000                         # optional: fail if total > $1000/month
 ```
@@ -197,7 +212,6 @@ Integrate cost estimation into your CI/CD pipeline and PR review workflow.
 | `params-file` | Path to `.bicepparam` file | — | — |
 | `base-file` | Base branch `.bicep` file (enables delta comparison) | — | — |
 | `base-params-file` | Base branch `.bicepparam` file | — | — |
-| `currency` | Currency code | — | `USD` |
 | `output-format` | `json`, `table`, or `markdown` | — | `json` |
 | `fail-on-threshold` | Fail if estimated monthly cost exceeds this value | — | — |
 

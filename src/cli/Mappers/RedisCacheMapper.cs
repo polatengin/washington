@@ -12,7 +12,7 @@ public class RedisCacheMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
         var skuName = GetSkuName(resource);
@@ -23,7 +23,6 @@ public class RedisCacheMapper : IResourceCostMapper
                 ServiceName: "Azure Cache for Redis",
                 ArmRegionName: region,
                 SkuName: skuName,
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

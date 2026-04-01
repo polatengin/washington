@@ -55,7 +55,6 @@ public class OutputFormatterTests
                     "Standard_D2s_v3 @ $0.0960/hr × 730 hrs", 70.08m)
             },
             GrandTotal: 70.08m,
-            Currency: "USD",
             Warnings: new List<string> { "⚠ No pricing mapper for Microsoft.Network/networkInterfaces — skipped" }
         );
     }

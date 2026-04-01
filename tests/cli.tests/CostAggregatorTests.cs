@@ -19,7 +19,6 @@ public class CostAggregatorTests
                 UnitPrice = 0.096,
                 UnitOfMeasure = "1 Hour",
                 MeterName = "D2s v3",
-                CurrencyCode = "USD",
                 ServiceName = "Virtual Machines"
             }
         });
@@ -32,12 +31,11 @@ public class CostAggregatorTests
                 properties: new { hardwareProfile = new { vmSize = "Standard_D2s_v3" } })
         };
 
-        var report = await aggregator.GenerateReportAsync(resources, "USD");
+        var report = await aggregator.GenerateReportAsync(resources);
 
         Assert.Single(report.Lines);
         Assert.Equal(70.08m, report.Lines[0].MonthlyCost);
         Assert.Equal(70.08m, report.GrandTotal);
-        Assert.Equal("USD", report.Currency);
         Assert.Empty(report.Warnings);
     }
 
@@ -52,7 +50,6 @@ public class CostAggregatorTests
                 UnitPrice = 0.096,
                 UnitOfMeasure = "1 Hour",
                 MeterName = "D2s v3",
-                CurrencyCode = "USD",
                 ServiceName = "Virtual Machines"
             },
             new PriceRecord
@@ -61,7 +58,6 @@ public class CostAggregatorTests
                 UnitPrice = 0.19,
                 UnitOfMeasure = "1 Hour",
                 MeterName = "P1 v3",
-                CurrencyCode = "USD",
                 ServiceName = "Azure App Service"
             }
         });
@@ -76,7 +72,7 @@ public class CostAggregatorTests
                 sku: new { name = "P1v3" })
         };
 
-        var report = await aggregator.GenerateReportAsync(resources, "USD");
+        var report = await aggregator.GenerateReportAsync(resources);
 
         Assert.Equal(2, report.Lines.Count);
         Assert.True(report.GrandTotal > 0);
@@ -94,7 +90,7 @@ public class CostAggregatorTests
             CreateResource("Microsoft.Network/networkInterfaces", "nic-1")
         };
 
-        var report = await aggregator.GenerateReportAsync(resources, "USD");
+        var report = await aggregator.GenerateReportAsync(resources);
 
         Assert.Empty(report.Lines);
         Assert.Single(report.Warnings);
@@ -113,7 +109,6 @@ public class CostAggregatorTests
                 UnitPrice = 0.096,
                 UnitOfMeasure = "1 Hour",
                 MeterName = "D2s v3",
-                CurrencyCode = "USD"
             }
         });
 
@@ -126,7 +121,7 @@ public class CostAggregatorTests
             CreateResource("Microsoft.Network/networkInterfaces", "nic-1")
         };
 
-        var report = await aggregator.GenerateReportAsync(resources, "USD");
+        var report = await aggregator.GenerateReportAsync(resources);
 
         Assert.Single(report.Lines);
         Assert.Single(report.Warnings);
@@ -140,40 +135,11 @@ public class CostAggregatorTests
         var registry = new MapperRegistry();
         var aggregator = new CostAggregator(registry, mockPricingClient);
 
-        var report = await aggregator.GenerateReportAsync(new List<ResourceDescriptor>(), "USD");
+        var report = await aggregator.GenerateReportAsync(new List<ResourceDescriptor>());
 
         Assert.Empty(report.Lines);
         Assert.Empty(report.Warnings);
         Assert.Equal(0m, report.GrandTotal);
-        Assert.Equal("USD", report.Currency);
-    }
-
-    [Fact]
-    public async Task GenerateReport_RespectsCustomCurrency()
-    {
-        var mockPricingClient = new MockPricingApiClient(new List<PriceRecord>
-        {
-            new PriceRecord
-            {
-                ArmSkuName = "Standard_D2s_v3",
-                UnitPrice = 0.088,
-                UnitOfMeasure = "1 Hour",
-                MeterName = "D2s v3",
-                CurrencyCode = "EUR"
-            }
-        });
-
-        var registry = new MapperRegistry();
-        var aggregator = new CostAggregator(registry, mockPricingClient);
-        var resources = new List<ResourceDescriptor>
-        {
-            CreateResource("Microsoft.Compute/virtualMachines", "vm-1",
-                properties: new { hardwareProfile = new { vmSize = "Standard_D2s_v3" } })
-        };
-
-        var report = await aggregator.GenerateReportAsync(resources, "EUR");
-
-        Assert.Equal("EUR", report.Currency);
     }
 
     private static ResourceDescriptor CreateResource(

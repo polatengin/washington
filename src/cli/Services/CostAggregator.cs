@@ -16,7 +16,7 @@ public class CostAggregator
     }
 
     public async Task<CostReport> GenerateReportAsync(
-        List<ResourceDescriptor> resources, string currency = "USD")
+        List<ResourceDescriptor> resources)
     {
         var lines = new List<ResourceCostLine>();
         var warnings = new List<string>();
@@ -31,7 +31,7 @@ public class CostAggregator
                 continue;
             }
 
-            var queries = mapper.BuildQueries(resource, currency);
+            var queries = mapper.BuildQueries(resource);
             var allPrices = new List<PriceRecord>();
 
             foreach (var query in queries)
@@ -52,6 +52,6 @@ public class CostAggregator
             grandTotal += cost.Amount;
         }
 
-        return new CostReport(lines, grandTotal, currency, warnings);
+        return new CostReport(lines, grandTotal, warnings);
     }
 }

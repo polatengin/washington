@@ -12,7 +12,7 @@ public class ApiManagementMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
         var skuName = GetSkuName(resource);
@@ -23,7 +23,6 @@ public class ApiManagementMapper : IResourceCostMapper
                 ServiceName: "API Management",
                 ArmRegionName: region,
                 SkuName: skuName,
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

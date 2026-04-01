@@ -7,7 +7,6 @@ public record PricingQuery(
     string? SkuName = null,
     string? MeterName = null,
     string? ProductName = null,
-    string CurrencyCode = "USD",
     string PriceType = "Consumption"
 )
 {
@@ -15,7 +14,6 @@ public record PricingQuery(
     {
         var filters = new List<string>
         {
-            $"currencyCode eq '{CurrencyCode}'",
             $"priceType eq '{PriceType}'"
         };
 

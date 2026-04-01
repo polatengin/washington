@@ -17,7 +17,6 @@ export async function createLspClient(context: vscode.ExtensionContext): Promise
       fileEvents: vscode.workspace.createFileSystemWatcher('**/*.bicep'),
     },
     initializationOptions: {
-      currency: vscode.workspace.getConfiguration('washington').get<string>('currency') ?? 'USD',
     },
   };
 

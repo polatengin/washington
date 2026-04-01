@@ -10,7 +10,7 @@ public class VirtualNetworkMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
 
@@ -19,7 +19,6 @@ public class VirtualNetworkMapper : IResourceCostMapper
             new PricingQuery(
                 ServiceName: "Virtual Network",
                 ArmRegionName: region,
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

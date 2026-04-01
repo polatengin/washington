@@ -12,7 +12,7 @@ public class EventHubMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
         var tier = GetSkuTier(resource);
@@ -23,7 +23,6 @@ public class EventHubMapper : IResourceCostMapper
                 ServiceName: "Event Hubs",
                 ArmRegionName: region,
                 SkuName: tier,
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

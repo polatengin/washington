@@ -12,7 +12,7 @@ public class MySqlFlexibleServerMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
         var skuName = GetSkuName(resource);
@@ -23,7 +23,6 @@ public class MySqlFlexibleServerMapper : IResourceCostMapper
                 ServiceName: "Azure Database for MySQL",
                 ArmRegionName: region,
                 ArmSkuName: skuName,
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

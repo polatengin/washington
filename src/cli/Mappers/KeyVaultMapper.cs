@@ -10,7 +10,7 @@ public class KeyVaultMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
         var skuName = GetSkuName(resource);
@@ -21,7 +21,6 @@ public class KeyVaultMapper : IResourceCostMapper
                 ServiceName: "Key Vault",
                 ArmRegionName: region,
                 ProductName: $"Key Vault {skuName}",
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

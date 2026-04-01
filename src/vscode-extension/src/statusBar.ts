@@ -11,7 +11,7 @@ export function createStatusBarItem(): vscode.StatusBarItem {
 }
 
 export function updateStatusBar(item: vscode.StatusBarItem, report: CostReport): void {
-  item.text = `$(symbol-operator) Cost: $${report.grandTotal.toFixed(2)}/${report.currency === 'USD' ? 'mo' : `mo ${report.currency}`}`;
-  item.tooltip = `Estimated monthly Azure cost: $${report.grandTotal.toFixed(2)} ${report.currency}\nResources: ${report.lines.length}\nWarnings: ${report.warnings.length}`;
+  item.text = `$(symbol-operator) Cost: $${report.grandTotal.toFixed(2)}/mo`;
+  item.tooltip = `Estimated monthly Azure cost: $${report.grandTotal.toFixed(2)}\nResources: ${report.lines.length}\nWarnings: ${report.warnings.length}`;
   item.show();
 }

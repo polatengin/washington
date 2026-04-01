@@ -11,7 +11,7 @@ public class EventGridMapper : IResourceCostMapper
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase) ||
         resource.ResourceType.Equals("Microsoft.EventGrid/domains", StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
 
@@ -20,7 +20,6 @@ public class EventGridMapper : IResourceCostMapper
             new PricingQuery(
                 ServiceName: "Event Grid",
                 ArmRegionName: region,
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

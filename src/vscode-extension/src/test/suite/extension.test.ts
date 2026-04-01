@@ -18,7 +18,6 @@ suite('Extension Activation', () => {
 
   test('Configuration should have defaults', () => {
     const config = vscode.workspace.getConfiguration('washington');
-    assert.strictEqual(config.get('currency'), 'USD');
     assert.strictEqual(config.get('defaultRegion'), 'eastus');
     assert.strictEqual(config.get('cliPath'), '');
     assert.strictEqual(config.get('estimateOnSave'), true);

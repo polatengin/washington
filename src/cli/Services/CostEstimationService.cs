@@ -17,7 +17,7 @@ public class CostEstimationService
     }
 
     public async Task<CostReport> EstimateFromBicepAsync(
-        string bicepFilePath, string? paramsFilePath = null, string currency = "USD",
+        string bicepFilePath, string? paramsFilePath = null,
         Dictionary<string, string>? paramOverrides = null)
     {
         // Compile bicep to ARM JSON
@@ -30,12 +30,12 @@ public class CostEstimationService
             await _compiler.CompileBicepParamsToArm(paramsFilePath);
         }
 
-        return await EstimateFromArmJsonAsync(armJson, currency);
+        return await EstimateFromArmJsonAsync(armJson);
     }
 
-    public async Task<CostReport> EstimateFromArmJsonAsync(string armJson, string currency = "USD")
+    public async Task<CostReport> EstimateFromArmJsonAsync(string armJson)
     {
         var resources = _extractor.Extract(armJson);
-        return await _aggregator.GenerateReportAsync(resources, currency);
+        return await _aggregator.GenerateReportAsync(resources);
     }
 }

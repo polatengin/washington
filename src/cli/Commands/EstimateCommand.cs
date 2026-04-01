@@ -18,11 +18,6 @@ public class EstimateCommand
             name: "--params-file",
             description: "Path to the .bicepparam file");
 
-        var currencyOption = new Option<string>(
-            name: "--currency",
-            getDefaultValue: () => "USD",
-            description: "Currency code (e.g., USD, EUR)");
-
         var outputFormatOption = new Option<string>(
             name: "--output",
             getDefaultValue: () => "table",
@@ -37,21 +32,20 @@ public class EstimateCommand
         {
             fileOption,
             paramsFileOption,
-            currencyOption,
             outputFormatOption,
             paramOption
         };
 
-        command.SetHandler(async (file, paramsFile, currency, outputFormat, paramOverrides) =>
+        command.SetHandler(async (file, paramsFile, outputFormat, paramOverrides) =>
         {
-            await RunAsync(file, paramsFile, currency, outputFormat, paramOverrides);
-        }, fileOption, paramsFileOption, currencyOption, outputFormatOption, paramOption);
+            await RunAsync(file, paramsFile, outputFormat, paramOverrides);
+        }, fileOption, paramsFileOption, outputFormatOption, paramOption);
 
         return command;
     }
 
     private static async Task RunAsync(
-        FileInfo file, FileInfo? paramsFile, string currency,
+        FileInfo file, FileInfo? paramsFile,
         string outputFormat, string[] paramOverrides)
     {
         if (!file.Exists)
@@ -82,7 +76,6 @@ public class EstimateCommand
         var report = await service.EstimateFromBicepAsync(
             file.FullName,
             paramsFile?.FullName,
-            currency,
             paramDict);
 
         var output = OutputFormatter.Format(report, outputFormat, file.FullName);

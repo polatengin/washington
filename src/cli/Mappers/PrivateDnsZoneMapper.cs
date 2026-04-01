@@ -10,7 +10,7 @@ public class PrivateDnsZoneMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
 
@@ -20,7 +20,6 @@ public class PrivateDnsZoneMapper : IResourceCostMapper
                 ServiceName: "Azure DNS",
                 ArmRegionName: region,
                 ProductName: "Azure DNS - Private Zones",
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

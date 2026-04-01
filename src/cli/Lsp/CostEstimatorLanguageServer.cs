@@ -254,7 +254,7 @@ public class CostEstimatorLanguageServer
                     },
                     Command = new LspCommand
                     {
-                        Title = $"💰 Estimated Monthly Total: ${report.GrandTotal:N2} {report.Currency}",
+                        Title = $"💰 Estimated Monthly Total: ${report.GrandTotal:N2}",
                         CommandId = "washington.showCostDetails"
                     }
                 });
@@ -353,7 +353,7 @@ public class CostEstimatorLanguageServer
 
         try
         {
-            var report = await _costService.EstimateFromBicepAsync(filePath, currency: p.Currency);
+            var report = await _costService.EstimateFromBicepAsync(filePath);
             _documentReports[p.Uri] = report;
             await SendResponseAsync(request.Id, report);
         }
@@ -371,13 +371,6 @@ public class CostEstimatorLanguageServer
             return;
         }
 
-        var currency = "USD";
-        if (request.Params.HasValue)
-        {
-            var p = JsonSerializer.Deserialize<EstimateWorkspaceParams>(request.Params.Value, _jsonOptions);
-            if (p != null) currency = p.Currency;
-        }
-
         var rootPath = UriToPath(_rootUri);
         var bicepFiles = Directory.GetFiles(rootPath, "*.bicep", SearchOption.AllDirectories);
 
@@ -389,7 +382,7 @@ public class CostEstimatorLanguageServer
         {
             try
             {
-                var report = await _costService.EstimateFromBicepAsync(file, currency: currency);
+                var report = await _costService.EstimateFromBicepAsync(file);
                 allLines.AddRange(report.Lines);
                 allWarnings.AddRange(report.Warnings);
                 grandTotal += report.GrandTotal;
@@ -400,7 +393,7 @@ public class CostEstimatorLanguageServer
             }
         }
 
-        var workspaceReport = new CostReport(allLines, grandTotal, currency, allWarnings);
+        var workspaceReport = new CostReport(allLines, grandTotal, allWarnings);
         await SendResponseAsync(request.Id, workspaceReport);
     }
 

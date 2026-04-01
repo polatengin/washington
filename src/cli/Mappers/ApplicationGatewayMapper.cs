@@ -12,7 +12,7 @@ public class ApplicationGatewayMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
         var tier = GetTier(resource);
@@ -23,7 +23,6 @@ public class ApplicationGatewayMapper : IResourceCostMapper
                 ServiceName: "Application Gateway",
                 ArmRegionName: region,
                 ProductName: $"Application Gateway {tier}",
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

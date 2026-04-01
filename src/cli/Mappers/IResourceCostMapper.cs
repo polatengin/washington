@@ -6,6 +6,6 @@ public interface IResourceCostMapper
 {
     string ResourceType { get; }
     bool CanMap(ResourceDescriptor resource);
-    List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD");
+    List<PricingQuery> BuildQueries(ResourceDescriptor resource);
     MonthlyCost CalculateCost(ResourceDescriptor resource, List<PriceRecord> prices);
 }

@@ -13,10 +13,6 @@ inputs:
   base-params-file:
     description: 'Path to the base branch .bicepparam file'
     required: false
-  currency:
-    description: 'Currency code (default: USD)'
-    required: false
-    default: 'USD'
   output-format:
     description: 'Output format: json, table, or markdown'
     required: false
@@ -58,7 +54,7 @@ runs:
         if [ -n "${{ inputs.params-file }}" ]; then
           ARGS="$ARGS --params-file ${{ inputs.params-file }}"
         fi
-        ARGS="$ARGS --output ${{ inputs.output-format }} --currency ${{ inputs.currency }}"
+        ARGS="$ARGS --output ${{ inputs.output-format }}"
 
         RESULT=$("${{ runner.temp }}/washington/cli" $ARGS)
 
@@ -78,7 +74,7 @@ runs:
         if [ -n "${{ inputs.base-params-file }}" ]; then
           ARGS="$ARGS --params-file ${{ inputs.base-params-file }}"
         fi
-        ARGS="$ARGS --output json --currency ${{ inputs.currency }}"
+        ARGS="$ARGS --output json"
 
         BASE_RESULT=$("${{ runner.temp }}/washington/cli" $ARGS 2>/dev/null || echo '{"grandTotal": 0}')
 

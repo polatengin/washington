@@ -158,7 +158,6 @@ public class MapperTests
                 UnitPrice = 0.096,
                 UnitOfMeasure = "1 Hour",
                 MeterName = "D2s v3",
-                CurrencyCode = "USD"
             }
         };
 
@@ -207,7 +206,6 @@ public class MapperTests
                 UnitPrice = 0.10,
                 UnitOfMeasure = "1 Hour",
                 MeterName = "DS2 v2",
-                CurrencyCode = "USD"
             }
         };
 
@@ -629,7 +627,6 @@ public class MapperTests
                 UnitPrice = 0.096,
                 UnitOfMeasure = "1 Hour",
                 MeterName = "D2s v3",
-                CurrencyCode = "USD"
             }
         };
 

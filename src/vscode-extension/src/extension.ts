@@ -31,7 +31,6 @@ export async function activate(context: vscode.ExtensionContext) {
         const config = getConfig();
         const report = await client.sendRequest<CostReport>('washington/estimateFile', {
           uri: editor.document.uri.toString(),
-          currency: config.currency,
         });
         if (report) {
           treeDataProvider.update(report);
@@ -50,9 +49,7 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('washington.estimateWorkspace', async () => {
       try {
         const config = getConfig();
-        const report = await client.sendRequest<CostReport>('washington/estimateWorkspace', {
-          currency: config.currency,
-        });
+        const report = await client.sendRequest<CostReport>('washington/estimateWorkspace', {});
         if (report) {
           treeDataProvider.update(report);
           if (config.showStatusBar) {

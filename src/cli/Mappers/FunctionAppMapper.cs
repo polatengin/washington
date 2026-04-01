@@ -17,7 +17,7 @@ public class FunctionAppMapper : IResourceCostMapper
         return kind.Contains("functionapp", StringComparison.OrdinalIgnoreCase);
     }
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
 
@@ -26,7 +26,6 @@ public class FunctionAppMapper : IResourceCostMapper
             new PricingQuery(
                 ServiceName: "Functions",
                 ArmRegionName: region,
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

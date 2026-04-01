@@ -242,13 +242,8 @@ public class EstimateFileParams
 {
     [JsonPropertyName("uri")]
     public string Uri { get; set; } = "";
-
-    [JsonPropertyName("currency")]
-    public string Currency { get; set; } = "USD";
 }
 
 public class EstimateWorkspaceParams
 {
-    [JsonPropertyName("currency")]
-    public string Currency { get; set; } = "USD";
 }

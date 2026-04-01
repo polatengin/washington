@@ -12,7 +12,7 @@ public class VirtualMachineMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var vmSize = GetVmSize(resource);
         var region = resource.Location;
@@ -23,7 +23,6 @@ public class VirtualMachineMapper : IResourceCostMapper
                 ServiceName: "Virtual Machines",
                 ArmRegionName: region,
                 ArmSkuName: vmSize,
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

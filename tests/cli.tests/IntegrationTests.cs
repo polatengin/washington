@@ -28,14 +28,13 @@ public class IntegrationTests
                 UnitPrice = 0.096,
                 UnitOfMeasure = "1 Hour",
                 MeterName = "D2s v3",
-                CurrencyCode = "USD",
                 ServiceName = "Virtual Machines"
             }
         });
 
         var registry = new MapperRegistry();
         var aggregator = new CostAggregator(registry, mockPricing);
-        var report = await aggregator.GenerateReportAsync(resources, "USD");
+        var report = await aggregator.GenerateReportAsync(resources);
 
         Assert.Single(report.Lines);
         Assert.Equal("test-vm", report.Lines[0].ResourceName);
@@ -63,7 +62,6 @@ public class IntegrationTests
                 UnitPrice = 0.096,
                 UnitOfMeasure = "1 Hour",
                 MeterName = "D2s v3",
-                CurrencyCode = "USD",
                 ServiceName = "Virtual Machines"
             },
             new PriceRecord
@@ -72,7 +70,6 @@ public class IntegrationTests
                 UnitPrice = 0.19,
                 UnitOfMeasure = "1 Hour",
                 MeterName = "P1 v3",
-                CurrencyCode = "USD",
                 ServiceName = "Azure App Service"
             },
             new PriceRecord
@@ -81,7 +78,6 @@ public class IntegrationTests
                 UnitPrice = 0.018,
                 UnitOfMeasure = "1 GB/Month",
                 MeterName = "Hot LRS Data Stored",
-                CurrencyCode = "USD",
                 ServiceName = "Storage",
                 ProductName = "Tables"
             }
@@ -89,7 +85,7 @@ public class IntegrationTests
 
         var registry = new MapperRegistry();
         var aggregator = new CostAggregator(registry, mockPricing);
-        var report = await aggregator.GenerateReportAsync(resources, "USD");
+        var report = await aggregator.GenerateReportAsync(resources);
 
         // 3 mapped resources (VM, Storage, App Service Plan) + 1 unmapped (NIC)
         Assert.Equal(3, report.Lines.Count);
@@ -116,13 +112,12 @@ public class IntegrationTests
                 UnitPrice = 0.096,
                 UnitOfMeasure = "1 Hour",
                 MeterName = "D2s v3",
-                CurrencyCode = "USD"
             }
         });
 
         var registry = new MapperRegistry();
         var aggregator = new CostAggregator(registry, mockPricing);
-        var report = await aggregator.GenerateReportAsync(resources, "USD");
+        var report = await aggregator.GenerateReportAsync(resources);
 
         // All four output formats should produce non-empty output
         var tableOutput = OutputFormatter.Format(report, "table", "test.bicep");
@@ -165,7 +160,7 @@ public class IntegrationTests
         var mockPricing = new MockPricingApiClient(new List<PriceRecord>());
         var registry = new MapperRegistry();
         var aggregator = new CostAggregator(registry, mockPricing);
-        var report = await aggregator.GenerateReportAsync(resources, "USD");
+        var report = await aggregator.GenerateReportAsync(resources);
 
         Assert.Empty(report.Lines);
         Assert.Empty(report.Warnings);
@@ -213,13 +208,12 @@ public class IntegrationTests
                 UnitPrice = 0.096,
                 UnitOfMeasure = "1 Hour",
                 MeterName = "D2s v3",
-                CurrencyCode = "USD"
             }
         });
 
         var registry = new MapperRegistry();
         var aggregator = new CostAggregator(registry, mockPricing);
-        var report = await aggregator.GenerateReportAsync(resources, "USD");
+        var report = await aggregator.GenerateReportAsync(resources);
 
         Assert.Single(report.Lines);
         Assert.Equal("included-vm", report.Lines[0].ResourceName);

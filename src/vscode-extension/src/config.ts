@@ -3,7 +3,6 @@ import * as vscode from 'vscode';
 const SECTION = 'washington';
 
 export interface WashingtonConfig {
-  currency: string;
   defaultRegion: string;
   cliPath: string;
   estimateOnSave: boolean;
@@ -15,7 +14,6 @@ export interface WashingtonConfig {
 export function getConfig(): WashingtonConfig {
   const cfg = vscode.workspace.getConfiguration(SECTION);
   return {
-    currency: cfg.get<string>('currency') ?? 'USD',
     defaultRegion: cfg.get<string>('defaultRegion') ?? 'eastus',
     cliPath: cfg.get<string>('cliPath') ?? '',
     estimateOnSave: cfg.get<boolean>('estimateOnSave') ?? true,

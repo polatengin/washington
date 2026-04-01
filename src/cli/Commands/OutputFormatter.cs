@@ -28,7 +28,7 @@ public static class OutputFormatter
 
         sb.AppendLine();
         sb.AppendLine($"Bicep Cost Estimate{(filePath != null ? $": {Path.GetFileName(filePath)}" : "")}");
-        sb.AppendLine($"Currency: {report.Currency} | Date: {DateTime.Now:yyyy-MM-dd}");
+        sb.AppendLine($"Date: {DateTime.Now:yyyy-MM-dd}");
         sb.AppendLine();
 
         if (report.Lines.Count == 0 && report.Warnings.Count == 0)
@@ -87,7 +87,7 @@ public static class OutputFormatter
 
         sb.AppendLine($"## Bicep Cost Estimate{(filePath != null ? $": {Path.GetFileName(filePath)}" : "")}");
         sb.AppendLine();
-        sb.AppendLine($"**Currency:** {report.Currency} | **Date:** {DateTime.Now:yyyy-MM-dd}");
+        sb.AppendLine($"**Date:** {DateTime.Now:yyyy-MM-dd}");
         sb.AppendLine();
         sb.AppendLine("| Resource | Type | Details | Monthly Cost |");
         sb.AppendLine("|----------|------|---------|-------------:|");

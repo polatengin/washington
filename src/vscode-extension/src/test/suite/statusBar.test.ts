@@ -21,7 +21,6 @@ suite('StatusBar', () => {
     const report: CostReport = {
       lines: [],
       grandTotal: 364.17,
-      currency: 'USD',
       warnings: [],
     };
 
@@ -32,17 +31,16 @@ suite('StatusBar', () => {
     item.dispose();
   });
 
-  test('shows currency suffix for non-USD', () => {
+  test('shows cost in status bar', () => {
     const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     const report: CostReport = {
       lines: [],
       grandTotal: 300.0,
-      currency: 'EUR',
       warnings: [],
     };
 
-    item.text = `$(symbol-operator) Cost: $${report.grandTotal.toFixed(2)}/mo ${report.currency}`;
-    assert.ok(item.text.includes('EUR'));
+    item.text = `$(symbol-operator) Cost: $${report.grandTotal.toFixed(2)}/mo`;
+    assert.ok(item.text.includes('300.00'));
 
     item.dispose();
   });

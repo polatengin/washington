@@ -12,7 +12,7 @@ public class SynapseWorkspaceMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
 
@@ -21,7 +21,6 @@ public class SynapseWorkspaceMapper : IResourceCostMapper
             new PricingQuery(
                 ServiceName: "Azure Synapse Analytics",
                 ArmRegionName: region,
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

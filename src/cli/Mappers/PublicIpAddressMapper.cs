@@ -12,7 +12,7 @@ public class PublicIpAddressMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
         var skuName = GetSkuName(resource);
@@ -23,7 +23,6 @@ public class PublicIpAddressMapper : IResourceCostMapper
                 ServiceName: "Virtual Network",
                 ArmRegionName: region,
                 MeterName: skuName == "Standard" ? "Standard IPv4 Static Public IP" : "Basic IPv4 Static Public IP",
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

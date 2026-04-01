@@ -12,7 +12,7 @@ public class AzureFirewallMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
         var skuTier = GetSkuTier(resource);
@@ -23,7 +23,6 @@ public class AzureFirewallMapper : IResourceCostMapper
                 ServiceName: "Azure Firewall",
                 ArmRegionName: region,
                 SkuName: skuTier,
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

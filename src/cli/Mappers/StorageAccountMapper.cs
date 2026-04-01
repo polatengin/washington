@@ -10,7 +10,7 @@ public class StorageAccountMapper : IResourceCostMapper
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
 
-    public List<PricingQuery> BuildQueries(ResourceDescriptor resource, string currency = "USD")
+    public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
         var region = resource.Location;
 
@@ -21,7 +21,6 @@ public class StorageAccountMapper : IResourceCostMapper
                 ArmRegionName: region,
                 ProductName: GetProductName(resource),
                 MeterName: "Hot LRS Data Stored",
-                CurrencyCode: currency,
                 PriceType: "Consumption"
             )
         };

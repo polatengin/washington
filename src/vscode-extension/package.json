@@ -17,11 +17,6 @@
     "configuration": {
       "title": "Washington Cost Estimator",
       "properties": {
-        "washington.currency": {
-          "type": "string",
-          "default": "USD",
-          "description": "Currency code for cost estimates (e.g., USD, EUR)"
-        },
         "washington.defaultRegion": {
           "type": "string",
           "default": "eastus",
