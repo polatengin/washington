@@ -27,6 +27,7 @@
       ]
     }
   },
+  "forwardPorts": [3000],
   "postCreateCommand": "az bicep upgrade && git submodule update",
   "remoteUser": "root"
 }
