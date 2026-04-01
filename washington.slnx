@@ -1,8 +1,8 @@
 <Solution>
   <Folder Name="/src/">
-    <Project Path="src/cli/cli.csproj" />
+    <Project Path="src/cli/washington.csproj" />
   </Folder>
   <Folder Name="/tests/">
-    <Project Path="tests/cli.tests/cli.tests.csproj" />
+    <Project Path="tests/cli.tests/washington.tests.csproj" />
   </Folder>
 </Solution>
