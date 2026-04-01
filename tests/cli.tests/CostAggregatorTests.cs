@@ -123,8 +123,8 @@ public class CostAggregatorTests
 
         var report = await aggregator.GenerateReportAsync(resources);
 
-        Assert.Single(report.Lines);
-        Assert.Single(report.Warnings);
+        Assert.Equal(2, report.Lines.Count);
+        Assert.Empty(report.Warnings);
         Assert.True(report.GrandTotal > 0);
     }
 
