@@ -87,10 +87,9 @@ public class IntegrationTests
         var aggregator = new CostAggregator(registry, mockPricing);
         var report = await aggregator.GenerateReportAsync(resources);
 
-        // 3 mapped resources (VM, Storage, App Service Plan) + 1 unmapped (NIC)
-        Assert.Equal(3, report.Lines.Count);
-        Assert.Single(report.Warnings);
-        Assert.Contains("Microsoft.Network/networkInterfaces", report.Warnings[0]);
+        // 4 mapped resources (VM, Storage, App Service Plan, NIC)
+        Assert.Equal(4, report.Lines.Count);
+        Assert.Empty(report.Warnings);
 
         // Grand total should be sum of all mapped costs
         Assert.Equal(report.Lines.Sum(l => l.MonthlyCost), report.GrandTotal);
