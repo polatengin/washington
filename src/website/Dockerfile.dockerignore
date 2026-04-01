@@ -1,0 +1,18 @@
+# Exclude everything not needed for the docs site build
+node_modules/
+.git/
+.github/
+bicep/
+src/cli/
+src/vscode-extension/
+tests/
+*.slnx
+*.md
+!docs/**/*.md
+LICENSE
+action.yml
+plan.md
+.devcontainer/
+.vscode/
+.editorconfig
+.gitmodules
