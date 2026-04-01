@@ -266,6 +266,22 @@ Tests cover resource extraction, cost mappers, output formatters, and full end-t
 
 ---
 
+## Roadmap
+
+The following features are planned for future releases:
+
+- **Pre-built CLI binaries** — Publish platform-specific binaries as GitHub releases for faster Action startup (no build step needed)
+- **Multi-file / module-aware projects** — Support Bicep projects that span multiple files and use modules
+- **Cost comparison between parameter sets** — Compare costs across different parameter sets (e.g. `dev` vs `prod`)
+- **Historical price tracking** — Detect cost changes over time as Azure pricing evolves
+- **`diff` command** — Show cost delta vs current deployment (`washington estimate diff main.bicep`)
+- **PR comment template customization** — Allow users to customize the GitHub Action PR comment format
+- **Currency selection** — Add `--currency` flag to the CLI and GitHub Action for non-USD currencies
+- **Reserved Instances / Savings Plans** — Show RI and savings plan pricing alongside pay-as-you-go for comparison
+- **Direct ARM JSON template support** — Allow `--file` to accept pre-compiled ARM JSON templates directly (service layer supports this; CLI routing pending)
+
+---
+
 ## License
 
 [MIT](LICENSE)
