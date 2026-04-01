@@ -33,12 +33,12 @@ clean: ## Remove generated outputs
 	rm -rf src/vscode-extension/bin src/vscode-extension/dist src/vscode-extension/out src/website/build src/website/.docusaurus src/website/static/text publish
 
 build-cli: clean ## Build the default repo surface
-	dotnet build src/cli/washington.csproj --configuration Debug
+	dotnet build src/cli/washington.csproj --configuration Release
 
 build-extension: clean ## Build the VS Code extension
 	rm -rf src/vscode-extension/bin
 	mkdir -p src/vscode-extension/bin
-	cp -r src/cli/bin/Debug/net10.0/. src/vscode-extension/bin/
+	cp -r src/cli/bin/Release/net10.0/. src/vscode-extension/bin/
 	chmod +x src/vscode-extension/bin/washington || true
 	npm --prefix src/vscode-extension run compile
 
@@ -46,7 +46,7 @@ build-website: clean ## Build the documentation website
 	npm --prefix src/website run build
 
 test-cli: build-cli ## Run the required test suites
-	dotnet test tests/cli.tests/washington.tests.csproj --configuration Debug
+	dotnet test tests/cli.tests/washington.tests.csproj --configuration Release
 
 test-extension: build-extension ## Run the VS Code extension tests
 	npm --prefix src/vscode-extension test
