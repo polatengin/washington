@@ -19,6 +19,7 @@ help:
 info: ## Show tool versions and current paths
 	@echo "Washington build information"
 	@echo "  CLI project:    src/cli/washington.csproj"
+	@echo "  CLI binary:     src/cli/bin/Release/net10.0/bce"
 	@echo "  CLI tests:      tests/cli.tests/washington.tests.csproj"
 	@echo "  Dotnet SDK:     $$(dotnet --version)"
 	@echo "  Node.js:        $$(node --version 2>/dev/null || echo 'not found')"
@@ -38,14 +39,14 @@ clean: ## Remove generated outputs
 	dotnet clean washington.slnx
 	rm -rf src/vscode-extension/bin src/vscode-extension/dist src/vscode-extension/out src/website/build src/website/.docusaurus src/website/static/text publish
 
-build-cli: clean ## Build the Washington CLI
+build-cli: clean ## Build the BCE CLI
 	dotnet build src/cli/washington.csproj --configuration Release
 
 build-extension: clean ## Build the VS Code extension
 	rm -rf src/vscode-extension/bin
 	mkdir -p src/vscode-extension/bin
 	cp -r src/cli/bin/Release/net10.0/. src/vscode-extension/bin/
-	chmod +x src/vscode-extension/bin/washington || true
+	chmod +x src/vscode-extension/bin/bce || true
 	npm --prefix src/vscode-extension run compile
 
 build-website: clean ## Build the documentation website
@@ -66,7 +67,7 @@ package-cli: build-cli ## Publish self-contained CLI binaries for supported runt
 	for runtime in win-x64 linux-x64 osx-x64 osx-arm64; do \
 		dotnet publish src/cli/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r "$$runtime" -o "publish/$$runtime"; \
 	done
-	cp "publish/win-x64/washington.exe" "publish/washington-win-x64.exe"
-	cp "publish/linux-x64/washington" "publish/washington-linux-x64"
-	cp "publish/osx-x64/washington" "publish/washington-osx-x64"
-	cp "publish/osx-arm64/washington" "publish/washington-osx-arm64"
+	cp "publish/win-x64/bce.exe" "publish/bce-win-x64.exe"
+	cp "publish/linux-x64/bce" "publish/bce-linux-x64"
+	cp "publish/osx-x64/bce" "publish/bce-osx-x64"
+	cp "publish/osx-arm64/bce" "publish/bce-osx-arm64"

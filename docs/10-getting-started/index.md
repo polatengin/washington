@@ -5,7 +5,7 @@ sidebar_position: 10
 
 # Getting Started
 
-This guide walks you through installing Washington and running your first cost estimate.
+This guide walks you through installing the Washington CLI, published as `bce`, and running your first cost estimate.
 
 ## Prerequisites
 
@@ -21,6 +21,8 @@ This guide walks you through installing Washington and running your first cost e
 curl -sL https://bicepcostestimator.net/install.sh | bash
 ```
 
+This installs `bce` to `~/.bce/bin` by default.
+
 ### From Source
 
 ```bash
@@ -30,13 +32,13 @@ make setup-cli
 make build-cli
 ```
 
-The built binary will be at `src/cli/bin/Release/net10.0/washington`.
+The built binary will be at `src/cli/bin/Release/net10.0/bce`.
 
 ## First Estimate
 
 ```bash
-# Point Washington at a Bicep file
-washington estimate path/to/main.bicep
+# Point bce at a Bicep file
+bce estimate --file path/to/main.bicep
 ```
 
 The output shows a table of resources with their estimated monthly costs.

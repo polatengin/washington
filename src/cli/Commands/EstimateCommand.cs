@@ -29,7 +29,7 @@ public class EstimateCommand
             description: "Parameter value override in key=value format (can be specified multiple times)")
         { AllowMultipleArgumentsPerToken = true };
 
-        var command = new Command("estimate", "Estimate monthly Azure costs from a Bicep file")
+        var command = new Command("estimate", "Estimate monthly Azure costs from a Bicep or ARM file")
         {
             fileOption,
             paramsFileOption,

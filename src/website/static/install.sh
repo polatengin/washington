@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Washington CLI installer
+# BCE CLI installer
 # Usage: curl -sL https://bicepcostestimator.net/install.sh | bash
 
 REPO="polatengin/washington"
-INSTALL_DIR="${INSTALL_DIR:-$HOME/.washington/bin}"
+INSTALL_DIR="${INSTALL_DIR:-$HOME/.bce/bin}"
 
-echo "Installing Washington CLI..."
+echo "Installing BCE CLI..."
 
 # Detect OS and architecture
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
@@ -40,7 +40,8 @@ if [ -z "$LATEST" ]; then
   exit 1
 fi
 
-DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${LATEST}/washington-${PLATFORM}.tar.gz"
+DOWNLOAD_URL="https://github.com/${REPO}/releases/download/${LATEST}/bce-${PLATFORM}"
+TARGET_PATH="${INSTALL_DIR}/bce"
 
 echo "  Version:  ${LATEST}"
 echo "  Platform: ${PLATFORM}"
@@ -48,11 +49,11 @@ echo "  Target:   ${INSTALL_DIR}"
 
 # Download and extract
 mkdir -p "$INSTALL_DIR"
-curl -fsSL "$DOWNLOAD_URL" | tar -xz -C "$INSTALL_DIR"
-chmod +x "${INSTALL_DIR}/washington"
+curl -fsSL "$DOWNLOAD_URL" -o "$TARGET_PATH"
+chmod +x "$TARGET_PATH"
 
 echo ""
-echo "Washington CLI installed to ${INSTALL_DIR}/washington"
+echo "BCE CLI installed to ${TARGET_PATH}"
 
 # Check if INSTALL_DIR is in PATH
 if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
@@ -63,4 +64,4 @@ if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
   echo ""
 fi
 
-echo "Run 'washington --help' to get started."
+echo "Run 'bce --help' to get started."

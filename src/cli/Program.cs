@@ -6,7 +6,7 @@ public class Program
 {
     public static async Task<int> Main(string[] args)
     {
-        var rootCommand = new RootCommand("Azure Cost Estimator — estimate monthly Azure costs from Bicep files");
+    var rootCommand = new RootCommand("BCE (Bicep Cost Estimator) — estimate monthly Azure costs from Bicep and ARM files");
 
         // estimate command
         rootCommand.AddCommand(EstimateCommand.Create());

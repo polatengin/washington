@@ -1,4 +1,4 @@
-name: Release Washington CLI
+name: Release BCE CLI
 
 on:
   workflow_dispatch:
@@ -84,7 +84,7 @@ jobs:
                   {
                     "parts": [
                       {
-                        "text": "You are a release assistant that summarizes git commit messages into a changelog for the Washington CLI project. Washington estimates cost of bicep and ARM deployments.\n\nHere are the commits:\n\n'"$COMMITS"'\n\nGenerate a concise changelog in markdown format with sections like ## Features, ## Improvements, ## Bug Fixes, etc. Focus on user-facing changes."
+                        "text": "You are a release assistant that summarizes git commit messages into a changelog for the BCE CLI in the Washington project. BCE estimates cost of Bicep and ARM deployments.\n\nHere are the commits:\n\n'"$COMMITS"'\n\nGenerate a concise changelog in markdown format with sections like ## Features, ## Improvements, ## Bug Fixes, etc. Focus on user-facing changes."
                       }
                     ]
                   }
@@ -124,7 +124,7 @@ jobs:
             --title "Release $TAG" \
             --notes "${{ steps.release_notes.outputs.RELEASE_NOTES }}"
 
-          gh release upload "$TAG" ./publish/washington-win-x64.exe#washington-win-x64.exe
-          gh release upload "$TAG" ./publish/washington-linux-x64#washington-linux-x64
-          gh release upload "$TAG" ./publish/washington-osx-x64#washington-osx-x64
-          gh release upload "$TAG" ./publish/washington-osx-arm64#washington-osx-arm64
+          gh release upload "$TAG" ./publish/bce-win-x64.exe#bce-win-x64.exe
+          gh release upload "$TAG" ./publish/bce-linux-x64#bce-linux-x64
+          gh release upload "$TAG" ./publish/bce-osx-x64#bce-osx-x64
+          gh release upload "$TAG" ./publish/bce-osx-arm64#bce-osx-arm64

@@ -5,47 +5,66 @@ sidebar_position: 20
 
 # CLI Commands
 
-The Washington CLI provides commands for estimating Azure infrastructure costs from the terminal.
+Washington's CLI is published as `bce`.
 
-## `washington estimate`
+## `bce estimate`
 
 Estimate the cost of an infrastructure-as-code file.
 
 ```bash
-washington estimate <file> [options]
+bce estimate --file <path> [options]
 ```
-
-### Arguments
-
-| Argument | Description |
-|----------|-------------|
-| `<file>` | Path to a Bicep, ARM JSON, or Terraform file |
 
 ### Options
 
-| Option | Description |
-|--------|-------------|
-| `--output`, `-o` | Output format: `table`, `json`, `csv` (default: `table`) |
-| `--currency` | Currency code (default: `USD`) |
-| `--region` | Override Azure region |
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--file <path>` | Path to a `.bicep` or ARM JSON file | required |
+| `--params-file <path>` | Path to a `.bicepparam` file | — |
+| `--param <key=value>` | Override a parameter value; repeat as needed | — |
+| `--output <format>` | Output format: `table`, `json`, `csv`, or `markdown` | `table` |
 
 ### Examples
 
 ```bash
 # Basic estimate
-washington estimate main.bicep
+bce estimate --file main.bicep
 
 # JSON output for CI pipelines
-washington estimate main.bicep -o json
+bce estimate --file main.bicep --output json
 
-# Specify currency
-washington estimate main.bicep --currency EUR
+# Use a params file and parameter overrides
+bce estimate --file main.bicep --params-file main.bicepparam --param env=prod
+
+# Estimate from an ARM template
+bce estimate --file main.arm.json --output markdown
 ```
 
-## `washington version`
+## `bce cache info`
 
-Display the installed version.
+Show the current pricing cache size and entry count.
 
 ```bash
-washington version
+bce cache info
 ```
+
+## `bce cache clear`
+
+Remove all cached pricing data.
+
+```bash
+bce cache clear
+```
+
+## `bce lsp`
+
+Start the Language Server Protocol server used by the VS Code extension.
+
+```bash
+bce lsp
+```
+
+## Global Options
+
+- `bce --help` shows command usage.
+- `bce --version` prints the current CLI version.

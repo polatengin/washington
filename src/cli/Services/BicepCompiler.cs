@@ -6,7 +6,7 @@ public class BicepCompiler
 {
     public async Task<string> CompileBicepToArm(string bicepFilePath)
     {
-        var tempDir = Path.Combine(Path.GetTempPath(), "washington", Guid.NewGuid().ToString("N")[..8]);
+        var tempDir = Path.Combine(Path.GetTempPath(), "bce", Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(tempDir);
 
         try
@@ -48,7 +48,7 @@ public class BicepCompiler
 
     public async Task<string> CompileBicepParamsToArm(string bicepParamFilePath)
     {
-        var tempDir = Path.Combine(Path.GetTempPath(), "washington", Guid.NewGuid().ToString("N")[..8]);
+        var tempDir = Path.Combine(Path.GetTempPath(), "bce", Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(tempDir);
 
         try

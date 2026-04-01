@@ -25,7 +25,7 @@
     {
       "label": "CopyCLIToBin",
       "type": "shell",
-      "command": "rm -rf ${workspaceFolder}/src/vscode-extension/bin && mkdir -p ${workspaceFolder}/src/vscode-extension/bin && cp -r ${workspaceFolder}/src/cli/bin/Release/net10.0/. ${workspaceFolder}/src/vscode-extension/bin/ && chmod +x ${workspaceFolder}/src/vscode-extension/bin/washington || true",
+      "command": "rm -rf ${workspaceFolder}/src/vscode-extension/bin && mkdir -p ${workspaceFolder}/src/vscode-extension/bin && cp -r ${workspaceFolder}/src/cli/bin/Release/net10.0/. ${workspaceFolder}/src/vscode-extension/bin/ && chmod +x ${workspaceFolder}/src/vscode-extension/bin/bce || true",
       "dependsOn": [
         "BuildCLI"
       ],

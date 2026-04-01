@@ -2,6 +2,8 @@
 
 _Azure Deployments Cost Estimator_ (Washington) is a **FinOps** solution that estimates monthly Azure costs from Bicep files — before you deploy.
 
+The published CLI command is `bce`, short for **Bicep Cost Estimator**.
+
 It ships as a **CLI tool**, a **VS Code extension**, and a **GitHub Action**, giving you cost visibility across local development, code review, and CI/CD pipelines.
 
 ## Key Concepts
@@ -83,6 +85,8 @@ make build-cli
 make test-cli
 ```
 
+The built CLI binary will be at `src/cli/bin/Release/net10.0/bce`.
+
 For other surfaces, install and build them explicitly:
 
 ```bash
@@ -97,26 +101,28 @@ make build-website
 
 ## CLI
 
+The examples below assume `bce` is on your `PATH`. If you're running from a source build, invoke `./src/cli/bin/Release/net10.0/bce` instead.
+
 ### Estimate Command
 
 ```bash
 # Estimate a single VM (default table output)
-dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/simple-vm.bicep
+bce estimate --file ./tests/fixtures/simple-vm.bicep
 
 # Estimate all resources with a params file, output as markdown
-dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/all.bicep --params-file ./tests/fixtures/all.bicepparam --output markdown
+bce estimate --file ./tests/fixtures/all.bicep --params-file ./tests/fixtures/all.bicepparam --output markdown
 
 # Estimate an AKS cluster, output as JSON
-dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/aks.bicep --output json
+bce estimate --file ./tests/fixtures/aks.bicep --output json
 
 # Estimate AKS + VM together, output as CSV
-dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/aks-vm.bicep --output csv
+bce estimate --file ./tests/fixtures/aks-vm.bicep --output csv
 
 # Estimate from a pre-compiled ARM template
-dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/multi-resource.arm.json --output table
+bce estimate --file ./tests/fixtures/multi-resource.arm.json --output table
 
 # Override parameter values
-dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/aks-vm.bicep --param vmSize=Standard_D4s_v3 --param env=prod
+bce estimate --file ./tests/fixtures/aks-vm.bicep --param vmSize=Standard_D4s_v3 --param env=prod
 ```
 
 **Options:**
@@ -139,10 +145,10 @@ dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixt
 
 ```bash
 # View cache statistics (entry count and size)
-dotnet run --project ./src/cli/washington.csproj -- cache info
+bce cache info
 
 # Clear all cached pricing data
-dotnet run --project ./src/cli/washington.csproj -- cache clear
+bce cache clear
 ```
 
 Cache is stored at `~/.bicep-cost-estimator/cache/` with a default 24-hour TTL.
@@ -150,7 +156,7 @@ Cache is stored at `~/.bicep-cost-estimator/cache/` with a default 24-hour TTL.
 ### LSP Server Mode
 
 ```bash
-dotnet run --project ./src/cli/washington.csproj -- lsp
+bce lsp
 ```
 
 Starts a Language Server Protocol server over stdin/stdout (JSON-RPC). Used by editors for real-time cost estimation.
@@ -159,7 +165,7 @@ Starts a Language Server Protocol server over stdin/stdout (JSON-RPC). Used by e
 
 ## VS Code Extension
 
-The extension activates on `.bicep` files and communicates with the CLI in LSP mode — **zero logic duplication**.
+The extension activates on `.bicep` files and communicates with the `bce` CLI in LSP mode — **zero logic duplication**.
 
 ### Editor Features
 
@@ -182,7 +188,7 @@ The extension activates on `.bicep` files and communicates with the CLI in LSP m
 | Setting | Description | Default |
 | --- | --- | --- |
 | `washington.defaultRegion` | Default Azure region | `eastus` |
-| `washington.cliPath` | Path to CLI binary (auto-detected if empty) | `""` |
+| `washington.cliPath` | Path to the `bce` CLI binary (auto-detected if empty) | `""` |
 | `washington.estimateOnSave` | Auto-estimate on save | `true` |
 | `washington.showCodeLens` | Show CodeLens cost annotations | `true` |
 | `washington.showStatusBar` | Show total cost in status bar | `true` |
@@ -192,7 +198,7 @@ The extension activates on `.bicep` files and communicates with the CLI in LSP m
 
 ## GitHub Action
 
-Integrate cost estimation into your CI/CD pipeline and PR review workflow.
+Integrate cost estimation into your CI/CD pipeline and PR review workflow. The action builds and runs `bce` under the hood.
 
 ### Usage
 
@@ -279,7 +285,7 @@ The following features are planned for future releases:
 - **Multi-file / module-aware projects** — Support Bicep projects that span multiple files and use modules
 - **Cost comparison between parameter sets** — Compare costs across different parameter sets (e.g. `dev` vs `prod`)
 - **Historical price tracking** — Detect cost changes over time as Azure pricing evolves
-- **`diff` command** — Show cost delta vs current deployment (`washington estimate diff main.bicep`)
+- **`diff` command** — Show cost delta vs current deployment (`bce estimate diff main.bicep`)
 - **PR comment template customization** — Allow users to customize the GitHub Action PR comment format
 - **Currency selection** — Add `--currency` flag to the CLI and GitHub Action for non-USD currencies
 - **Reserved Instances / Savings Plans** — Show RI and savings plan pricing alongside pay-as-you-go for comparison

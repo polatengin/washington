@@ -5,7 +5,7 @@ sidebar_position: 40
 
 # GitHub Action
 
-The Washington GitHub Action posts Azure cost estimates as comments on your pull requests, helping you catch unexpected cost changes before merging.
+The Washington GitHub Action builds and runs the `bce` CLI in CI so you can estimate Azure costs directly from your workflow.
 
 ## Usage
 
@@ -24,30 +24,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: polatengin/washington@main
+      - id: cost
+        uses: polatengin/washington@main
         with:
           file: main.bicep
+          params-file: main.bicepparam
+          output-format: json
 ```
 
 ## Inputs
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `file` | Path to infrastructure file | Yes | — |
-| `currency` | Display currency | No | `USD` |
-| `comment` | Post PR comment | No | `true` |
+| `file` | Path to the `.bicep` file to estimate | Yes | — |
+| `params-file` | Optional `.bicepparam` file | No | — |
+| `base-file` | Base branch `.bicep` file for delta comparison | No | — |
+| `base-params-file` | Base branch `.bicepparam` file for delta comparison | No | — |
+| `output-format` | Result format: `json`, `table`, or `markdown` | No | `json` |
+| `fail-on-threshold` | Fail the step if the monthly total exceeds this value | No | — |
 
-## Example PR Comment
+## Outputs
 
-The action posts a comment like:
+| Output | Description |
+|-------|-------------|
+| `estimation-result` | Full estimation result in the selected output format |
+| `total-cost` | Estimated monthly total |
+| `base-cost` | Estimated monthly total for the base file, or `0` |
+| `delta-cost` | Difference between current and base totals |
 
-```
-## 💰 Azure Cost Estimate
+## Example
 
-| Resource | Type | SKU | Monthly Cost |
-|----------|------|-----|-------------|
-| myVm | Microsoft.Compute/virtualMachines | Standard_D2s_v3 | $70.08 |
-| myStorage | Microsoft.Storage/storageAccounts | Standard_LRS | $21.84 |
-
-**Total estimated monthly cost: $91.92**
+```yaml
+- name: Show estimated total
+  run: echo "Monthly total: ${{ steps.cost.outputs.total-cost }}"
 ```

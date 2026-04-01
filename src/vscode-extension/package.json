@@ -25,7 +25,7 @@
         "washington.cliPath": {
           "type": "string",
           "default": "",
-          "description": "Path to the washington CLI binary. Auto-detected if empty."
+          "description": "Path to the bce CLI binary. Auto-detected if empty."
         },
         "washington.estimateOnSave": {
           "type": "boolean",

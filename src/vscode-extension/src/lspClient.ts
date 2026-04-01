@@ -52,7 +52,7 @@ function resolveServerCommand(context: vscode.ExtensionContext): ServerCommand {
   // 2. Check bundled binary (platform-specific)
   const platform = process.platform;
   const ext = platform === 'win32' ? '.exe' : '';
-  const bundledPath = path.join(context.extensionPath, 'bin', `washington${ext}`);
+  const bundledPath = path.join(context.extensionPath, 'bin', `bce${ext}`);
   try {
     const fs = require('fs');
     if (fs.existsSync(bundledPath)) {
@@ -75,6 +75,6 @@ function resolveServerCommand(context: vscode.ExtensionContext): ServerCommand {
     } catch {}
   }
 
-  // 4. Fall back to 'washington' on PATH
-  return { command: 'washington', args: ['lsp'] };
+  // 4. Fall back to 'bce' on PATH
+  return { command: 'bce', args: ['lsp'] };
 }

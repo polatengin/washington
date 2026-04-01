@@ -5,31 +5,28 @@ sidebar_position: 21
 
 # CLI Configuration
 
-Washington CLI can be configured via command-line options or a configuration file.
+Washington's CLI is published as `bce`.
 
-## Configuration File
+The current CLI does not support a dedicated config file or `BCE_*` environment variables. Configure behavior on each invocation with command flags.
 
-Create a `.washington.json` file in your project root:
+## Per-Run Options
 
-```json
-{
-  "defaultCurrency": "USD",
-  "defaultRegion": "eastus2",
-  "outputFormat": "table"
-}
+| Option | Description | Default |
+|----------|-------------|---------|
+| `--params-file <path>` | Load parameter values from a `.bicepparam` file | — |
+| `--param <key=value>` | Override a parameter value on the command line | — |
+| `--output <format>` | Choose `table`, `json`, `csv`, or `markdown` output | `table` |
+
+## Runtime Defaults
+
+- If a resource region cannot be resolved from the source file, `bce` falls back to `eastus`.
+- Pricing responses are cached for 24 hours under `~/.bicep-cost-estimator/cache`.
+- The VS Code extension setting `washington.cliPath` can point to a custom `bce` binary.
+
+## Examples
+
+```bash
+bce estimate --file main.bicep --output json
+
+bce estimate --file main.bicep --params-file main.bicepparam --param env=prod
 ```
-
-## Environment Variables
-
-| Variable | Description |
-|----------|-------------|
-| `WASHINGTON_CURRENCY` | Default currency code |
-| `WASHINGTON_REGION` | Default Azure region |
-| `WASHINGTON_OUTPUT` | Default output format |
-
-## Precedence
-
-1. Command-line flags (highest priority)
-2. Environment variables
-3. `.washington.json` configuration file
-4. Built-in defaults
