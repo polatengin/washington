@@ -27,6 +27,15 @@
       "problemMatcher": "$msCompile"
     },
     {
+      "label": "CopyCLIToBin",
+      "type": "shell",
+      "command": "mkdir -p ${workspaceFolder}/src/vscode-extension/bin && cp -r ${workspaceFolder}/src/cli/bin/Debug/net10.0/* ${workspaceFolder}/src/vscode-extension/bin/ && ln -sf cli ${workspaceFolder}/src/vscode-extension/bin/washington",
+      "dependsOn": [
+        "BuildCLI"
+      ],
+      "problemMatcher": []
+    },
+    {
       "label": "vscode-extension-compile",
       "type": "npm",
       "script": "compile",
@@ -35,7 +44,7 @@
       "problemMatcher": [],
       "detail": "webpack",
       "dependsOn": [
-        "BuildCLI"
+        "CopyCLIToBin"
       ]
     }
   ]
