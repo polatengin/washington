@@ -42,10 +42,13 @@ public class CostAggregator
 
             var cost = mapper.CalculateCost(resource, allPrices);
 
+            var hourlyCost = cost.Amount / 730m;
+
             lines.Add(new ResourceCostLine(
                 ResourceType: resource.ResourceType,
                 ResourceName: resource.Name,
                 PricingDetails: cost.Details,
+                HourlyCost: Math.Round(hourlyCost, 4),
                 MonthlyCost: cost.Amount
             ));
 

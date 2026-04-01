@@ -22,7 +22,7 @@ public class OutputFormatterTests
         var report = CreateSampleReport();
         var output = OutputFormatter.Format(report, "csv");
 
-        Assert.StartsWith("ResourceName,ResourceType,PricingDetails,MonthlyCost", output);
+        Assert.StartsWith("ResourceName,ResourceType,PricingDetails,HourlyCost,MonthlyCost", output);
         Assert.Contains("test-vm", output);
     }
 
@@ -52,7 +52,7 @@ public class OutputFormatterTests
             Lines: new List<ResourceCostLine>
             {
                 new("Microsoft.Compute/virtualMachines", "test-vm",
-                    "Standard_D2s_v3 @ $0.0960/hr × 730 hrs", 70.08m)
+                    "Standard_D2s_v3 @ $0.0960/hr × 730 hrs", 0.0960m, 70.08m)
             },
             GrandTotal: 70.08m,
             Warnings: new List<string> { "⚠ No pricing mapper for Microsoft.Network/networkInterfaces — skipped" }

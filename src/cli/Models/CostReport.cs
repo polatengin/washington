@@ -12,5 +12,6 @@ public record ResourceCostLine(
     [property: JsonPropertyName("resourceType")] string ResourceType,
     [property: JsonPropertyName("resourceName")] string ResourceName,
     [property: JsonPropertyName("pricingDetails")] string PricingDetails,
+    [property: JsonPropertyName("hourlyCost")] decimal HourlyCost,
     [property: JsonPropertyName("monthlyCost")] decimal MonthlyCost
 );

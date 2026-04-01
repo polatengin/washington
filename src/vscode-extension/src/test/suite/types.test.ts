@@ -9,6 +9,7 @@ suite('Types', () => {
           resourceType: 'Microsoft.Compute/virtualMachines',
           resourceName: 'test-vm',
           pricingDetails: 'Standard_D2s_v3 @ $0.0960/hr × 730 hrs',
+          hourlyCost: 0.096,
           monthlyCost: 70.08,
         },
       ],
@@ -28,6 +29,7 @@ suite('Types', () => {
       resourceType: 'Microsoft.Storage/storageAccounts',
       resourceName: 'mystorage',
       pricingDetails: 'StorageV2 Standard_LRS Hot ~100 GB',
+      hourlyCost: 0.0071,
       monthlyCost: 5.2,
     };
 

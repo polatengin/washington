@@ -41,22 +41,24 @@ public static class OutputFormatter
         var nameWidth = Math.Max(16, report.Lines.Max(l => l.ResourceName.Length) + 2);
         var typeWidth = Math.Max(20, report.Lines.Max(l => l.ResourceType.Length) + 2);
         var detailsWidth = Math.Max(20, report.Lines.Max(l => l.PricingDetails.Length) + 2);
+        var hourlyCostWidth = 14;
         var costWidth = 14;
 
-        var totalWidth = nameWidth + typeWidth + detailsWidth + costWidth;
+        var totalWidth = nameWidth + typeWidth + detailsWidth + hourlyCostWidth + costWidth;
         var separator = new string('─', totalWidth);
 
-        sb.AppendLine($"{"Resource".PadRight(nameWidth)}{"Type".PadRight(typeWidth)}{"Details".PadRight(detailsWidth)}{"Monthly Cost".PadLeft(costWidth)}");
+        sb.AppendLine($"{"Resource".PadRight(nameWidth)}{"Type".PadRight(typeWidth)}{"Details".PadRight(detailsWidth)}{"Hourly Cost".PadLeft(hourlyCostWidth)}{"Monthly Cost".PadLeft(costWidth)}");
         sb.AppendLine(separator);
 
         foreach (var line in report.Lines)
         {
+            var hourly = line.HourlyCost > 0 ? $"${line.HourlyCost:N4}" : "—";
             var cost = line.MonthlyCost > 0 ? $"${line.MonthlyCost:N2}" : "—";
-            sb.AppendLine($"{line.ResourceName.PadRight(nameWidth)}{line.ResourceType.PadRight(typeWidth)}{line.PricingDetails.PadRight(detailsWidth)}{cost.PadLeft(costWidth)}");
+            sb.AppendLine($"{line.ResourceName.PadRight(nameWidth)}{line.ResourceType.PadRight(typeWidth)}{line.PricingDetails.PadRight(detailsWidth)}{hourly.PadLeft(hourlyCostWidth)}{cost.PadLeft(costWidth)}");
         }
 
         sb.AppendLine(separator);
-        sb.AppendLine($"{"".PadRight(nameWidth + typeWidth)}{"ESTIMATED MONTHLY TOTAL".PadRight(detailsWidth)}{$"${report.GrandTotal:N2}".PadLeft(costWidth)}");
+        sb.AppendLine($"{"".PadRight(nameWidth + typeWidth)}{"ESTIMATED MONTHLY TOTAL".PadRight(detailsWidth)}{"".PadLeft(hourlyCostWidth)}{$"${report.GrandTotal:N2}".PadLeft(costWidth)}");
         sb.AppendLine();
 
         foreach (var warning in report.Warnings)
@@ -70,14 +72,14 @@ public static class OutputFormatter
     private static string FormatCsv(CostReport report)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("ResourceName,ResourceType,PricingDetails,MonthlyCost");
+        sb.AppendLine("ResourceName,ResourceType,PricingDetails,HourlyCost,MonthlyCost");
 
         foreach (var line in report.Lines)
         {
-            sb.AppendLine($"\"{line.ResourceName}\",\"{line.ResourceType}\",\"{line.PricingDetails}\",{line.MonthlyCost:F2}");
+            sb.AppendLine($"\"{line.ResourceName}\",\"{line.ResourceType}\",\"{line.PricingDetails}\",{line.HourlyCost:F4},{line.MonthlyCost:F2}");
         }
 
-        sb.AppendLine($"\"TOTAL\",\"\",\"\",{report.GrandTotal:F2}");
+        sb.AppendLine($"\"TOTAL\",\"\",\"\",\"\",{report.GrandTotal:F2}");
         return sb.ToString();
     }
 
@@ -89,16 +91,17 @@ public static class OutputFormatter
         sb.AppendLine();
         sb.AppendLine($"**Date:** {DateTime.Now:yyyy-MM-dd}");
         sb.AppendLine();
-        sb.AppendLine("| Resource | Type | Details | Monthly Cost |");
-        sb.AppendLine("|----------|------|---------|-------------:|");
+        sb.AppendLine("| Resource | Type | Details | Hourly Cost | Monthly Cost |");
+        sb.AppendLine("|----------|------|---------|------------:|-------------:|");
 
         foreach (var line in report.Lines)
         {
+            var hourly = line.HourlyCost > 0 ? $"${line.HourlyCost:N4}" : "—";
             var cost = line.MonthlyCost > 0 ? $"${line.MonthlyCost:N2}" : "—";
-            sb.AppendLine($"| {line.ResourceName} | {line.ResourceType} | {line.PricingDetails} | {cost} |");
+            sb.AppendLine($"| {line.ResourceName} | {line.ResourceType} | {line.PricingDetails} | {hourly} | {cost} |");
         }
 
-        sb.AppendLine($"| | | **ESTIMATED MONTHLY TOTAL** | **${report.GrandTotal:N2}** |");
+        sb.AppendLine($"| | | **ESTIMATED MONTHLY TOTAL** | | **${report.GrandTotal:N2}** |");
         sb.AppendLine();
 
         if (report.Warnings.Count > 0)

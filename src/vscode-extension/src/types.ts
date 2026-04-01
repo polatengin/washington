@@ -8,5 +8,6 @@ export interface ResourceCostLine {
   resourceType: string;
   resourceName: string;
   pricingDetails: string;
+  hourlyCost: number;
   monthlyCost: number;
 }
