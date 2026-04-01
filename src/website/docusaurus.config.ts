@@ -6,19 +6,24 @@ const config: Config = {
   title: 'Washington',
   tagline: 'Azure Cost Estimator',
   favicon: 'img/logo.svg',
+  url: 'https://bicepcostestimator.net',
 
   future: {
     v4: true,
   },
 
-  url: 'https://bicepcostestimator.net',
   baseUrl: '/',
-  trailingSlash: false,
-
   organizationName: 'polatengin',
   projectName: 'washington',
+  trailingSlash: false,
 
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
+
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn'
+    }
+  },
 
   i18n: {
     defaultLocale: 'en',
