@@ -1,0 +1,148 @@
+name: Release Washington CLI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      security-events: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@c2fa09f4bde5ebb9d1777cf28262a3eb3db3ced7 # v5.2.0
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Get next version
+        id: version
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+        with:
+          script: |
+            let nextVersion;
+            try {
+              const { data: latestRelease } = await github.rest.repos.getLatestRelease({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+              });
+              let [major, minor, patch] = latestRelease.tag_name.replace('v', '').split('.').map(Number);
+              patch++;
+              nextVersion = `${major}.${minor}.${patch}`;
+            } catch (error) {
+              if (error.status === 404) {
+                console.log("No releases found, starting with version 0.1.0");
+                nextVersion = '0.1.0';
+              } else {
+                throw error;
+              }
+            }
+            console.log(`New version: ${nextVersion}`);
+            core.setOutput('version', nextVersion);
+            core.setOutput('new_version_tag', `v${nextVersion}`);
+
+      - name: Update project version
+        run: |
+          sed -i 's|<Version>.*</Version>|<Version>${{ steps.version.outputs.version }}</Version>|' src/cli/washington.csproj
+          sed -i 's|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>${{ steps.version.outputs.version }}</AssemblyVersion>|' src/cli/washington.csproj
+          sed -i 's|<FileVersion>.*</FileVersion>|<FileVersion>${{ steps.version.outputs.version }}</FileVersion>|' src/cli/washington.csproj
+
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/init@c10b8064de6f491fea524254123dbe5e09572f13 # v3.27.6
+        with:
+          languages: 'csharp,javascript'
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@c10b8064de6f491fea524254123dbe5e09572f13 # v3.27.6
+
+      - name: Build
+        run: dotnet build src/cli/washington.csproj --configuration Release
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@c10b8064de6f491fea524254123dbe5e09572f13 # v3.27.6
+
+      - name: Generate Release Notes
+        id: release_notes
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          echo "📝 Generating release notes..."
+
+          # Get the last tag, or use initial commit if no tags exist
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || git rev-list --max-parents=0 HEAD)
+          echo "Last release: $LAST_TAG"
+
+          # Get commit messages since last release
+          COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:'%s' | tr '\n' ' ')
+          echo "Commits: $COMMITS"
+
+          if [ -n "$GEMINI_API_KEY" ] && [ -n "$COMMITS" ]; then
+            echo "Using Gemini API to generate release notes..."
+            RELEASE_NOTES=$(curl -s "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent" \
+              -H "Content-Type: application/json" \
+              -H "X-Goog-Api-Key: ${GEMINI_API_KEY}" \
+              -d '{
+                "contents": [
+                  {
+                    "parts": [
+                      {
+                        "text": "You are a release assistant that summarizes git commit messages into a changelog for the Washington CLI project. Washington estimates cost of bicep and ARM deployments.\n\nHere are the commits:\n\n'"$COMMITS"'\n\nGenerate a concise changelog in markdown format with sections like ## Features, ## Improvements, ## Bug Fixes, etc. Focus on user-facing changes."
+                      }
+                    ]
+                  }
+                ]
+              }' | jq -r ".candidates[0].content.parts[0].text" 2>/dev/null)
+
+            if [ $? -eq 0 ] && [ -n "$RELEASE_NOTES" ] && [ "$RELEASE_NOTES" != "null" ]; then
+              echo "✅ Generated release notes using Gemini API"
+              echo "$RELEASE_NOTES" > release_notes.md
+            else
+              echo "⚠️ Failed to generate release notes with Gemini API, using fallback"
+              RELEASE_NOTES="## Changes\n\nThis release includes the following commits:\n\n$(git log ${LAST_TAG}..HEAD --pretty=format:'- %s' | head -20)"
+              echo -e "$RELEASE_NOTES" > release_notes.md
+            fi
+          else
+            echo "⚠️ Gemini API key not available or no commits found, using fallback"
+            RELEASE_NOTES="## Changes\n\nThis release includes various improvements and bug fixes."
+            echo -e "$RELEASE_NOTES" > release_notes.md
+          fi
+
+          # Set output for use in create release step
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_OUTPUT
+          cat release_notes.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Publish
+        run: |
+          dotnet publish $(CLI_DIR)/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r win-x64 -o ./publish/win-x64
+          dotnet publish $(CLI_DIR)/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r linux-x64 -o ./publish/linux-x64
+          dotnet publish $(CLI_DIR)/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r osx-x64 -o ./publish/osx-x64
+          dotnet publish $(CLI_DIR)/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r osx-arm64 -o ./publish/osx-arm64
+          cp ./publish/win-x64/washington.exe ./publish/washington-win-x64.exe
+          cp ./publish/linux-x64/washington ./publish/washington-linux-x64
+          cp ./publish/osx-x64/washington ./publish/washington-osx-x64
+          cp ./publish/osx-arm64/washington ./publish/washington-osx-arm64
+
+      - name: Create Release
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG=${{ steps.version.outputs.new_version_tag }}
+
+          gh release create "$TAG" \
+            --title "Release $TAG" \
+            --notes "${{ steps.release_notes.outputs.RELEASE_NOTES }}"
+
+          gh release upload "$TAG" ./publish/washington-win-x64.exe#washington-win-x64.exe
+          gh release upload "$TAG" ./publish/washington-linux-x64#washington-linux-x64
+          gh release upload "$TAG" ./publish/washington-osx-x64#washington-osx-x64
+          gh release upload "$TAG" ./publish/washington-osx-arm64#washington-osx-arm64
