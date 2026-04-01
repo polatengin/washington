@@ -279,6 +279,13 @@ The following features are planned for future releases:
 - **Currency selection** — Add `--currency` flag to the CLI and GitHub Action for non-USD currencies
 - **Reserved Instances / Savings Plans** — Show RI and savings plan pricing alongside pay-as-you-go for comparison
 - **Direct ARM JSON template support** — Allow `--file` to accept pre-compiled ARM JSON templates directly (service layer supports this; CLI routing pending)
+- **SARIF output format** — Integrate cost warnings into GitHub Code Scanning / security tab
+- **Cost optimization suggestions** — Recommend cheaper SKUs, redundant resources, or right-sizing opportunities
+- **Tag-based cost grouping** — Group and subtotal costs by Azure resource tags (team, project, environment)
+- **Spot VM pricing** — Show spot/low-priority pricing alongside pay-as-you-go
+- **Custom pricing overrides** — Support Enterprise Agreement / CSP pricing via user-provided rate cards
+- **Annual / multi-year projections** — Show costs beyond monthly (quarterly, annual)
+- **Bicep module registry support** — Resolve modules from Azure Container Registry and template specs
 
 ---
 
