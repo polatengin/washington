@@ -313,7 +313,6 @@ public class CostEstimatorLanguageServer
             if (hoveredLine >= resourceLine && hoveredLine <= resourceEndLine)
             {
                 var markdown = $"### 💰 Cost Estimate: {line.ResourceName}\n\n" +
-                               $"| Field | Value |\n|-------|-------|\n" +
                                $"| **Type** | {line.ResourceType} |\n" +
                                $"| **Details** | {line.PricingDetails} |\n" +
                                $"| **Monthly Cost** | ${line.MonthlyCost:N2} |\n";
