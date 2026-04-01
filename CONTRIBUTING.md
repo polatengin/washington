@@ -8,6 +8,7 @@ We welcome contributions to Washington! This guide explains how to set up a deve
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Node.js 20+](https://nodejs.org/)
+- GNU Make
 - [Docker](https://www.docker.com/) (for website development)
 
 ### Clone and Build
@@ -15,20 +16,23 @@ We welcome contributions to Washington! This guide explains how to set up a deve
 ```bash
 git clone https://github.com/polatengin/washington.git
 cd washington
+make setup-cli
+make build-cli
+make test-cli
+```
 
-# Build the CLI
-dotnet build src/cli/cli.csproj
+If you're working on the VS Code extension or documentation website, install those dependencies explicitly:
 
-# Run tests
-dotnet test tests/cli.tests/
+```bash
+make setup-extension
+make setup-website
 ```
 
 ### Website Development
 
 ```bash
-cd src/website
-npm install
-npm start
+make setup-website
+npm --prefix src/website start
 ```
 
 This starts a local development server at `http://localhost:3000`.
@@ -38,7 +42,7 @@ This starts a local development server at `http://localhost:3000`.
 1. Fork the repository
 2. Create a feature branch: `git checkout -b my-feature`
 3. Make your changes and add tests
-4. Run the test suite: `dotnet test`
+4. Run `make test-cli` and, for extension changes, `make test-extension`
 5. Submit a pull request
 
 ## Project Structure
