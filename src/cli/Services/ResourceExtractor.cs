@@ -51,7 +51,8 @@ public class ResourceExtractor
         {
             var type = resource.GetStringProperty("type");
             var apiVersion = resource.GetStringProperty("apiVersion");
-            var name = resource.GetStringProperty("name");
+            var rawName = resource.GetStringProperty("name");
+            var name = ResolveArmStringExpression(rawName, paramDefaults) ?? rawName;
             var location = ResolveArmExpression(resource.GetStringProperty("location"), paramDefaults);
 
             if (string.IsNullOrEmpty(type))
