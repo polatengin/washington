@@ -83,17 +83,23 @@ dotnet build src/cli/washington.csproj
 ### Estimate Command
 
 ```bash
-# Basic estimate
-dotnet run --project ./src/cli/washington.csproj -- estimate --file main.bicep
+# Estimate a single VM (default table output)
+dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/simple-vm.bicep
 
-# With parameters file
-dotnet run --project ./src/cli/washington.csproj -- estimate --file main.bicep --params-file params.bicepparam
+# Estimate all resources with a params file, output as markdown
+dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/all.bicep --params-file ./tests/fixtures/all.bicepparam --output markdown
+
+# Estimate an AKS cluster, output as JSON
+dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/aks.bicep --output json
+
+# Estimate AKS + VM together, output as CSV
+dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/aks-vm.bicep --output csv
+
+# Estimate from a pre-compiled ARM template
+dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/multi-resource.arm.json --output table
 
 # Override parameter values
-dotnet run --project ./src/cli/washington.csproj -- estimate --file main.bicep --param vmSize=Standard_D4s_v3 --param env=prod
-
-# Choose output format
-dotnet run --project ./src/cli/washington.csproj -- estimate --file main.bicep --output json
+dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/aks-vm.bicep --param vmSize=Standard_D4s_v3 --param env=prod
 ```
 
 **Options:**
@@ -111,25 +117,6 @@ dotnet run --project ./src/cli/washington.csproj -- estimate --file main.bicep -
 - **`json`** — Machine-readable JSON with `lines`, `grandTotal`, and `warnings`
 - **`csv`** — RFC 4180 CSV with headers and a TOTAL row
 - **`markdown`** — GitHub-flavored markdown table
-
-### Sample Commands
-
-```bash
-# 1. Estimate a single VM (default table output)
-dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/simple-vm.bicep
-
-# 2. Estimate all resources with a params file, output as markdown
-dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/all.bicep --params-file ./tests/fixtures/all.bicepparam --output markdown
-
-# 3. Estimate an AKS cluster, output as JSON
-dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/aks.bicep --output json
-
-# 4. Estimate AKS + VM together, output as CSV
-dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/aks-vm.bicep --output csv
-
-# 5. Estimate from a pre-compiled ARM template
-dotnet run --project ./src/cli/washington.csproj -- estimate --file ./tests/fixtures/multi-resource.arm.json --output table
-```
 
 ### Cache Management
 
