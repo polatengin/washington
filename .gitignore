@@ -4,6 +4,8 @@ obj/
 node_modules/
 build/
 dist/
+out/
+publish/
 
 .docusaurus
 .cache-loader
