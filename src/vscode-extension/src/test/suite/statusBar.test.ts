@@ -21,6 +21,7 @@ suite('StatusBar', () => {
     const report: CostReport = {
       lines: [],
       grandTotal: 364.17,
+      currency: 'USD',
       warnings: [],
     };
 
@@ -36,6 +37,7 @@ suite('StatusBar', () => {
     const report: CostReport = {
       lines: [],
       grandTotal: 300.0,
+      currency: 'USD',
       warnings: [],
     };
 

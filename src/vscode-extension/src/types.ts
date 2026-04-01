@@ -1,6 +1,7 @@
 export interface CostReport {
   lines: ResourceCostLine[];
   grandTotal: number;
+  currency: string;
   warnings: string[];
 }
 
