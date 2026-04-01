@@ -114,7 +114,7 @@ dotnet run --project ./src/cli/cli.csproj -- estimate --file main.bicep --output
 ### Sample Commands
 
 ```bash
-# 1. Estimate a single VM (table output, default USD)
+# 1. Estimate a single VM (default table output)
 dotnet run --project ./src/cli/cli.csproj -- estimate --file ./tests/fixtures/simple-vm.bicep
 
 # 2. Estimate all resources with a params file, output as markdown
