@@ -1,6 +1,7 @@
 using System.CommandLine;
 using Washington.Cache;
 using Washington.Mappers;
+using Washington.Models;
 using Washington.Services;
 
 namespace Washington.Commands;
@@ -73,10 +74,19 @@ public class EstimateCommand
             }
         }
 
-        var report = await service.EstimateFromBicepAsync(
-            file.FullName,
-            paramsFile?.FullName,
-            paramDict);
+        CostReport report;
+        if (file.Extension.Equals(".json", StringComparison.OrdinalIgnoreCase))
+        {
+            var armJson = await File.ReadAllTextAsync(file.FullName);
+            report = await service.EstimateFromArmJsonAsync(armJson);
+        }
+        else
+        {
+            report = await service.EstimateFromBicepAsync(
+                file.FullName,
+                paramsFile?.FullName,
+                paramDict);
+        }
 
         var output = OutputFormatter.Format(report, outputFormat, file.FullName);
         Console.Write(output);
