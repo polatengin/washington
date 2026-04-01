@@ -4,11 +4,16 @@ import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-lan
 
 let client: LanguageClient | undefined;
 
+interface ServerCommand {
+  command: string;
+  args: string[];
+}
+
 export async function createLspClient(context: vscode.ExtensionContext): Promise<LanguageClient> {
-  const cliPath = resolveCliPath(context);
+  const serverCommand = resolveServerCommand(context);
   const serverOptions: ServerOptions = {
-    run: { command: cliPath, args: ['lsp'] },
-    debug: { command: cliPath, args: ['lsp'] },
+    run: { command: serverCommand.command, args: serverCommand.args },
+    debug: { command: serverCommand.command, args: serverCommand.args },
   };
 
   const clientOptions: LanguageClientOptions = {
@@ -37,11 +42,11 @@ export async function deactivateClient(): Promise<void> {
   }
 }
 
-function resolveCliPath(context: vscode.ExtensionContext): string {
+function resolveServerCommand(context: vscode.ExtensionContext): ServerCommand {
   // 1. Check explicit setting
   const configPath = vscode.workspace.getConfiguration('washington').get<string>('cliPath');
   if (configPath && configPath.length > 0) {
-    return configPath;
+    return { command: configPath, args: ['lsp'] };
   }
 
   // 2. Check bundled binary (platform-specific)
@@ -51,22 +56,25 @@ function resolveCliPath(context: vscode.ExtensionContext): string {
   try {
     const fs = require('fs');
     if (fs.existsSync(bundledPath)) {
-      return bundledPath;
+      return { command: bundledPath, args: ['lsp'] };
     }
   } catch {}
 
-  // 3. Fall back to dotnet run project path
+  // 3. Fall back to dotnet run against the workspace project
   const workspaceFolder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath;
   if (workspaceFolder) {
-    const projectPath = path.join(workspaceFolder, 'src', 'cli', 'cli.csproj');
+    const projectPath = path.join(workspaceFolder, 'src', 'cli', 'washington.csproj');
     try {
       const fs = require('fs');
       if (fs.existsSync(projectPath)) {
-        return 'dotnet';
+        return {
+          command: 'dotnet',
+          args: ['run', '--project', projectPath, '--', 'lsp'],
+        };
       }
     } catch {}
   }
 
   // 4. Fall back to 'washington' on PATH
-  return 'washington';
+  return { command: 'washington', args: ['lsp'] };
 }
