@@ -3,12 +3,18 @@ SHELL := bash
 
 .DEFAULT_GOAL := help
 
-.PHONY: setup-cli setup-extension setup-website build-cli build-extension build-website test-cli test-extension info
+.PHONY: help info setup-cli setup-extension setup-website clean build-cli build-extension build-website test-cli test-extension package-cli
 
 help:
 	@echo "Washington development targets"
 	@echo
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z0-9_.-]+:.*## / {printf "%-24s %s\n", $$1, $$2; found = 1} END {if (!found) print "  (no documented targets found)"}' $(MAKEFILE_LIST) | sort
+	@echo
+	@echo "Examples:"
+	@echo "  make setup-cli"
+	@echo "  make build-cli"
+	@echo "  make test-cli"
+	@echo "  make build-extension"
 
 info: ## Show tool versions and current paths
 	@echo "Washington build information"
@@ -32,7 +38,7 @@ clean: ## Remove generated outputs
 	dotnet clean washington.slnx
 	rm -rf src/vscode-extension/bin src/vscode-extension/dist src/vscode-extension/out src/website/build src/website/.docusaurus src/website/static/text publish
 
-build-cli: clean ## Build the default repo surface
+build-cli: clean ## Build the Washington CLI
 	dotnet build src/cli/washington.csproj --configuration Release
 
 build-extension: clean ## Build the VS Code extension
@@ -45,7 +51,7 @@ build-extension: clean ## Build the VS Code extension
 build-website: clean ## Build the documentation website
 	npm --prefix src/website run build
 
-test-cli: build-cli ## Run the required test suites
+test-cli: build-cli ## Run the CLI test suite
 	dotnet test tests/cli.tests/washington.tests.csproj --configuration Release
 
 test-extension: build-extension ## Run the VS Code extension tests
