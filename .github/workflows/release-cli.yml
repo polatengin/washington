@@ -122,10 +122,10 @@ jobs:
 
       - name: Publish
         run: |
-          dotnet publish $(CLI_DIR)/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r win-x64 -o ./publish/win-x64
-          dotnet publish $(CLI_DIR)/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r linux-x64 -o ./publish/linux-x64
-          dotnet publish $(CLI_DIR)/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r osx-x64 -o ./publish/osx-x64
-          dotnet publish $(CLI_DIR)/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r osx-arm64 -o ./publish/osx-arm64
+          dotnet publish src/cli/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r win-x64 -o ./publish/win-x64
+          dotnet publish src/cli/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r linux-x64 -o ./publish/linux-x64
+          dotnet publish src/cli/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r osx-x64 -o ./publish/osx-x64
+          dotnet publish src/cli/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r osx-arm64 -o ./publish/osx-arm64
           cp ./publish/win-x64/washington.exe ./publish/washington-win-x64.exe
           cp ./publish/linux-x64/washington ./publish/washington-linux-x64
           cp ./publish/osx-x64/washington ./publish/washington-osx-x64
