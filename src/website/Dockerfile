@@ -3,8 +3,9 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
-# Copy docs from repo root
+# Copy docs and root CONTRIBUTING.md
 COPY docs/ ./docs/
+COPY CONTRIBUTING.md ./CONTRIBUTING.md
 
 # Copy website source
 COPY src/website/package*.json ./src/website/
