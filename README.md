@@ -30,15 +30,16 @@ It ships as a **CLI tool**, a **VS Code extension**, and a **GitHub Action**, gi
 
 ---
 
-## Supported Azure Resource Types (53)
+## Supported Azure Resource Types (56)
 
 | Category | Resource Types |
 | --- | --- |
 | **Compute** | Virtual Machines, Virtual Machine Scale Sets, Managed Disks, Batch Accounts, Spring Apps |
 | **Containers** | AKS Managed Clusters, Container Registry, Container Apps, Container App Environments, Container Instances |
 | **App Services** | App Service Plans, Function Apps, Static Web Apps |
+| **Storage** | Storage Accounts |
 | **Databases** | SQL Database, SQL Elastic Pools, SQL Managed Instances, Cosmos DB, PostgreSQL Flexible Servers, MySQL Flexible Servers, MariaDB Servers |
-| **Networking** | Public IP Addresses, Application Gateways, Load Balancers, Virtual Network Gateways, Azure Firewall, Private Endpoints, NAT Gateways, Virtual Networks, Private DNS Zones, Traffic Manager, Bastion Hosts, DDoS Protection Plans, ExpressRoute Circuits, Front Door |
+| **Networking** | Public IP Addresses, Application Gateways, Load Balancers, Virtual Network Gateways, Azure Firewall, Private Endpoints, NAT Gateways, Virtual Networks, Network Interfaces, Private DNS Zones, Traffic Manager, Bastion Hosts, DDoS Protection Plans, ExpressRoute Circuits, Front Door |
 | **Security** | Key Vault |
 | **Messaging** | Event Hub, Service Bus, Event Grid, Notification Hubs |
 | **AI / ML** | Cognitive Services, Machine Learning Workspaces, Azure AI Search |
