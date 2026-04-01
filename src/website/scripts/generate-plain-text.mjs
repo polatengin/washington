@@ -5,8 +5,32 @@ import { join, relative, dirname, basename, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const docsDir = join(__dirname, '..', '..', '..', 'docs');
+const repoRoot = join(__dirname, '..', '..', '..');
+const docsDir = join(repoRoot, 'docs');
 const outputDir = join(__dirname, '..', 'static', 'text');
+const contributingSource = join(repoRoot, 'CONTRIBUTING.md');
+const contributingDest = join(docsDir, '50-guides', 'contributing.md');
+const contributingFrontmatter = `---
+title: Contributing
+sidebar_position: 50
+---
+
+`;
+
+async function copyContributingDoc() {
+  const content = await readFile(contributingSource, 'utf8');
+  const body = content.replace(/^# Contributing\s*\n/, '');
+
+  await mkdir(dirname(contributingDest), { recursive: true });
+  await writeFile(contributingDest, contributingFrontmatter + body, 'utf8');
+
+  console.log('Prepared docs/50-guides/contributing.md');
+}
+
+async function cleanupContributingDoc() {
+  await rm(contributingDest, { force: true });
+  console.log('Removed docs/50-guides/contributing.md');
+}
 
 /**
  * Strip number prefix from a directory name.
@@ -101,6 +125,13 @@ function buildIndex(files) {
 }
 
 // Main
+if (process.argv.includes('--cleanup')) {
+  await cleanupContributingDoc();
+  process.exit(0);
+}
+
+await copyContributingDoc();
+
 console.log('Generating plain-text files...');
 
 // Clean output directory

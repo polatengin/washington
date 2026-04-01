@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "prebuild": "node scripts/copy-contributing.mjs && node scripts/generate-plain-text.mjs",
+    "prebuild": "node scripts/generate-plain-text.mjs",
     "start": "docusaurus start",
     "build": "docusaurus build",
+    "postbuild": "node scripts/generate-plain-text.mjs --cleanup",
     "dev": "npm run build && docusaurus serve",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
