@@ -21,7 +21,7 @@
       "type": "coreclr",
       "request": "launch",
       "preLaunchTask": "BuildCLI",
-      "program": "${workspaceFolder}/src/cli/bin/Debug/net10.0/washington.dll",
+      "program": "${workspaceFolder}/src/cli/bin/Release/net10.0/washington.dll",
       "args": [
         "estimate",
         "--file",
