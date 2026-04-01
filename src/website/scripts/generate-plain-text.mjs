@@ -89,12 +89,12 @@ function buildIndex(files) {
 
   lines.push('');
   lines.push('Usage:');
-  lines.push('  curl https://bicepcostestimate.net/              # this page');
-  lines.push('  curl https://bicepcostestimate.net/getting-started');
-  lines.push('  curl https://bicepcostestimate.net/cli/commands');
+  lines.push('  curl https://bicepcostestimator.net/              # this page');
+  lines.push('  curl https://bicepcostestimator.net/getting-started');
+  lines.push('  curl https://bicepcostestimator.net/cli/commands');
   lines.push('');
   lines.push('Install:');
-  lines.push('  curl -sL https://bicepcostestimate.net/install.sh | bash');
+  lines.push('  curl -sL https://bicepcostestimator.net/install.sh | bash');
   lines.push('');
 
   return lines.join('\n');

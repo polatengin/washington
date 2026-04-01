@@ -70,7 +70,7 @@ app.use((req, res, next) => {
   }
 
   res.status(404).type('text/plain; charset=utf-8');
-  return res.send('404 - Page not found\n\nRun: curl https://bicepcostestimate.net/ for available pages.\n');
+  return res.send('404 - Page not found\n\nRun: curl https://bicepcostestimator.net/ for available pages.\n');
 });
 
 // Browser: serve Docusaurus static build

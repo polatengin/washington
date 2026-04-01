@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Washington CLI installer
-# Usage: curl -sL https://bicepcostestimate.net/install.sh | bash
+# Usage: curl -sL https://bicepcostestimator.net/install.sh | bash
 
 REPO="polatengin/washington"
 INSTALL_DIR="${INSTALL_DIR:-$HOME/.washington/bin}"
