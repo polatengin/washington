@@ -588,6 +588,753 @@ public class MapperTests
         Assert.Equal("Standard_S1", queries[0].SkuName);
     }
 
+    // ===== P4: Compute mappers =====
+
+    [Fact]
+    public void VirtualMachineScaleSetMapper_CanMap_CorrectType()
+    {
+        var mapper = new VirtualMachineScaleSetMapper();
+        var resource = CreateResource("Microsoft.Compute/virtualMachineScaleSets",
+            sku: new { name = "Standard_D2s_v3", capacity = 3 });
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void VirtualMachineScaleSetMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new VirtualMachineScaleSetMapper();
+        var resource = CreateResource("Microsoft.Compute/virtualMachineScaleSets",
+            sku: new { name = "Standard_D2s_v3", capacity = 3 });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Virtual Machines", queries[0].ServiceName);
+        Assert.Equal("Standard_D2s_v3", queries[0].ArmSkuName);
+    }
+
+    [Fact]
+    public void VirtualMachineScaleSetMapper_CalculateCost_MultipliesInstances()
+    {
+        var mapper = new VirtualMachineScaleSetMapper();
+        var resource = CreateResource("Microsoft.Compute/virtualMachineScaleSets",
+            sku: new { name = "Standard_D2s_v3", capacity = 3 });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                ArmSkuName = "Standard_D2s_v3",
+                UnitPrice = 0.096,
+                UnitOfMeasure = "1 Hour",
+                MeterName = "D2s v3",
+                CurrencyCode = "USD"
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        // 0.096 * 730 * 3 = 210.24
+        Assert.Equal(210.24m, cost.Amount);
+        Assert.Contains("× 3", cost.Details);
+    }
+
+    [Fact]
+    public void BatchAccountMapper_CanMap_CorrectType()
+    {
+        var mapper = new BatchAccountMapper();
+        var resource = CreateResource("Microsoft.Batch/batchAccounts");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void BatchAccountMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new BatchAccountMapper();
+        var resource = CreateResource("Microsoft.Batch/batchAccounts");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Batch", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void SpringAppMapper_CanMap_CorrectType()
+    {
+        var mapper = new SpringAppMapper();
+        var resource = CreateResource("Microsoft.AppPlatform/Spring");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void SpringAppMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new SpringAppMapper();
+        var resource = CreateResource("Microsoft.AppPlatform/Spring",
+            sku: new { name = "Standard" });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure Spring Apps", queries[0].ServiceName);
+    }
+
+    // ===== P4: Networking mappers =====
+
+    [Fact]
+    public void VirtualNetworkMapper_CanMap_CorrectType()
+    {
+        var mapper = new VirtualNetworkMapper();
+        var resource = CreateResource("Microsoft.Network/virtualNetworks");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void VirtualNetworkMapper_NoPeering_ReturnsFree()
+    {
+        var mapper = new VirtualNetworkMapper();
+        var resource = CreateResource("Microsoft.Network/virtualNetworks");
+
+        var cost = mapper.CalculateCost(resource, new List<PriceRecord>());
+
+        Assert.Equal(0m, cost.Amount);
+        Assert.Contains("free", cost.Details, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void NatGatewayMapper_CanMap_CorrectType()
+    {
+        var mapper = new NatGatewayMapper();
+        var resource = CreateResource("Microsoft.Network/natGateways");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void NatGatewayMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new NatGatewayMapper();
+        var resource = CreateResource("Microsoft.Network/natGateways");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Virtual Network", queries[0].ServiceName);
+        Assert.Equal("NAT Gateway", queries[0].ProductName);
+    }
+
+    [Fact]
+    public void PrivateDnsZoneMapper_CanMap_CorrectType()
+    {
+        var mapper = new PrivateDnsZoneMapper();
+        var resource = CreateResource("Microsoft.Network/privateDnsZones");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void PrivateDnsZoneMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new PrivateDnsZoneMapper();
+        var resource = CreateResource("Microsoft.Network/privateDnsZones");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure DNS", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void TrafficManagerMapper_CanMap_CorrectType()
+    {
+        var mapper = new TrafficManagerMapper();
+        var resource = CreateResource("Microsoft.Network/trafficManagerProfiles");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void TrafficManagerMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new TrafficManagerMapper();
+        var resource = CreateResource("Microsoft.Network/trafficManagerProfiles");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Traffic Manager", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void BastionHostMapper_CanMap_CorrectType()
+    {
+        var mapper = new BastionHostMapper();
+        var resource = CreateResource("Microsoft.Network/bastionHosts");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void BastionHostMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new BastionHostMapper();
+        var resource = CreateResource("Microsoft.Network/bastionHosts",
+            sku: new { name = "Standard" });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure Bastion", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void DdosProtectionPlanMapper_CanMap_CorrectType()
+    {
+        var mapper = new DdosProtectionPlanMapper();
+        var resource = CreateResource("Microsoft.Network/ddosProtectionPlans");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void DdosProtectionPlanMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new DdosProtectionPlanMapper();
+        var resource = CreateResource("Microsoft.Network/ddosProtectionPlans");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure DDoS Protection", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void ExpressRouteCircuitMapper_CanMap_CorrectType()
+    {
+        var mapper = new ExpressRouteCircuitMapper();
+        var resource = CreateResource("Microsoft.Network/expressRouteCircuits");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void ExpressRouteCircuitMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new ExpressRouteCircuitMapper();
+        var resource = CreateResource("Microsoft.Network/expressRouteCircuits");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("ExpressRoute", queries[0].ServiceName);
+    }
+
+    // ===== P4: Database mappers =====
+
+    [Fact]
+    public void SqlElasticPoolMapper_CanMap_CorrectType()
+    {
+        var mapper = new SqlElasticPoolMapper();
+        var resource = CreateResource("Microsoft.Sql/servers/elasticPools",
+            sku: new { name = "StandardPool", capacity = 50 });
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void SqlElasticPoolMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new SqlElasticPoolMapper();
+        var resource = CreateResource("Microsoft.Sql/servers/elasticPools",
+            sku: new { name = "StandardPool", capacity = 50 });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("SQL Database", queries[0].ServiceName);
+        Assert.Equal("StandardPool", queries[0].ArmSkuName);
+    }
+
+    [Fact]
+    public void MariaDbServerMapper_CanMap_CorrectType()
+    {
+        var mapper = new MariaDbServerMapper();
+        var resource = CreateResource("Microsoft.DBforMariaDB/servers",
+            sku: new { name = "GP_Gen5_2" });
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void MariaDbServerMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new MariaDbServerMapper();
+        var resource = CreateResource("Microsoft.DBforMariaDB/servers",
+            sku: new { name = "GP_Gen5_2" });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure Database for MariaDB", queries[0].ServiceName);
+        Assert.Equal("GP_Gen5_2", queries[0].ArmSkuName);
+    }
+
+    // ===== P4: AI / ML mappers =====
+
+    [Fact]
+    public void CognitiveServicesMapper_CanMap_CorrectType()
+    {
+        var mapper = new CognitiveServicesMapper();
+        var resource = CreateResource("Microsoft.CognitiveServices/accounts",
+            properties: new { _kind = "OpenAI" });
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void CognitiveServicesMapper_BuildQueries_OpenAI()
+    {
+        var mapper = new CognitiveServicesMapper();
+        var resource = CreateResource("Microsoft.CognitiveServices/accounts",
+            properties: new { _kind = "OpenAI" });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure OpenAI Service", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void CognitiveServicesMapper_BuildQueries_GenericCognitive()
+    {
+        var mapper = new CognitiveServicesMapper();
+        var resource = CreateResource("Microsoft.CognitiveServices/accounts",
+            properties: new { _kind = "SomeOtherService" });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Cognitive Services", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void MachineLearningWorkspaceMapper_CanMap_CorrectType()
+    {
+        var mapper = new MachineLearningWorkspaceMapper();
+        var resource = CreateResource("Microsoft.MachineLearningServices/workspaces");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void MachineLearningWorkspaceMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new MachineLearningWorkspaceMapper();
+        var resource = CreateResource("Microsoft.MachineLearningServices/workspaces");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure Machine Learning", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void SearchServiceMapper_CanMap_CorrectType()
+    {
+        var mapper = new SearchServiceMapper();
+        var resource = CreateResource("Microsoft.Search/searchServices",
+            sku: new { name = "standard" });
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void SearchServiceMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new SearchServiceMapper();
+        var resource = CreateResource("Microsoft.Search/searchServices",
+            sku: new { name = "standard" });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure AI Search", queries[0].ServiceName);
+        Assert.Equal("standard", queries[0].SkuName);
+    }
+
+    // ===== P4: Storage & Messaging mappers =====
+
+    [Fact]
+    public void EventGridMapper_CanMap_CorrectType()
+    {
+        var mapper = new EventGridMapper();
+        var resource = CreateResource("Microsoft.EventGrid/topics");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void EventGridMapper_CanMap_Domains()
+    {
+        var mapper = new EventGridMapper();
+        var resource = CreateResource("Microsoft.EventGrid/domains");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void EventGridMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new EventGridMapper();
+        var resource = CreateResource("Microsoft.EventGrid/topics");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Event Grid", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void NotificationHubMapper_CanMap_CorrectType()
+    {
+        var mapper = new NotificationHubMapper();
+        var resource = CreateResource("Microsoft.NotificationHubs/namespaces");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void NotificationHubMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new NotificationHubMapper();
+        var resource = CreateResource("Microsoft.NotificationHubs/namespaces",
+            sku: new { name = "Basic" });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Notification Hubs", queries[0].ServiceName);
+    }
+
+    // ===== P4: Container mappers =====
+
+    [Fact]
+    public void ContainerInstanceMapper_CanMap_CorrectType()
+    {
+        var mapper = new ContainerInstanceMapper();
+        var resource = CreateResource("Microsoft.ContainerInstance/containerGroups");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void ContainerInstanceMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new ContainerInstanceMapper();
+        var resource = CreateResource("Microsoft.ContainerInstance/containerGroups");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Container Instances", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void ContainerAppsEnvironmentMapper_CanMap_CorrectType()
+    {
+        var mapper = new ContainerAppsEnvironmentMapper();
+        var resource = CreateResource("Microsoft.App/managedEnvironments");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void ContainerAppsEnvironmentMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new ContainerAppsEnvironmentMapper();
+        var resource = CreateResource("Microsoft.App/managedEnvironments");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure Container Apps", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void ContainerAppsEnvironmentMapper_Consumption_ReturnsFree()
+    {
+        var mapper = new ContainerAppsEnvironmentMapper();
+        var resource = CreateResource("Microsoft.App/managedEnvironments");
+
+        var cost = mapper.CalculateCost(resource, new List<PriceRecord>());
+
+        Assert.Equal(0m, cost.Amount);
+        Assert.Contains("Consumption", cost.Details);
+    }
+
+    // ===== P4: Monitoring & Management mappers =====
+
+    [Fact]
+    public void ApplicationInsightsMapper_CanMap_CorrectType()
+    {
+        var mapper = new ApplicationInsightsMapper();
+        var resource = CreateResource("Microsoft.Insights/components");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void ApplicationInsightsMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new ApplicationInsightsMapper();
+        var resource = CreateResource("Microsoft.Insights/components");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Application Insights", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void AutomationAccountMapper_CanMap_CorrectType()
+    {
+        var mapper = new AutomationAccountMapper();
+        var resource = CreateResource("Microsoft.Automation/automationAccounts");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void AutomationAccountMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new AutomationAccountMapper();
+        var resource = CreateResource("Microsoft.Automation/automationAccounts");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Automation", queries[0].ServiceName);
+    }
+
+    // ===== P4: Integration mappers =====
+
+    [Fact]
+    public void LogicAppMapper_CanMap_CorrectType()
+    {
+        var mapper = new LogicAppMapper();
+        var resource = CreateResource("Microsoft.Logic/workflows");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void LogicAppMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new LogicAppMapper();
+        var resource = CreateResource("Microsoft.Logic/workflows");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Logic Apps", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void DataFactoryMapper_CanMap_CorrectType()
+    {
+        var mapper = new DataFactoryMapper();
+        var resource = CreateResource("Microsoft.DataFactory/factories");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void DataFactoryMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new DataFactoryMapper();
+        var resource = CreateResource("Microsoft.DataFactory/factories");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure Data Factory v2", queries[0].ServiceName);
+    }
+
+    // ===== P4: Analytics & Other mappers =====
+
+    [Fact]
+    public void DatabricksWorkspaceMapper_CanMap_CorrectType()
+    {
+        var mapper = new DatabricksWorkspaceMapper();
+        var resource = CreateResource("Microsoft.Databricks/workspaces");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void DatabricksWorkspaceMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new DatabricksWorkspaceMapper();
+        var resource = CreateResource("Microsoft.Databricks/workspaces",
+            sku: new { name = "premium" });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure Databricks", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void SynapseWorkspaceMapper_CanMap_CorrectType()
+    {
+        var mapper = new SynapseWorkspaceMapper();
+        var resource = CreateResource("Microsoft.Synapse/workspaces");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void SynapseWorkspaceMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new SynapseWorkspaceMapper();
+        var resource = CreateResource("Microsoft.Synapse/workspaces");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure Synapse Analytics", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void IoTHubMapper_CanMap_CorrectType()
+    {
+        var mapper = new IoTHubMapper();
+        var resource = CreateResource("Microsoft.Devices/IotHubs",
+            sku: new { name = "S1", capacity = 1 });
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void IoTHubMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new IoTHubMapper();
+        var resource = CreateResource("Microsoft.Devices/IotHubs",
+            sku: new { name = "S1", capacity = 1 });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("IoT Hub", queries[0].ServiceName);
+        Assert.Equal("S1", queries[0].SkuName);
+    }
+
+    [Fact]
+    public void IoTHubMapper_FreeTier_ReturnsZero()
+    {
+        var mapper = new IoTHubMapper();
+        var resource = CreateResource("Microsoft.Devices/IotHubs",
+            sku: new { name = "F1", capacity = 1 });
+
+        var cost = mapper.CalculateCost(resource, new List<PriceRecord>());
+
+        Assert.Equal(0m, cost.Amount);
+        Assert.Contains("Free", cost.Details);
+    }
+
+    [Fact]
+    public void AppConfigurationMapper_CanMap_CorrectType()
+    {
+        var mapper = new AppConfigurationMapper();
+        var resource = CreateResource("Microsoft.AppConfiguration/configurationStores");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void AppConfigurationMapper_BuildQueries_CorrectServiceName()
+    {
+        var mapper = new AppConfigurationMapper();
+        var resource = CreateResource("Microsoft.AppConfiguration/configurationStores",
+            sku: new { name = "standard" });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure App Configuration", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void AppConfigurationMapper_FreeTier_ReturnsZero()
+    {
+        var mapper = new AppConfigurationMapper();
+        var resource = CreateResource("Microsoft.AppConfiguration/configurationStores",
+            sku: new { name = "free" });
+
+        var cost = mapper.CalculateCost(resource, new List<PriceRecord>());
+
+        Assert.Equal(0m, cost.Amount);
+        Assert.Contains("Free", cost.Details);
+    }
+
+    // ===== Registry covers all new mappers =====
+
+    [Fact]
+    public void MapperRegistry_FindsAllNewMappers()
+    {
+        var registry = new MapperRegistry();
+
+        // P4: Compute
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Compute/virtualMachineScaleSets")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Batch/batchAccounts")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.AppPlatform/Spring")));
+
+        // P4: Networking
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Network/virtualNetworks")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Network/natGateways")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Network/privateDnsZones")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Network/trafficManagerProfiles")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Network/bastionHosts")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Network/ddosProtectionPlans")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Network/expressRouteCircuits")));
+
+        // P4: Databases
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Sql/servers/elasticPools")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.DBforMariaDB/servers")));
+
+        // P4: AI / ML
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.CognitiveServices/accounts")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.MachineLearningServices/workspaces")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Search/searchServices")));
+
+        // P4: Storage & Messaging
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.EventGrid/topics")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.NotificationHubs/namespaces")));
+
+        // P4: Containers
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.ContainerInstance/containerGroups")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.App/managedEnvironments")));
+
+        // P4: Monitoring & Management
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Insights/components")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Automation/automationAccounts")));
+
+        // P4: Integration
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Logic/workflows")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.DataFactory/factories")));
+
+        // P4: Analytics & Other
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Databricks/workspaces")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Synapse/workspaces")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.Devices/IotHubs")));
+        Assert.NotNull(registry.GetMapper(CreateResource("Microsoft.AppConfiguration/configurationStores")));
+    }
+
     private static ResourceDescriptor CreateResource(
         string resourceType,
         object? properties = null,
