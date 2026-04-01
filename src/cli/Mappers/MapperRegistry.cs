@@ -89,6 +89,65 @@ public class MapperRegistry
         Register(new SynapseWorkspaceMapper());
         Register(new IoTHubMapper());
         Register(new AppConfigurationMapper());
+
+        // P5: Networking (extended)
+        Register(new DnsZoneMapper());
+        Register(new NetworkSecurityGroupMapper());
+        Register(new RouteTableMapper());
+        Register(new NetworkWatcherMapper());
+        Register(new FirewallPolicyMapper());
+
+        // P5: Security
+        Register(new ManagedIdentityMapper());
+        Register(new RecoveryServicesVaultMapper());
+        Register(new DefenderForCloudMapper());
+
+        // P5: AI / ML
+        Register(new BotServiceMapper());
+
+        // P5: Analytics
+        Register(new KustoClusterMapper());
+        Register(new StreamAnalyticsMapper());
+        Register(new HdInsightClusterMapper());
+        Register(new PowerBIEmbeddedMapper());
+
+        // P5: Storage
+        Register(new NetAppFilesMapper());
+
+        // P5: Databases
+        Register(new RedisEnterpriseMapper());
+        Register(new CosmosDbMongoClusterMapper());
+
+        // P5: Developer
+        Register(new DevCenterMapper());
+        Register(new LoadTestingMapper());
+        Register(new DevTestLabMapper());
+
+        // P5: Integration
+        Register(new RelayMapper());
+        Register(new HealthcareApisMapper());
+        Register(new CommunicationServicesMapper());
+
+        // P5: Media & Maps
+        Register(new MediaServicesMapper());
+        Register(new MapsAccountMapper());
+
+        // P5: IoT
+        Register(new DigitalTwinsMapper());
+
+        // P5: Governance
+        Register(new PurviewAccountMapper());
+        Register(new ConfidentialLedgerMapper());
+
+        // P5: Virtual Desktop
+        Register(new VirtualDesktopHostPoolMapper());
+
+        // P5: Service Fabric
+        Register(new ServiceFabricClusterMapper());
+
+        // P5: Monitoring
+        Register(new MonitorWorkspaceMapper());
+        Register(new ManagedGrafanaMapper());
     }
 
     public void Register(IResourceCostMapper mapper) => _mappers.Add(mapper);
