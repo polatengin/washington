@@ -2,4 +2,15 @@ bin/
 obj/
 
 node_modules/
+build/
 dist/
+
+.docusaurus
+.cache-loader
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+src/website/static/text/
+src/website/build/
