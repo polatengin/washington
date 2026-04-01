@@ -43,6 +43,51 @@ public class MapperRegistry
         Register(new ApiManagementMapper());
         Register(new StaticWebAppMapper());
         Register(new SignalRMapper());
+
+        // P4: Compute
+        Register(new VirtualMachineScaleSetMapper());
+        Register(new BatchAccountMapper());
+        Register(new SpringAppMapper());
+
+        // P4: Networking
+        Register(new VirtualNetworkMapper());
+        Register(new NatGatewayMapper());
+        Register(new PrivateDnsZoneMapper());
+        Register(new TrafficManagerMapper());
+        Register(new BastionHostMapper());
+        Register(new DdosProtectionPlanMapper());
+        Register(new ExpressRouteCircuitMapper());
+
+        // P4: Databases
+        Register(new SqlElasticPoolMapper());
+        Register(new MariaDbServerMapper());
+
+        // P4: AI / ML
+        Register(new CognitiveServicesMapper());
+        Register(new MachineLearningWorkspaceMapper());
+        Register(new SearchServiceMapper());
+
+        // P4: Storage & Messaging
+        Register(new EventGridMapper());
+        Register(new NotificationHubMapper());
+
+        // P4: Containers
+        Register(new ContainerInstanceMapper());
+        Register(new ContainerAppsEnvironmentMapper());
+
+        // P4: Monitoring & Management
+        Register(new ApplicationInsightsMapper());
+        Register(new AutomationAccountMapper());
+
+        // P4: Integration
+        Register(new LogicAppMapper());
+        Register(new DataFactoryMapper());
+
+        // P4: Analytics & Other
+        Register(new DatabricksWorkspaceMapper());
+        Register(new SynapseWorkspaceMapper());
+        Register(new IoTHubMapper());
+        Register(new AppConfigurationMapper());
     }
 
     public void Register(IResourceCostMapper mapper) => _mappers.Add(mapper);
