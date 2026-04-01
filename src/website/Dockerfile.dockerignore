@@ -8,6 +8,7 @@ src/vscode-extension/
 tests/
 *.slnx
 *.md
+!CONTRIBUTING.md
 !docs/**/*.md
 LICENSE
 action.yml
