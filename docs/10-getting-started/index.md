@@ -17,7 +17,7 @@ This guide walks you through installing Washington and running your first cost e
 ### Quick Install (Linux/macOS)
 
 ```bash
-curl -sL https://bicepcostestimate.net/install.sh | bash
+curl -sL https://bicepcostestimator.net/install.sh | bash
 ```
 
 ### From Source
