@@ -85,7 +85,7 @@ public class MapperTests
 
         var vmResource = CreateResource("Microsoft.Compute/virtualMachines");
         var storageResource = CreateResource("Microsoft.Storage/storageAccounts");
-        var unknownResource = CreateResource("Microsoft.Network/networkInterfaces");
+        var nicResource = CreateResource("Microsoft.Network/networkInterfaces");
         var aksResource = CreateResource("Microsoft.ContainerService/managedClusters");
         var publicIpResource = CreateResource("Microsoft.Network/publicIPAddresses");
         var appGwResource = CreateResource("Microsoft.Network/applicationGateways");
@@ -93,9 +93,11 @@ public class MapperTests
         var kvResource = CreateResource("Microsoft.KeyVault/vaults");
         var acrResource = CreateResource("Microsoft.ContainerRegistry/registries");
         var lbResource = CreateResource("Microsoft.Network/loadBalancers");
+        var unknownResource = CreateResource("Microsoft.CustomProviders/resourceProviders");
 
         Assert.NotNull(registry.GetMapper(vmResource));
         Assert.NotNull(registry.GetMapper(storageResource));
+        Assert.NotNull(registry.GetMapper(nicResource));
         Assert.Null(registry.GetMapper(unknownResource));
         Assert.NotNull(registry.GetMapper(aksResource));
         Assert.NotNull(registry.GetMapper(publicIpResource));

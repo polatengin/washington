@@ -87,14 +87,14 @@ public class CostAggregatorTests
         var aggregator = new CostAggregator(registry, mockPricingClient);
         var resources = new List<ResourceDescriptor>
         {
-            CreateResource("Microsoft.Network/networkInterfaces", "nic-1")
+            CreateResource("Microsoft.CustomProviders/resourceProviders", "custom-1")
         };
 
         var report = await aggregator.GenerateReportAsync(resources);
 
         Assert.Empty(report.Lines);
         Assert.Single(report.Warnings);
-        Assert.Contains("Microsoft.Network/networkInterfaces", report.Warnings[0]);
+        Assert.Contains("Microsoft.CustomProviders/resourceProviders", report.Warnings[0]);
         Assert.Equal(0m, report.GrandTotal);
     }
 
