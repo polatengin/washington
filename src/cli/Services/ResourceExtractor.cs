@@ -1,10 +1,13 @@
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Washington.Models;
 
 namespace Washington.Services;
 
 public class ResourceExtractor
 {
+    private const string DefaultRegion = "eastus";
+
     public List<ResourceDescriptor> Extract(string armTemplateJson)
     {
         var descriptors = new List<ResourceDescriptor>();
@@ -12,15 +15,34 @@ public class ResourceExtractor
         using var doc = JsonDocument.Parse(armTemplateJson);
         var root = doc.RootElement;
 
+        var paramDefaults = ExtractParameterDefaults(root);
+
         if (root.TryGetProperty("resources", out var resources))
         {
-            ExtractResources(resources, descriptors);
+            ExtractResources(resources, descriptors, paramDefaults);
         }
 
         return descriptors;
     }
 
-    private void ExtractResources(JsonElement resources, List<ResourceDescriptor> descriptors)
+    private static Dictionary<string, string> ExtractParameterDefaults(JsonElement root)
+    {
+        var defaults = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        if (root.TryGetProperty("parameters", out var parameters) && parameters.ValueKind == JsonValueKind.Object)
+        {
+            foreach (var param in parameters.EnumerateObject())
+            {
+                if (param.Value.TryGetProperty("defaultValue", out var defaultValue) &&
+                    defaultValue.ValueKind == JsonValueKind.String)
+                {
+                    defaults[param.Name] = defaultValue.GetString() ?? string.Empty;
+                }
+            }
+        }
+        return defaults;
+    }
+
+    private void ExtractResources(JsonElement resources, List<ResourceDescriptor> descriptors, Dictionary<string, string> paramDefaults)
     {
         if (resources.ValueKind != JsonValueKind.Array)
             return;
@@ -30,7 +52,7 @@ public class ResourceExtractor
             var type = resource.GetStringProperty("type");
             var apiVersion = resource.GetStringProperty("apiVersion");
             var name = resource.GetStringProperty("name");
-            var location = resource.GetStringProperty("location");
+            var location = ResolveArmExpression(resource.GetStringProperty("location"), paramDefaults);
 
             if (string.IsNullOrEmpty(type))
                 continue;
@@ -60,10 +82,41 @@ public class ResourceExtractor
             // Recurse into nested/child resources
             if (resource.TryGetProperty("resources", out var childResources))
             {
-                ExtractResources(childResources, descriptors);
+                ExtractResources(childResources, descriptors, paramDefaults);
             }
         }
     }
+
+    /// <summary>
+    /// Resolves ARM template expressions (e.g. "[parameters('location')]", "[resourceGroup().location]")
+    /// to a concrete value. Falls back to DefaultRegion if the expression cannot be resolved.
+    /// </summary>
+    private static string ResolveArmExpression(string value, Dictionary<string, string> paramDefaults)
+    {
+        if (string.IsNullOrEmpty(value))
+            return DefaultRegion;
+
+        // Not an ARM expression — use as-is
+        if (!value.StartsWith('[') || !value.EndsWith(']'))
+            return value;
+
+        // Try to resolve [parameters('paramName')] by looking up default values
+        var paramMatch = Regex.Match(value, @"^\[parameters\('(\w+)'\)\]$");
+        if (paramMatch.Success)
+        {
+            var paramName = paramMatch.Groups[1].Value;
+            if (paramDefaults.TryGetValue(paramName, out var defaultVal) && !IsArmExpression(defaultVal))
+            {
+                return defaultVal;
+            }
+        }
+
+        // Unresolvable expression — fall back to default region
+        return DefaultRegion;
+    }
+
+    private static bool IsArmExpression(string value) =>
+        value.StartsWith('[') && value.EndsWith(']');
 
     private static ResourceDescriptor BuildDescriptor(
         JsonElement resource, string type, string apiVersion, string name, string location)
