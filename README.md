@@ -30,27 +30,32 @@ It ships as a **CLI tool**, a **VS Code extension**, and a **GitHub Action**, gi
 
 ---
 
-## Supported Azure Resource Types (56)
+## Supported Azure Resource Types (87)
 
 | Category | Resource Types |
 | --- | --- |
 | **Compute** | Virtual Machines, Virtual Machine Scale Sets, Managed Disks, Batch Accounts, Spring Apps |
 | **Containers** | AKS Managed Clusters, Container Registry, Container Apps, Container App Environments, Container Instances |
 | **App Services** | App Service Plans, Function Apps, Static Web Apps |
-| **Storage** | Storage Accounts |
-| **Databases** | SQL Database, SQL Elastic Pools, SQL Managed Instances, Cosmos DB, PostgreSQL Flexible Servers, MySQL Flexible Servers, MariaDB Servers |
-| **Networking** | Public IP Addresses, Application Gateways, Load Balancers, Virtual Network Gateways, Azure Firewall, Private Endpoints, NAT Gateways, Virtual Networks, Network Interfaces, Private DNS Zones, Traffic Manager, Bastion Hosts, DDoS Protection Plans, ExpressRoute Circuits, Front Door |
-| **Security** | Key Vault |
+| **Storage** | Storage Accounts, Azure NetApp Files |
+| **Databases** | SQL Database, SQL Elastic Pools, SQL Managed Instances, Cosmos DB, Cosmos DB for MongoDB vCore, PostgreSQL Flexible Servers, MySQL Flexible Servers, MariaDB Servers |
+| **Networking** | Public IP Addresses, Application Gateways, Load Balancers, Virtual Network Gateways, Azure Firewall, Firewall Policies, Private Endpoints, NAT Gateways, Virtual Networks, Network Interfaces, Network Security Groups, Route Tables, Private DNS Zones, DNS Zones, Traffic Manager, Bastion Hosts, DDoS Protection Plans, ExpressRoute Circuits, Front Door, Network Watcher |
+| **Security** | Key Vault, Managed Identity, Recovery Services Vault, Defender for Cloud |
 | **Messaging** | Event Hub, Service Bus, Event Grid, Notification Hubs |
-| **AI / ML** | Cognitive Services, Machine Learning Workspaces, Azure AI Search |
-| **Monitoring** | Log Analytics Workspaces, Application Insights |
-| **Integration** | API Management, Logic Apps, Data Factory |
-| **Analytics** | Databricks Workspaces, Synapse Workspaces |
-| **Caching** | Azure Cache for Redis |
+| **AI / ML** | Cognitive Services, Machine Learning Workspaces, Azure AI Search, Bot Service |
+| **Monitoring** | Log Analytics Workspaces, Application Insights, Azure Monitor Workspace, Azure Managed Grafana |
+| **Integration** | API Management, Logic Apps, Data Factory, Azure Relay, Azure Communication Services, Azure API for FHIR |
+| **Analytics** | Databricks Workspaces, Synapse Workspaces, Azure Data Explorer, Stream Analytics, HDInsight, Power BI Embedded |
+| **Caching** | Azure Cache for Redis, Redis Enterprise |
 | **Real-time** | SignalR Service |
-| **IoT** | IoT Hub |
+| **IoT** | IoT Hub, Azure Digital Twins |
 | **Config** | App Configuration |
 | **Automation** | Automation Accounts |
+| **Developer** | Dev Center, Azure Load Testing, DevTest Labs |
+| **Virtual Desktop** | Azure Virtual Desktop |
+| **Service Fabric** | Service Fabric Clusters |
+| **Governance** | Microsoft Purview, Confidential Ledger |
+| **Media & Maps** | Media Services, Azure Maps |
 
 Unmapped resource types produce a warning: `⚠ No pricing mapper for Microsoft.Xyz/abc — skipped`.
 
