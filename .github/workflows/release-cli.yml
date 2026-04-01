@@ -57,7 +57,7 @@ jobs:
           sed -i 's|<FileVersion>.*</FileVersion>|<FileVersion>${{ steps.version.outputs.version }}</FileVersion>|' src/cli/washington.csproj
 
       - name: Build
-        run: dotnet build src/cli/washington.csproj --configuration Release
+        run: make build-cli
 
       - name: Generate Release Notes
         id: release_notes
@@ -111,15 +111,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Publish
-        run: |
-          dotnet publish src/cli/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r win-x64 -o ./publish/win-x64
-          dotnet publish src/cli/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r linux-x64 -o ./publish/linux-x64
-          dotnet publish src/cli/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r osx-x64 -o ./publish/osx-x64
-          dotnet publish src/cli/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r osx-arm64 -o ./publish/osx-arm64
-          cp ./publish/win-x64/washington.exe ./publish/washington-win-x64.exe
-          cp ./publish/linux-x64/washington ./publish/washington-linux-x64
-          cp ./publish/osx-x64/washington ./publish/washington-osx-x64
-          cp ./publish/osx-arm64/washington ./publish/washington-osx-arm64
+        run: make package-cli
 
       - name: Create Release
         id: create_release
