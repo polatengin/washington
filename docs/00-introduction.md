@@ -23,6 +23,12 @@ Washington is an open-source tool that estimates the cost of your Azure infrastr
 | [VS Code Extension](/vscode-extension) | Real-time cost estimates in your editor |
 | [GitHub Action](/github-action) | Cost estimates on every pull request |
 
+## Learn More
+
+- [How Estimates Work](/guides/how-estimates-work) explains the compile, extract, price, and aggregate pipeline.
+- [Supported Resources](/guides/supported-resources) lists the Azure resource families mapped today.
+- [Troubleshooting](/guides/troubleshooting) covers unsupported resources, cache issues, region fallback, and extension setup.
+
 ## Quick Start
 
 ```bash
