@@ -24,7 +24,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_ACR_SUBSCRIPTION_ID: ${{ vars.AZURE_ACR_SUBSCRIPTION_ID }}
       AZURE_ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
       AZURE_CONTAINER_APP_NAME: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
       AZURE_CONTAINER_APP_RESOURCE_GROUP: ${{ secrets.AZURE_CONTAINER_APP_RESOURCE_GROUP }}
@@ -48,7 +47,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          az account set --subscription "${AZURE_ACR_SUBSCRIPTION_ID:-$AZURE_SUBSCRIPTION_ID}"
+          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
 
           acr_login_server="$(az acr show --name "$AZURE_ACR_NAME" --query loginServer --output tsv)"
           image_sha="$acr_login_server/washington-website:$GITHUB_SHA"
@@ -67,7 +66,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          az account set --subscription "${AZURE_ACR_SUBSCRIPTION_ID:-$AZURE_SUBSCRIPTION_ID}"
+          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
           az acr login --name "$AZURE_ACR_NAME"
 
       - name: Build and push website image
