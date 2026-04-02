@@ -28,7 +28,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'VS Code Extension',
-      items: ['vscode-extension/index'],
+      items: ['vscode-extension/index', 'vscode-extension/settings'],
     },
     {
       type: 'category',
@@ -39,6 +39,7 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: 'Guides',
       items: [
+        'guides/contributing',
         'guides/how-estimates-work',
         'guides/supported-resources',
         'guides/troubleshooting',
