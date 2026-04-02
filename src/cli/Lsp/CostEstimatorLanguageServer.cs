@@ -10,7 +10,16 @@ namespace Washington.Lsp;
 
 public class CostEstimatorLanguageServer
 {
-    private readonly CostEstimationService _costService;
+    private sealed record ServerConfiguration(
+        string DefaultRegion,
+        bool EstimateOnSave,
+        bool ShowCodeLens,
+        double CacheTtlHours)
+    {
+        public static ServerConfiguration Default { get; } = new("eastus", true, true, 24);
+    }
+
+    private CostEstimationService _costService;
     private readonly Stream _input;
     private readonly Stream _output;
     private readonly ConcurrentDictionary<string, string> _openDocuments = new();
@@ -19,6 +28,7 @@ public class CostEstimatorLanguageServer
     private readonly int _debounceMs;
     private bool _shutdown;
     private string? _rootUri;
+    private ServerConfiguration _configuration = ServerConfiguration.Default;
 
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
@@ -31,14 +41,7 @@ public class CostEstimatorLanguageServer
         _input = input;
         _output = output;
         _debounceMs = debounceMs;
-
-        var cache = new FilePricingCache();
-        var compiler = new BicepCompiler();
-        var extractor = new ResourceExtractor();
-        var pricingClient = new PricingApiClient(cache);
-        var mapperRegistry = new MapperRegistry();
-        var aggregator = new CostAggregator(mapperRegistry, pricingClient);
-        _costService = new CostEstimationService(compiler, extractor, aggregator);
+        _costService = CreateCostService(_configuration);
     }
 
     public async Task RunAsync()
@@ -121,6 +124,7 @@ public class CostEstimatorLanguageServer
         {
             var initParams = JsonSerializer.Deserialize<InitializeParams>(request.Params.Value, _jsonOptions);
             _rootUri = initParams?.RootUri;
+            ApplyConfiguration(initParams?.InitializationOptions);
         }
 
         var result = new InitializeResult
@@ -138,6 +142,8 @@ public class CostEstimatorLanguageServer
 
     private async Task HandleDidOpenAsync(LspRequest request)
     {
+        if (!_configuration.EstimateOnSave) return;
+
         if (!request.Params.HasValue) return;
 
         var p = JsonSerializer.Deserialize<DidOpenTextDocumentParams>(request.Params.Value, _jsonOptions);
@@ -151,6 +157,8 @@ public class CostEstimatorLanguageServer
 
     private async Task HandleDidSaveAsync(LspRequest request)
     {
+        if (!_configuration.EstimateOnSave) return;
+
         if (!request.Params.HasValue) return;
 
         var p = JsonSerializer.Deserialize<DidSaveTextDocumentParams>(request.Params.Value, _jsonOptions);
@@ -161,6 +169,8 @@ public class CostEstimatorLanguageServer
 
     private async Task HandleDidChangeAsync(LspRequest request)
     {
+        if (!_configuration.EstimateOnSave) return;
+
         if (!request.Params.HasValue) return;
 
         var p = JsonSerializer.Deserialize<DidChangeTextDocumentParams>(request.Params.Value, _jsonOptions);
@@ -198,6 +208,12 @@ public class CostEstimatorLanguageServer
 
     private async Task HandleCodeLensAsync(LspRequest request)
     {
+        if (!_configuration.ShowCodeLens)
+        {
+            await SendResponseAsync(request.Id, Array.Empty<CodeLens>());
+            return;
+        }
+
         if (!request.Params.HasValue)
         {
             await SendResponseAsync(request.Id, Array.Empty<CodeLens>());
@@ -352,7 +368,8 @@ public class CostEstimatorLanguageServer
 
         try
         {
-            var report = await _costService.EstimateFromBicepAsync(filePath);
+            var paramsFilePath = await FindMatchingParamsFileAsync(filePath);
+            var report = await _costService.EstimateFromBicepAsync(filePath, paramsFilePath);
             _documentReports[p.Uri] = report;
             await SendResponseAsync(request.Id, report);
         }
@@ -381,7 +398,8 @@ public class CostEstimatorLanguageServer
         {
             try
             {
-                var report = await _costService.EstimateFromBicepAsync(file);
+                var paramsFilePath = await FindMatchingParamsFileAsync(file);
+                var report = await _costService.EstimateFromBicepAsync(file, paramsFilePath);
                 allLines.AddRange(report.Lines);
                 allWarnings.AddRange(report.Warnings);
                 grandTotal += report.GrandTotal;
@@ -411,7 +429,8 @@ public class CostEstimatorLanguageServer
 
         try
         {
-            var report = await _costService.EstimateFromBicepAsync(filePath);
+            var paramsFilePath = await FindMatchingParamsFileAsync(filePath);
+            var report = await _costService.EstimateFromBicepAsync(filePath, paramsFilePath);
             _documentReports[uri] = report;
 
             // Publish diagnostics for warnings
@@ -472,6 +491,84 @@ public class CostEstimatorLanguageServer
         if (uri.StartsWith("file://"))
             return Uri.UnescapeDataString(uri[7..]);
         return uri;
+    }
+
+    private static CostEstimationService CreateCostService(ServerConfiguration configuration)
+    {
+        var ttlHours = configuration.CacheTtlHours > 0 ? configuration.CacheTtlHours : 24;
+        var cache = new FilePricingCache(TimeSpan.FromHours(ttlHours));
+        var compiler = new BicepCompiler();
+        var extractor = new ResourceExtractor(configuration.DefaultRegion);
+        var pricingClient = new PricingApiClient(cache);
+        var mapperRegistry = new MapperRegistry();
+        var aggregator = new CostAggregator(mapperRegistry, pricingClient);
+        return new CostEstimationService(compiler, extractor, aggregator);
+    }
+
+    private void ApplyConfiguration(WashingtonInitializationOptions? initializationOptions)
+    {
+        _configuration = new ServerConfiguration(
+            string.IsNullOrWhiteSpace(initializationOptions?.DefaultRegion)
+                ? "eastus"
+                : initializationOptions!.DefaultRegion!,
+            initializationOptions?.EstimateOnSave ?? true,
+            initializationOptions?.ShowCodeLens ?? true,
+            initializationOptions?.CacheTtlHours ?? 24);
+
+        _costService = CreateCostService(_configuration);
+    }
+
+    private static async Task<string?> FindMatchingParamsFileAsync(string bicepFilePath)
+    {
+        var directory = Path.GetDirectoryName(bicepFilePath);
+        if (string.IsNullOrEmpty(directory) || !Directory.Exists(directory))
+        {
+            return null;
+        }
+
+        var bicepFullPath = Path.GetFullPath(bicepFilePath);
+        var bicepBaseName = Path.GetFileNameWithoutExtension(bicepFilePath);
+        var candidates = Directory.GetFiles(directory, "*.bicepparam", SearchOption.TopDirectoryOnly)
+            .OrderBy(path => Path.GetFileName(path), StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        foreach (var candidate in candidates)
+        {
+            if (!Path.GetFileNameWithoutExtension(candidate).Equals(bicepBaseName, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            if (await ParamsFileTargetsBicepAsync(candidate, bicepFullPath))
+            {
+                return candidate;
+            }
+        }
+
+        foreach (var candidate in candidates)
+        {
+            if (await ParamsFileTargetsBicepAsync(candidate, bicepFullPath))
+            {
+                return candidate;
+            }
+        }
+
+        return null;
+    }
+
+    private static async Task<bool> ParamsFileTargetsBicepAsync(string paramsFilePath, string bicepFullPath)
+    {
+        var content = await File.ReadAllTextAsync(paramsFilePath);
+        var match = Regex.Match(content, "^\\s*using\\s+['\"](?<path>[^'\"]+\\.bicep)['\"]", RegexOptions.Multiline);
+        if (!match.Success)
+        {
+            return false;
+        }
+
+        var referencedPath = match.Groups["path"].Value.Replace('/', Path.DirectorySeparatorChar);
+        var resolvedPath = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(paramsFilePath)!, referencedPath));
+
+        return string.Equals(resolvedPath, bicepFullPath, StringComparison.OrdinalIgnoreCase);
     }
 
     // LSP message I/O
