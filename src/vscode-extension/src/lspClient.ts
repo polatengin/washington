@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient/node';
+import { getConfig, toInitializationOptions } from './config';
 
 let client: LanguageClient | undefined;
 
@@ -11,6 +12,7 @@ interface ServerCommand {
 
 export async function createLspClient(context: vscode.ExtensionContext): Promise<LanguageClient> {
   const serverCommand = resolveServerCommand(context);
+  const config = getConfig();
   const serverOptions: ServerOptions = {
     run: { command: serverCommand.command, args: serverCommand.args },
     debug: { command: serverCommand.command, args: serverCommand.args },
@@ -21,8 +23,7 @@ export async function createLspClient(context: vscode.ExtensionContext): Promise
     synchronize: {
       fileEvents: vscode.workspace.createFileSystemWatcher('**/*.bicep'),
     },
-    initializationOptions: {
-    },
+    initializationOptions: toInitializationOptions(config),
   };
 
   client = new LanguageClient(
