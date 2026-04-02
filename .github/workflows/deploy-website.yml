@@ -1,0 +1,102 @@
+name: Deploy Website
+
+"on":
+  push:
+    branches:
+      - main
+    paths:
+      - docs/**
+      - src/website/**
+      - CONTRIBUTING.md
+      - .github/workflows/deploy-website.yml
+  workflow_dispatch:
+
+concurrency:
+  group: website-production
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Azure login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Enable Azure CLI extension auto-install
+        run: az config set extension.use_dynamic_install=yes_without_prompt
+
+      - name: Resolve image tags
+        id: image
+        env:
+          AZURE_ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
+          AZURE_CONTAINER_APP_NAME: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
+          AZURE_CONTAINER_APP_RESOURCE_GROUP: ${{ secrets.AZURE_CONTAINER_APP_RESOURCE_GROUP }}
+        run: |
+          set -euo pipefail
+
+          acr_login_server="$(az acr show --name "$AZURE_ACR_NAME" --query loginServer --output tsv)"
+          image_sha="$acr_login_server/washington-website:$GITHUB_SHA"
+          image_latest="$acr_login_server/washington-website:latest"
+
+          echo "ACR_LOGIN_SERVER=$acr_login_server" >> "$GITHUB_ENV"
+          echo "IMAGE_SHA=$image_sha" >> "$GITHUB_ENV"
+          echo "IMAGE_LATEST=$image_latest" >> "$GITHUB_ENV"
+          echo "image_sha=$image_sha" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Azure Container Registry
+        run: az acr login --name "$AZURE_ACR_NAME"
+
+      - name: Build and push website image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: src/website/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_SHA }}
+            ${{ env.IMAGE_LATEST }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Deploy image to Azure Container App
+        run: |
+          set -euo pipefail
+
+          az containerapp update \
+            --name "$AZURE_CONTAINER_APP_NAME" \
+            --resource-group "$AZURE_CONTAINER_APP_RESOURCE_GROUP" \
+            --image "$IMAGE_SHA"
+
+      - name: Show deployed revision
+        run: |
+          set -euo pipefail
+
+          fqdn="$(az containerapp show \
+            --name "$AZURE_CONTAINER_APP_NAME" \
+            --resource-group "$AZURE_CONTAINER_APP_RESOURCE_GROUP" \
+            --query properties.configuration.ingress.fqdn \
+            --output tsv)"
+
+          revision="$(az containerapp show \
+            --name "$AZURE_CONTAINER_APP_NAME" \
+            --resource-group "$AZURE_CONTAINER_APP_RESOURCE_GROUP" \
+            --query properties.latestReadyRevisionName \
+            --output tsv)"
+
+          echo "Deployed revision: $revision"
+          echo "Website URL: https://$fqdn"
