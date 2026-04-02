@@ -9,7 +9,7 @@
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/dotnet:2": {},
     "ghcr.io/devcontainers/features/github-cli:1": {},
-    "ghcr.io/devcontainers-contrib/features/npm-package:1": {
+    "ghcr.io/devcontainers-extra/features/npm-package:1": {
       "npm-check-updates": "latest"
     }
   },
