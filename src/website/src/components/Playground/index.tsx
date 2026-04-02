@@ -148,11 +148,6 @@ export default function Playground() {
       </form>
 
       <section>
-        <div className={styles.panelHeader}>
-          <p className={styles.panelEyebrow}>Results</p>
-          <h2>Estimate output</h2>
-        </div>
-
         <div className={styles.summaryGrid}>
           <article className={styles.summaryCard}>
             <span>Estimated monthly total</span>
