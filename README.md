@@ -1,95 +1,68 @@
-# Azure Deployments Cost Estimator
+# Bicep Cost Estimator
 
-_Azure Deployments Cost Estimator_ (Washington) is a **FinOps** solution that estimates monthly Azure costs from Bicep files — before you deploy.
+Bicep Cost Estimator (_Washington_) estimates monthly Azure costs from Bicep and ARM templates before you deploy. The published CLI command is `bce`.
 
-The published CLI command is `bce`, short for **Bicep Cost Estimator**.
+It currently ships as:
 
-It ships as a **CLI tool**, a **VS Code extension**, and a **GitHub Action**, giving you cost visibility across local development, code review, and CI/CD pipelines.
+- a .NET CLI
+- a VS Code extension backed by the CLI in LSP mode
+- a GitHub Action for CI and pull request workflows
+- a Docusaurus documentation site with browser and plain-text routes
 
-## Key Concepts
+## Quick Start
 
-- **Visibility** — Understand who is spending what in the cloud
-- **Accountability** — Encourage teams to take responsibility for their usage
-- **Optimization** — Find ways to reduce waste and save costs
-- **Collaboration** — Finance, engineering, and product teams work together
+Install the published CLI:
 
----
+```bash
+curl -sL https://bicepcostestimator.net/install.sh | bash
+bce estimate --file path/to/main.bicep
+```
 
-## Features at a Glance
-
-| Capability | CLI | VS Code Extension | GitHub Action |
-| --- | :---: | :---: | :---: |
-| Estimate costs from `.bicep` files | ✅ | ✅ | ✅ |
-| Multiple output formats (table, JSON, CSV, markdown) | ✅ | — | ✅ |
-| Inline cost annotations (CodeLens) | — | ✅ | — |
-| Hover cost breakdowns | — | ✅ | — |
-| Status bar total cost | — | ✅ | — |
-| Sidebar cost breakdown panel | — | ✅ | — |
-| Delta cost comparison (current vs base branch) | — | — | ✅ |
-| Cost threshold failure gate | — | — | ✅ |
-| Pricing cache (24h TTL, file-based) | ✅ | ✅ | ✅ |
-| Parameter-aware (`.bicepparam` files) | ✅ | ✅ | ✅ |
-
----
-
-## Supported Azure Resource Types (87)
-
-| Category | Resource Types |
-| --- | --- |
-| **Compute** | Virtual Machines, Virtual Machine Scale Sets, Managed Disks, Batch Accounts, Spring Apps |
-| **Containers** | AKS Managed Clusters, Container Registry, Container Apps, Container App Environments, Container Instances |
-| **App Services** | App Service Plans, Function Apps, Static Web Apps |
-| **Storage** | Storage Accounts, Azure NetApp Files |
-| **Databases** | SQL Database, SQL Elastic Pools, SQL Managed Instances, Cosmos DB, Cosmos DB for MongoDB vCore, PostgreSQL Flexible Servers, MySQL Flexible Servers, MariaDB Servers |
-| **Networking** | Public IP Addresses, Application Gateways, Load Balancers, Virtual Network Gateways, Azure Firewall, Firewall Policies, Private Endpoints, NAT Gateways, Virtual Networks, Network Interfaces, Network Security Groups, Route Tables, Private DNS Zones, DNS Zones, Traffic Manager, Bastion Hosts, DDoS Protection Plans, ExpressRoute Circuits, Front Door, Network Watcher |
-| **Security** | Key Vault, Managed Identity, Recovery Services Vault, Defender for Cloud |
-| **Messaging** | Event Hub, Service Bus, Event Grid, Notification Hubs |
-| **AI / ML** | Cognitive Services, Machine Learning Workspaces, Azure AI Search, Bot Service |
-| **Monitoring** | Log Analytics Workspaces, Application Insights, Azure Monitor Workspace, Azure Managed Grafana |
-| **Integration** | API Management, Logic Apps, Data Factory, Azure Relay, Azure Communication Services, Azure API for FHIR |
-| **Analytics** | Databricks Workspaces, Synapse Workspaces, Azure Data Explorer, Stream Analytics, HDInsight, Power BI Embedded |
-| **Caching** | Azure Cache for Redis, Redis Enterprise |
-| **Real-time** | SignalR Service |
-| **IoT** | IoT Hub, Azure Digital Twins |
-| **Config** | App Configuration |
-| **Automation** | Automation Accounts |
-| **Developer** | Dev Center, Azure Load Testing, DevTest Labs |
-| **Virtual Desktop** | Azure Virtual Desktop |
-| **Service Fabric** | Service Fabric Clusters |
-| **Governance** | Microsoft Purview, Confidential Ledger |
-| **Media & Maps** | Media Services, Azure Maps |
-
-Unmapped resource types produce a warning: `⚠ No pricing mapper for Microsoft.Xyz/abc — skipped`.
-
----
-
-## Getting Started
-
-### Prerequisites
-
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
-- GNU Make
-
-### Clone the Repository
+Build from source instead:
 
 ```bash
 git clone https://github.com/polatengin/washington.git
 cd washington
 make setup-cli
-```
-
-### Build
-
-```bash
 make build-cli
-make test-cli
+./src/cli/bin/Release/net10.0/bce estimate --file ./tests/fixtures/simple-vm.bicep
 ```
 
-The built CLI binary will be at `src/cli/bin/Release/net10.0/bce`.
+## What It Does
 
-For other surfaces, install and build them explicitly:
+- Compiles Bicep to ARM JSON using the embedded Bicep submodule
+- Extracts nested resources, copy loops, and conditionally skipped resources
+- Maps 87 Azure resource types to Azure Retail Prices API queries
+- Queries pricing with pagination, retry, and a local 24-hour file cache
+- Renders results as `table`, `json`, `csv`, or `markdown`
+
+## Documentation
+
+- [Introduction](https://bicepcostestimator.net/)
+- [Getting Started](https://bicepcostestimator.net/getting-started)
+- [CLI Commands](https://bicepcostestimator.net/cli/commands)
+- [VS Code Extension](https://bicepcostestimator.net/vscode-extension)
+- [GitHub Action](https://bicepcostestimator.net/github-action)
+- [How Estimates Work](https://bicepcostestimator.net/guides/how-estimates-work)
+- [Supported Resources](https://bicepcostestimator.net/guides/supported-resources)
+- [Troubleshooting](https://bicepcostestimator.net/guides/troubleshooting)
+- [Documentation Roadmap](https://bicepcostestimator.net/guides/documentation-roadmap)
+
+## Current Limitations
+
+- Unsupported resource types are skipped with a warning.
+- Spot and low-priority prices are excluded from default estimates.
+- `.bicepparam` files are accepted and compiled for validation, but current estimates are still driven by the compiled template. Command-line `--param` overrides are parsed today but not yet reflected in the final estimate.
+- The VS Code extension estimates on open, save, and debounced change. Some exposed settings are currently reserved rather than fully wired into runtime behavior.
+
+## Development
+
+Common local workflows:
 
 ```bash
+make setup-cli
+make test-cli
+
 make setup-extension
 make build-extension
 
@@ -97,185 +70,7 @@ make setup-website
 make build-website
 ```
 
----
-
-## CLI
-
-The examples below assume `bce` is on your `PATH`. If you're running from a source build, invoke `./src/cli/bin/Release/net10.0/bce` instead.
-
-### Estimate Command
-
-```bash
-# Estimate a single VM (default table output)
-bce estimate --file ./tests/fixtures/simple-vm.bicep
-
-# Estimate all resources with a params file, output as markdown
-bce estimate --file ./tests/fixtures/all.bicep --params-file ./tests/fixtures/all.bicepparam --output markdown
-
-# Estimate an AKS cluster, output as JSON
-bce estimate --file ./tests/fixtures/aks.bicep --output json
-
-# Estimate AKS + VM together, output as CSV
-bce estimate --file ./tests/fixtures/aks-vm.bicep --output csv
-
-# Estimate from a pre-compiled ARM template
-bce estimate --file ./tests/fixtures/multi-resource.arm.json --output table
-
-# Override parameter values
-bce estimate --file ./tests/fixtures/aks-vm.bicep --param vmSize=Standard_D4s_v3 --param env=prod
-```
-
-**Options:**
-
-| Flag | Description | Default |
-| --- | --- | --- |
-| `--file <path>` | Path to `.bicep` or ARM JSON file | *(required)* |
-| `--params-file <path>` | Path to `.bicepparam` file | — |
-| `--param <key=value>` | Override a parameter value (repeatable) | — |
-| `--output <format>` | `table`, `json`, `csv`, or `markdown` | `table` |
-
-### Output Formats
-
-- **`table`** — Human-readable ASCII table with resource names, types, pricing details, and monthly costs
-- **`json`** — Machine-readable JSON with `lines`, `grandTotal`, and `warnings`
-- **`csv`** — RFC 4180 CSV with headers and a TOTAL row
-- **`markdown`** — GitHub-flavored markdown table
-
-### Cache Management
-
-```bash
-# View cache statistics (entry count and size)
-bce cache info
-
-# Clear all cached pricing data
-bce cache clear
-```
-
-Cache is stored at `~/.bicep-cost-estimator/cache/` with a default 24-hour TTL.
-
-### LSP Server Mode
-
-```bash
-bce lsp
-```
-
-Starts a Language Server Protocol server over stdin/stdout (JSON-RPC). Used by editors for real-time cost estimation.
-
----
-
-## VS Code Extension
-
-The extension activates on `.bicep` files and communicates with the `bce` CLI in LSP mode — **zero logic duplication**.
-
-### Editor Features
-
-- **CodeLens** — Inline cost annotations (`💰 $XX.XX/mo`) above each resource declaration
-- **Hover** — Detailed cost breakdown table on hover over resources
-- **Status Bar** — Grand total estimated cost for the active file
-- **Cost Breakdown Panel** — Explorer sidebar TreeView listing all resources with costs
-- **Auto-estimate on save** — Re-estimates costs every time a `.bicep` file is saved
-
-### Commands
-
-| Command | Description |
-| --- | --- |
-| `Washington: Estimate File Cost` | Estimate cost of the current `.bicep` file |
-| `Washington: Estimate Workspace Cost` | Estimate all `.bicep` files in the workspace |
-| `Washington: Clear Pricing Cache` | Clear the local pricing cache |
-
-### Settings
-
-| Setting | Description | Default |
-| --- | --- | --- |
-| `washington.defaultRegion` | Default Azure region | `eastus` |
-| `washington.cliPath` | Path to the `bce` CLI binary (auto-detected if empty) | `""` |
-| `washington.estimateOnSave` | Auto-estimate on save | `true` |
-| `washington.showCodeLens` | Show CodeLens cost annotations | `true` |
-| `washington.showStatusBar` | Show total cost in status bar | `true` |
-| `washington.cacheTtlHours` | Pricing cache TTL in hours | `24` |
-
----
-
-## GitHub Action
-
-Integrate cost estimation into your CI/CD pipeline and PR review workflow. The action builds and runs `bce` under the hood.
-
-### Usage
-
-```yaml
-- name: Estimate Azure Costs
-  id: cost
-  uses: polatengin/washington@main
-  with:
-    file: infra/main.bicep
-    params-file: infra/main.bicepparam
-    base-file: base-branch/infra/main.bicep        # optional: enables delta comparison
-    base-params-file: base-branch/infra/main.bicepparam
-    output-format: json
-    fail-on-threshold: 1000                         # optional: fail if total > $1000/month
-```
-
-### Inputs
-
-| Input | Description | Required | Default |
-| --- | --- | :---: | --- |
-| `file` | Path to `.bicep` file | ✅ | — |
-| `params-file` | Path to `.bicepparam` file | — | — |
-| `base-file` | Base branch `.bicep` file (enables delta comparison) | — | — |
-| `base-params-file` | Base branch `.bicepparam` file | — | — |
-| `output-format` | `json`, `table`, or `markdown` | — | `json` |
-| `fail-on-threshold` | Fail if estimated monthly cost exceeds this value | — | — |
-
-### Outputs
-
-| Output | Description |
-| --- | --- |
-| `estimation-result` | Full JSON cost estimation result |
-| `total-cost` | Estimated monthly total (numeric) |
-| `base-cost` | Base branch cost (numeric, `0` if no base file) |
-| `delta-cost` | Monthly cost delta (current − base) |
-
----
-
-## Architecture
-
-```text
-┌─────────────┐     ┌──────────────────┐     ┌────────────────┐     ┌──────────────┐
-│ .bicep file │────▶│ Bicep Library    │────▶│ ARM JSON      │────▶│ Resource     │
-│             │     │ (git submodule)  │     │ Template       │     │ Extractor    │
-└─────────────┘     └──────────────────┘     └────────────────┘     └──────┬───────┘
-                                                                           │
-                                                                           ▼
-┌──────────────┐     ┌──────────────┐     ┌────────────────┐     ┌──────────────┐
-│ Cost Report  │◀────│ Cost         │◀────│ Pricing API   │◀────│ Resource     │
-│ (table/json/ │     │ Aggregator   │     │ Client + Cache │     │ Cost Mappers │
-│  csv/md)     │     └──────────────┘     └────────────────┘     └──────────────┘
-└──────────────┘
-```
-
-- **Bicep Library** — Compiled via git submodule (no external Bicep CLI needed)
-- **Resource Extractor** — Parses ARM JSON into resource descriptors; handles nested resources, copy loops, and conditional resources
-- **Resource Cost Mappers** — Per-resource-type mappers translate descriptors into Azure Retail Prices API queries
-- **Pricing API Client** — Queries `https://prices.azure.com/api/retail/prices` with automatic pagination, retry with exponential backoff, and file-based caching
-- **Cost Aggregator** — Combines mapper results into a structured `CostReport`
-
----
-
-## Pricing Data
-
-Cost data comes from the [Azure Retail Prices API](https://learn.microsoft.com/en-us/rest/api/cost-management/retail-prices/azure-retail-prices) — **free, no authentication required**. Spot and low-priority pricing is excluded by default.
-
----
-
-## Running Tests
-
-```bash
-dotnet test tests/cli.tests/
-```
-
-Tests cover resource extraction, cost mappers, output formatters, and full end-to-end estimation pipelines.
-
----
+The repository depends on the embedded `bicep` submodule, so use `make setup-cli` or `git submodule update --init --recursive` before building from a fresh clone.
 
 ## Roadmap
 
@@ -296,8 +91,6 @@ The following features are planned for future releases:
 - **Custom pricing overrides** — Support Enterprise Agreement / CSP pricing via user-provided rate cards
 - **Annual / multi-year projections** — Show costs beyond monthly (quarterly, annual)
 - **Bicep module registry support** — Resolve modules from Azure Container Registry and template specs
-
----
 
 ## License
 
