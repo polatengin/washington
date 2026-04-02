@@ -22,6 +22,12 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      AZURE_ACR_SUBSCRIPTION_ID: ${{ vars.AZURE_ACR_SUBSCRIPTION_ID }}
+      AZURE_ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
+      AZURE_CONTAINER_APP_NAME: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
+      AZURE_CONTAINER_APP_RESOURCE_GROUP: ${{ secrets.AZURE_CONTAINER_APP_RESOURCE_GROUP }}
 
     steps:
       - name: Checkout code
@@ -39,12 +45,10 @@ jobs:
 
       - name: Resolve image tags
         id: image
-        env:
-          AZURE_ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
-          AZURE_CONTAINER_APP_NAME: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
-          AZURE_CONTAINER_APP_RESOURCE_GROUP: ${{ secrets.AZURE_CONTAINER_APP_RESOURCE_GROUP }}
         run: |
           set -euo pipefail
+
+          az account set --subscription "${AZURE_ACR_SUBSCRIPTION_ID:-$AZURE_SUBSCRIPTION_ID}"
 
           acr_login_server="$(az acr show --name "$AZURE_ACR_NAME" --query loginServer --output tsv)"
           image_sha="$acr_login_server/washington-website:$GITHUB_SHA"
@@ -54,12 +58,17 @@ jobs:
           echo "IMAGE_SHA=$image_sha" >> "$GITHUB_ENV"
           echo "IMAGE_LATEST=$image_latest" >> "$GITHUB_ENV"
           echo "image_sha=$image_sha" >> "$GITHUB_OUTPUT"
+          echo "image_latest=$image_latest" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Log in to Azure Container Registry
-        run: az acr login --name "$AZURE_ACR_NAME"
+        run: |
+          set -euo pipefail
+
+          az account set --subscription "${AZURE_ACR_SUBSCRIPTION_ID:-$AZURE_SUBSCRIPTION_ID}"
+          az acr login --name "$AZURE_ACR_NAME"
 
       - name: Build and push website image
         uses: docker/build-push-action@v6
@@ -68,14 +77,16 @@ jobs:
           file: src/website/Dockerfile
           push: true
           tags: |
-            ${{ env.IMAGE_SHA }}
-            ${{ env.IMAGE_LATEST }}
+            ${{ steps.image.outputs.image_sha }}
+            ${{ steps.image.outputs.image_latest }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Deploy image to Azure Container App
         run: |
           set -euo pipefail
+
+          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
 
           az containerapp update \
             --name "$AZURE_CONTAINER_APP_NAME" \
@@ -85,6 +96,8 @@ jobs:
       - name: Show deployed revision
         run: |
           set -euo pipefail
+
+          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
 
           fqdn="$(az containerapp show \
             --name "$AZURE_CONTAINER_APP_NAME" \
