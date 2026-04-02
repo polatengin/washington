@@ -33,7 +33,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'GitHub Action',
-      items: ['github-action/index'],
+      items: ['github-action/index', 'github-action/examples'],
     },
     {
       type: 'category',
