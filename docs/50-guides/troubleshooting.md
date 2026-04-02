@@ -72,13 +72,13 @@ bce cache info
 
 ## `.bicepparam` file does not change the estimate
 
-This is a current implementation limitation.
+Washington applies values from `.bicepparam` files and `--param` overrides during resource extraction.
 
-- `--params-file` is accepted and compiled for validation.
-- `--param` overrides are parsed by the CLI.
-- The final estimate is still driven by the compiled template output, not by merged parameter values.
+If the estimate still does not change, check:
 
-Use these flags today as compatibility markers and validation hooks, not as a guarantee that the estimate reflects alternative parameter sets.
+- whether the parameter actually influences a priced property such as SKU, instance count, or location
+- whether the parameter flows through a template expression the extractor can resolve
+- whether you passed the correct `.bicepparam` file for the template you are estimating
 
 ## VS Code extension does not show costs
 
@@ -87,7 +87,8 @@ Check the following in order:
 1. Open a `.bicep` file, since the extension activates on the Bicep language.
 2. Set `washington.cliPath` if you want to force a known `bce` binary.
 3. If `washington.cliPath` is empty, the extension will try the bundled binary, then a workspace `src/cli/washington.csproj`, then `bce` on your `PATH`.
-4. Run `Washington: Estimate File Cost` manually from the command palette to verify the LSP path is working.
+4. If you expect automatic refresh, confirm `washington.estimateOnSave` is enabled.
+5. Run `Washington: Estimate File Cost` manually from the command palette to verify the LSP path is working.
 
 ## Workspace estimate looks larger than expected
 
