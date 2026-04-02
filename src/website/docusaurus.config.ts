@@ -74,47 +74,6 @@ const config: Config = {
         },
       ],
     },
-    footer: {
-      style: 'dark',
-      links: [
-        {
-          title: 'Docs',
-          items: [
-            {
-              label: 'Getting Started',
-              to: '/getting-started',
-            },
-            {
-              label: 'CLI',
-              to: '/cli/commands',
-            },
-          ],
-        },
-        {
-          title: 'Tools',
-          items: [
-            {
-              label: 'VS Code Extension',
-              to: '/vscode-extension',
-            },
-            {
-              label: 'GitHub Action',
-              to: '/github-action',
-            },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'GitHub',
-              href: 'https://github.com/polatengin/washington',
-            },
-          ],
-        },
-      ],
-      copyright: `Copyright © ${new Date().getFullYear()} Washington Project. Built with Docusaurus.`,
-    },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
