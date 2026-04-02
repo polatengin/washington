@@ -1,25 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap');
 
-.page {
-  --playground-bg: #f3efe3;
-  --playground-paper: rgba(255, 252, 245, 0.92);
-  --playground-panel: rgba(255, 249, 240, 0.9);
-  --playground-ink: #1d3124;
-  --playground-muted: #54655a;
-  --playground-border: rgba(29, 49, 36, 0.14);
-  --playground-accent: #14775e;
-  --playground-accent-strong: #0f5c49;
-  --playground-highlight: #f6b73c;
-  --playground-shadow: 0 20px 60px rgba(34, 55, 35, 0.12);
-  background:
-    radial-gradient(circle at top left, rgba(246, 183, 60, 0.35), transparent 28%),
-    radial-gradient(circle at top right, rgba(20, 119, 94, 0.16), transparent 32%),
-    linear-gradient(180deg, #f6f2e8 0%, var(--playground-bg) 55%, #ece6d7 100%);
-  color: var(--playground-ink);
-  min-height: 100vh;
-  padding: 2rem 1.5rem 5rem;
-}
-
 .hero,
 .workspace {
   margin: 0 auto;

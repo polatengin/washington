@@ -101,31 +101,7 @@ export default function PlaygroundPage() {
       title="Playground"
       description="Paste Bicep into the browser and get a live Azure cost estimate from Washington."
     >
-      <main className={styles.page}>
-        <section className={styles.hero}>
-          <div className={styles.heroCopy}>
-            <p className={styles.eyebrow}>Browser Playground</p>
-            <h1>Paste Bicep. Get an estimate in the same window.</h1>
-            <p className={styles.lead}>
-              This uses the same Washington CLI pipeline as the local toolchain: compile Bicep,
-              extract Azure resources, query pricing, and aggregate the monthly total.
-            </p>
-          </div>
-
-          <div className={styles.heroStats}>
-            <div className={styles.statCard}>
-              <span className={styles.statLabel}>Input</span>
-              <strong>Standalone Bicep</strong>
-              <p>Paste a single template directly into the editor.</p>
-            </div>
-            <div className={styles.statCard}>
-              <span className={styles.statLabel}>Output</span>
-              <strong>Monthly estimate</strong>
-              <p>See totals, per-resource pricing details, and warnings.</p>
-            </div>
-          </div>
-        </section>
-
+      <main>
         <section className={styles.workspace}>
           <form className={styles.editorPanel} onSubmit={handleSubmit}>
             <div className={styles.panelHeader}>
