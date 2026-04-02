@@ -57,7 +57,6 @@ export default function Playground() {
   const [report, setReport] = useState<CostReport | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [elapsedMs, setElapsedMs] = useState<number | null>(null);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -66,7 +65,6 @@ export default function Playground() {
     setError(null);
 
     try {
-      const startedAt = performance.now();
       const response = await fetch('/api/estimate', {
         method: 'POST',
         headers: {
@@ -82,10 +80,8 @@ export default function Playground() {
       }
 
       setReport(payload as CostReport);
-      setElapsedMs(Math.round(performance.now() - startedAt));
     } catch (submissionError) {
       setReport(null);
-      setElapsedMs(null);
       setError(submissionError instanceof Error ? submissionError.message : 'Estimation failed.');
     } finally {
       setIsSubmitting(false);
@@ -120,7 +116,6 @@ export default function Playground() {
               type="button"
               onClick={() => {
                 setReport(null);
-                setElapsedMs(null);
                 setError(null);
                 setSource('');
               }}
@@ -155,11 +150,8 @@ export default function Playground() {
 
       <section className={styles.resultsPanel}>
         <div className={styles.panelHeader}>
-          <div>
-            <p className={styles.panelEyebrow}>Results</p>
-            <h2>Estimate output</h2>
-          </div>
-          {elapsedMs !== null ? <span className={styles.elapsed}>{elapsedMs} ms</span> : null}
+          <p className={styles.panelEyebrow}>Results</p>
+          <h2>Estimate output</h2>
         </div>
 
         <div className={styles.summaryGrid}>
