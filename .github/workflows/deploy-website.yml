@@ -6,7 +6,9 @@ name: Deploy Website
       - main
     paths:
       - docs/**
+      - src/cli/**
       - src/website/**
+      - bicep
       - CONTRIBUTING.md
       - .github/workflows/deploy-website.yml
   workflow_dispatch:
