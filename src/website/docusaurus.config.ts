@@ -3,7 +3,7 @@ import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'Washington',
+  title: 'Bicep Cost Estimator',
   tagline: 'Azure Cost Estimator',
   favicon: 'img/logo.svg',
   url: 'https://bicepcostestimator.net',
@@ -55,9 +55,9 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'Washington',
+      title: 'Bicep Cost Estimator',
       logo: {
-        alt: 'Washington Logo',
+        alt: 'Bicep Cost Estimator Logo',
         src: 'img/logo.svg',
       },
       items: [
