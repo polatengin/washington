@@ -46,7 +46,6 @@ make build-cli
 - [How Estimates Work](https://bicepcostestimator.net/guides/how-estimates-work)
 - [Supported Resources](https://bicepcostestimator.net/guides/supported-resources)
 - [Troubleshooting](https://bicepcostestimator.net/guides/troubleshooting)
-- [Documentation Roadmap](https://bicepcostestimator.net/guides/documentation-roadmap)
 
 ## Current Limitations
 
