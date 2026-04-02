@@ -38,6 +38,8 @@ Open VS Code settings and search for `washington`:
 
 If `washington.cliPath` is empty, the extension first tries the bundled `bce` binary, then a workspace build, then `bce` on your `PATH`.
 
+For a full settings reference, see [Extension Settings](/vscode-extension/settings).
+
 ## Current Behavior and Limitations
 
 - The extension shells out to `bce lsp`; it does not implement pricing logic in TypeScript.
