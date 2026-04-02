@@ -92,11 +92,10 @@ export default function Playground() {
   const warningCount = report?.warnings.length ?? 0;
 
   return (
-    <section className={styles.workspace}>
-      <form className={styles.editorPanel} onSubmit={handleSubmit}>
+    <section>
+      <form onSubmit={handleSubmit}>
         <div className={styles.panelHeader}>
           <div>
-            <p className={styles.panelEyebrow}>Editor</p>
             <h2>Template input</h2>
           </div>
 
@@ -148,7 +147,7 @@ export default function Playground() {
         </div>
       </form>
 
-      <section className={styles.resultsPanel}>
+      <section>
         <div className={styles.panelHeader}>
           <p className={styles.panelEyebrow}>Results</p>
           <h2>Estimate output</h2>
