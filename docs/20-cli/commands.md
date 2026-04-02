@@ -20,8 +20,8 @@ bce estimate --file <path> [options]
 | Option | Description | Default |
 |--------|-------------|---------|
 | `--file <path>` | Path to a `.bicep` or ARM JSON file | required |
-| `--params-file <path>` | Path to a `.bicepparam` file | — |
-| `--param <key=value>` | Override a parameter value; repeat as needed | — |
+| `--params-file <path>` | Path to a `.bicepparam` file; currently compiled for validation alongside the main template | — |
+| `--param <key=value>` | Parsed as a parameter override; not yet applied to the compiled estimate result | — |
 | `--output <format>` | Output format: `table`, `json`, `csv`, or `markdown` | `table` |
 
 ### Examples
@@ -33,12 +33,18 @@ bce estimate --file main.bicep
 # JSON output for CI pipelines
 bce estimate --file main.bicep --output json
 
-# Use a params file and parameter overrides
+# Validate an associated params file while estimating the template
 bce estimate --file main.bicep --params-file main.bicepparam --param env=prod
 
 # Estimate from an ARM template
 bce estimate --file main.arm.json --output markdown
 ```
+
+## Current Behavior Notes
+
+- Unsupported resource types are skipped and returned as warnings in the output.
+- Spot and low-priority pricing is excluded from the default pricing query set.
+- The current implementation accepts `--params-file` and `--param`, but estimate results are still driven by the compiled template output rather than merged parameter values.
 
 ## `bce cache info`
 
