@@ -13,8 +13,8 @@ The current CLI does not support a dedicated config file or `BCE_*` environment 
 
 | Option | Description | Default |
 |----------|-------------|---------|
-| `--params-file <path>` | Compile a `.bicepparam` file for validation alongside the main template | — |
-| `--param <key=value>` | Provide a parameter override token; currently parsed but not yet applied to the estimate result | — |
+| `--params-file <path>` | Apply parameter values from a `.bicepparam` file | — |
+| `--param <key=value>` | Override a parameter value on the command line | — |
 | `--output <format>` | Choose `table`, `json`, `csv`, or `markdown` output | `table` |
 
 ## Runtime Defaults
@@ -26,8 +26,7 @@ The current CLI does not support a dedicated config file or `BCE_*` environment 
 ## Current Limitations
 
 - There is no persisted project or user-level CLI config file yet.
-- `--params-file` is currently useful for validating that the paired params file compiles, but estimate values still come from the compiled template path.
-- `--param` overrides are parsed by the CLI today, but they do not yet change the final estimate output.
+- Parameter application only affects values that flow through template parameters and into priced resource properties.
 
 ## Examples
 
