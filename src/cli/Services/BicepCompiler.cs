@@ -4,7 +4,7 @@ namespace Washington.Services;
 
 public class BicepCompiler
 {
-    public async Task<string> CompileBicepToArm(string bicepFilePath)
+    public virtual async Task<string> CompileBicepToArm(string bicepFilePath)
     {
         var tempDir = Path.Combine(Path.GetTempPath(), "bce", Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(tempDir);
@@ -46,7 +46,7 @@ public class BicepCompiler
         }
     }
 
-    public async Task<string> CompileBicepParamsToArm(string bicepParamFilePath)
+    public virtual async Task<string> CompileBicepParamsToArm(string bicepParamFilePath)
     {
         var tempDir = Path.Combine(Path.GetTempPath(), "bce", Guid.NewGuid().ToString("N")[..8]);
         Directory.CreateDirectory(tempDir);
