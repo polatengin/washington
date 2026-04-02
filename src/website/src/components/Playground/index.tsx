@@ -204,7 +204,7 @@ export default function Playground() {
             </div>
           </>
         ) : (
-          <div className={styles.emptyState}>
+          <div>
             <h3>No estimate yet</h3>
             <p>
               Paste a Bicep template on the left and run the estimator to see per-resource cost

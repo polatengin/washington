@@ -169,8 +169,3 @@ button:disabled {
 .tableShell td:nth-child(5) {
   white-space: nowrap;
 }
-
-.emptyState {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(20, 119, 94, 0.08));
-  border: 1px dashed rgba(29, 49, 36, 0.18);
-}
