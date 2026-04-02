@@ -67,6 +67,11 @@ const config: Config = {
           position: 'left',
         },
         {
+          label: 'Playground',
+          href: '/playground',
+          position: 'left',
+        },
+        {
           label: 'CLI Commands',
           href: '/cli/commands',
           position: 'left',
