@@ -51,8 +51,7 @@ make build-cli
 
 - Unsupported resource types are skipped with a warning.
 - Spot and low-priority prices are excluded from default estimates.
-- `.bicepparam` files are accepted and compiled for validation, but current estimates are still driven by the compiled template. Command-line `--param` overrides are parsed today but not yet reflected in the final estimate.
-- The VS Code extension estimates on open, save, and debounced change. Some exposed settings are currently reserved rather than fully wired into runtime behavior.
+- The VS Code extension auto-refresh behavior is controlled by `washington.estimateOnSave`.
 
 ## Development
 
