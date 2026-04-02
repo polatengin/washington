@@ -2,11 +2,9 @@
 node_modules/
 .git/
 .github/
-bicep/
-src/cli/
 src/vscode-extension/
 tests/
-*.slnx
+*.sln
 *.md
 !CONTRIBUTING.md
 !docs/**/*.md
