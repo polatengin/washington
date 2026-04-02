@@ -4,9 +4,19 @@ title: Introduction
 sidebar_position: 0
 ---
 
-# Washington - Azure Cost Estimator
+# Bicep Cost Estimator
 
-Washington is an open-source tool that estimates the cost of your Azure infrastructure **before** you deploy it. Its CLI is published as `bce` and works with Bicep and ARM templates.
+`Bicep Cost Estimator` (_bce_) is an open-source tool that estimates the cost of your Azure infrastructure **before** you deploy it. It works with Bicep and ARM templates.
+
+## Quick Start
+
+```bash
+# Install the CLI
+curl -sL https://bicepcostestimator.net/install.sh | bash
+
+# Estimate costs for a Bicep file
+bce estimate --file main.bicep
+```
 
 ## How It Works
 
@@ -30,15 +40,4 @@ Washington is an open-source tool that estimates the cost of your Azure infrastr
 - [Supported Resources](/guides/supported-resources) lists the Azure resource families mapped today.
 - [Troubleshooting](/guides/troubleshooting) covers unsupported resources, cache issues, region fallback, and extension setup.
 - [Playground](/playground) gives you a quick browser-based estimate for pasted Bicep templates.
-
-## Quick Start
-
-```bash
-# Install the CLI
-curl -sL https://bicepcostestimator.net/install.sh | bash
-
-# Estimate costs for a Bicep file
-bce estimate --file main.bicep
-```
-
-See [Getting Started](/getting-started) for detailed installation and usage instructions.
+- [Getting Started](/getting-started) for detailed installation and usage instructions.
