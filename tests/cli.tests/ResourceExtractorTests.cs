@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Washington.Services;
 using Washington.Models;
 using Xunit;
@@ -98,6 +99,54 @@ public class ResourceExtractorTests
 
         var resources = _extractor.Extract(json);
         Assert.Empty(resources);
+    }
+
+    [Fact]
+    public void Extract_AppliesSuppliedParameterValues()
+    {
+        var json = """
+        {
+            "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+            "contentVersion": "1.0.0.0",
+            "parameters": {
+                "location": {
+                    "type": "string",
+                    "defaultValue": "eastus"
+                },
+                "vmSize": {
+                    "type": "string",
+                    "defaultValue": "Standard_D2s_v3"
+                }
+            },
+            "resources": [
+                {
+                    "type": "Microsoft.Compute/virtualMachines",
+                    "apiVersion": "2023-09-01",
+                    "name": "test-vm",
+                    "location": "[parameters('location')]",
+                    "properties": {
+                        "hardwareProfile": {
+                            "vmSize": "[parameters('vmSize')]"
+                        }
+                    }
+                }
+            ]
+        }
+        """;
+
+        var suppliedParameterValues = new Dictionary<string, JsonElement>
+        {
+            ["location"] = JsonDocument.Parse("\"westus3\"").RootElement.Clone(),
+            ["vmSize"] = JsonDocument.Parse("\"Standard_D4s_v3\"").RootElement.Clone(),
+        };
+
+        var resources = _extractor.Extract(json, suppliedParameterValues);
+
+        Assert.Single(resources);
+        Assert.Equal("westus3", resources[0].Location);
+
+        var hardwareProfile = resources[0].Properties["hardwareProfile"];
+        Assert.Equal("Standard_D4s_v3", hardwareProfile.GetProperty("vmSize").GetString());
     }
 
     private static string GetFixturePath(string fileName) =>
