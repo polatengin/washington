@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "prebuild": "node scripts/generate-plain-text.mjs",
+    "generate:supported-resources": "node scripts/generate-supported-resources.mjs",
+    "prebuild": "node scripts/generate-supported-resources.mjs && node scripts/generate-plain-text.mjs",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "postbuild": "node scripts/generate-plain-text.mjs --cleanup",
