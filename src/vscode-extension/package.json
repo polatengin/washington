@@ -30,7 +30,7 @@
         "washington.estimateOnSave": {
           "type": "boolean",
           "default": true,
-          "description": "Automatically estimate costs when saving .bicep files"
+          "description": "Automatically refresh estimates for open .bicep files"
         },
         "washington.showCodeLens": {
           "type": "boolean",
