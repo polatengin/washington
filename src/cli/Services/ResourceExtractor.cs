@@ -6,43 +6,68 @@ namespace Washington.Services;
 
 public class ResourceExtractor
 {
-    private const string DefaultRegion = "eastus";
+    private readonly string _defaultRegion;
 
-    public List<ResourceDescriptor> Extract(string armTemplateJson)
+    public ResourceExtractor(string defaultRegion = "eastus")
+    {
+        _defaultRegion = string.IsNullOrWhiteSpace(defaultRegion) ? "eastus" : defaultRegion;
+    }
+
+    public List<ResourceDescriptor> Extract(
+        string armTemplateJson,
+        Dictionary<string, JsonElement>? suppliedParameterValues = null)
     {
         var descriptors = new List<ResourceDescriptor>();
 
         using var doc = JsonDocument.Parse(armTemplateJson);
         var root = doc.RootElement;
 
-        var paramDefaults = ExtractParameterDefaults(root);
+        var parameterValues = ExtractParameterDefaults(root);
+        MergeParameterValues(parameterValues, suppliedParameterValues);
 
         if (root.TryGetProperty("resources", out var resources))
         {
-            ExtractResources(resources, descriptors, paramDefaults);
+            ExtractResources(resources, descriptors, parameterValues);
         }
 
         return descriptors;
     }
 
-    private static Dictionary<string, string> ExtractParameterDefaults(JsonElement root)
+    private static Dictionary<string, JsonElement> ExtractParameterDefaults(JsonElement root)
     {
-        var defaults = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        var defaults = new Dictionary<string, JsonElement>(StringComparer.OrdinalIgnoreCase);
         if (root.TryGetProperty("parameters", out var parameters) && parameters.ValueKind == JsonValueKind.Object)
         {
             foreach (var param in parameters.EnumerateObject())
             {
-                if (param.Value.TryGetProperty("defaultValue", out var defaultValue) &&
-                    defaultValue.ValueKind == JsonValueKind.String)
+                if (param.Value.TryGetProperty("defaultValue", out var defaultValue))
                 {
-                    defaults[param.Name] = defaultValue.GetString() ?? string.Empty;
+                    defaults[param.Name] = defaultValue.Clone();
                 }
             }
         }
         return defaults;
     }
 
-    private void ExtractResources(JsonElement resources, List<ResourceDescriptor> descriptors, Dictionary<string, string> paramDefaults)
+    private static void MergeParameterValues(
+        Dictionary<string, JsonElement> parameterValues,
+        Dictionary<string, JsonElement>? suppliedParameterValues)
+    {
+        if (suppliedParameterValues == null)
+        {
+            return;
+        }
+
+        foreach (var entry in suppliedParameterValues)
+        {
+            parameterValues[entry.Key] = entry.Value.Clone();
+        }
+    }
+
+    private void ExtractResources(
+        JsonElement resources,
+        List<ResourceDescriptor> descriptors,
+        Dictionary<string, JsonElement> parameterValues)
     {
         if (resources.ValueKind != JsonValueKind.Array)
             return;
@@ -52,8 +77,8 @@ public class ResourceExtractor
             var type = resource.GetStringProperty("type");
             var apiVersion = resource.GetStringProperty("apiVersion");
             var rawName = resource.GetStringProperty("name");
-            var name = ResolveArmStringExpression(rawName, paramDefaults) ?? rawName;
-            var location = ResolveArmExpression(resource.GetStringProperty("location"), paramDefaults);
+            var name = ResolveArmStringExpression(rawName, parameterValues) ?? rawName;
+            var location = ResolveArmExpression(resource.GetStringProperty("location"), parameterValues);
 
             if (string.IsNullOrEmpty(type))
                 continue;
@@ -65,7 +90,7 @@ public class ResourceExtractor
                 for (int i = 0; i < count; i++)
                 {
                     var copyName = name.Replace("[copyIndex()]", i.ToString());
-                    descriptors.Add(BuildDescriptor(resource, type, apiVersion, copyName, location, paramDefaults));
+                    descriptors.Add(BuildDescriptor(resource, type, apiVersion, copyName, location, parameterValues));
                 }
             }
             else
@@ -77,13 +102,13 @@ public class ResourceExtractor
                     continue;
                 }
 
-                descriptors.Add(BuildDescriptor(resource, type, apiVersion, name, location, paramDefaults));
+                descriptors.Add(BuildDescriptor(resource, type, apiVersion, name, location, parameterValues));
             }
 
             // Recurse into nested/child resources
             if (resource.TryGetProperty("resources", out var childResources))
             {
-                ExtractResources(childResources, descriptors, paramDefaults);
+                ExtractResources(childResources, descriptors, parameterValues);
             }
         }
     }
@@ -92,28 +117,24 @@ public class ResourceExtractor
     /// Resolves ARM template expressions (e.g. "[parameters('location')]", "[resourceGroup().location]")
     /// to a concrete value. Falls back to DefaultRegion if the expression cannot be resolved.
     /// </summary>
-    private static string ResolveArmExpression(string value, Dictionary<string, string> paramDefaults)
+    private string ResolveArmExpression(string value, Dictionary<string, JsonElement> parameterValues)
     {
         if (string.IsNullOrEmpty(value))
-            return DefaultRegion;
+            return _defaultRegion;
 
         // Not an ARM expression — use as-is
         if (!value.StartsWith('[') || !value.EndsWith(']'))
             return value;
 
         // Try to resolve [parameters('paramName')] by looking up default values
-        var paramMatch = Regex.Match(value, @"^\[parameters\('(\w+)'\)\]$");
-        if (paramMatch.Success)
+        if (TryResolveParameterReference(value, parameterValues, out var resolvedValue) &&
+            TryGetScalarString(resolvedValue, out var resolvedString))
         {
-            var paramName = paramMatch.Groups[1].Value;
-            if (paramDefaults.TryGetValue(paramName, out var defaultVal) && !IsArmExpression(defaultVal))
-            {
-                return defaultVal;
-            }
+            return resolvedString;
         }
 
         // Unresolvable expression — fall back to default region
-        return DefaultRegion;
+        return _defaultRegion;
     }
 
     private static bool IsArmExpression(string value) =>
@@ -121,14 +142,14 @@ public class ResourceExtractor
 
     private static ResourceDescriptor BuildDescriptor(
         JsonElement resource, string type, string apiVersion, string name, string location,
-        Dictionary<string, string> paramDefaults)
+        Dictionary<string, JsonElement> parameterValues)
     {
         var sku = new Dictionary<string, JsonElement>();
         if (resource.TryGetProperty("sku", out var skuElement) && skuElement.ValueKind == JsonValueKind.Object)
         {
             foreach (var prop in skuElement.EnumerateObject())
             {
-                sku[prop.Name] = ResolveJsonElement(prop.Value, paramDefaults);
+                sku[prop.Name] = ResolveJsonElement(prop.Value, parameterValues);
             }
         }
 
@@ -137,14 +158,14 @@ public class ResourceExtractor
         {
             foreach (var prop in propsElement.EnumerateObject())
             {
-                properties[prop.Name] = ResolveJsonElement(prop.Value, paramDefaults);
+                properties[prop.Name] = ResolveJsonElement(prop.Value, parameterValues);
             }
         }
 
         // Also store the full "kind" if present
         if (resource.TryGetProperty("kind", out var kindElement))
         {
-            properties["_kind"] = ResolveJsonElement(kindElement, paramDefaults);
+            properties["_kind"] = ResolveJsonElement(kindElement, parameterValues);
         }
 
         return new ResourceDescriptor(type, apiVersion, name, location, sku, properties);
@@ -153,7 +174,9 @@ public class ResourceExtractor
     /// <summary>
     /// Recursively resolves ARM parameter expressions in a JsonElement tree.
     /// </summary>
-    private static JsonElement ResolveJsonElement(JsonElement element, Dictionary<string, string> paramDefaults)
+    private static JsonElement ResolveJsonElement(
+        JsonElement element,
+        Dictionary<string, JsonElement> parameterValues)
     {
         switch (element.ValueKind)
         {
@@ -161,9 +184,10 @@ public class ResourceExtractor
                 var strVal = element.GetString() ?? string.Empty;
                 if (IsArmExpression(strVal))
                 {
-                    var resolved = ResolveArmStringExpression(strVal, paramDefaults);
-                    if (resolved != null)
-                        return JsonDocument.Parse($"\"{EscapeJsonString(resolved)}\"").RootElement.Clone();
+                    if (TryResolveParameterReference(strVal, parameterValues, out var resolved))
+                    {
+                        return resolved.Clone();
+                    }
                 }
                 return element.Clone();
 
@@ -175,7 +199,7 @@ public class ResourceExtractor
                         writer.WriteStartArray();
                         foreach (var item in element.EnumerateArray())
                         {
-                            ResolveJsonElement(item, paramDefaults).WriteTo(writer);
+                            ResolveJsonElement(item, parameterValues).WriteTo(writer);
                         }
                         writer.WriteEndArray();
                     }
@@ -191,7 +215,7 @@ public class ResourceExtractor
                         foreach (var prop in element.EnumerateObject())
                         {
                             writer2.WritePropertyName(prop.Name);
-                            ResolveJsonElement(prop.Value, paramDefaults).WriteTo(writer2);
+                            ResolveJsonElement(prop.Value, parameterValues).WriteTo(writer2);
                         }
                         writer2.WriteEndObject();
                     }
@@ -206,18 +230,58 @@ public class ResourceExtractor
     /// <summary>
     /// Resolves an ARM expression string to a plain string, or returns null if unresolvable.
     /// </summary>
-    private static string? ResolveArmStringExpression(string value, Dictionary<string, string> paramDefaults)
+    private static string? ResolveArmStringExpression(string value, Dictionary<string, JsonElement> parameterValues)
+    {
+        if (TryResolveParameterReference(value, parameterValues, out var resolved) &&
+            TryGetScalarString(resolved, out var resolvedString))
+        {
+            return resolvedString;
+        }
+        return null;
+    }
+
+    private static bool TryResolveParameterReference(
+        string value,
+        Dictionary<string, JsonElement> parameterValues,
+        out JsonElement resolvedValue)
     {
         var paramMatch = Regex.Match(value, @"^\[parameters\('(\w+)'\)\]$");
         if (paramMatch.Success)
         {
             var paramName = paramMatch.Groups[1].Value;
-            if (paramDefaults.TryGetValue(paramName, out var defaultVal) && !IsArmExpression(defaultVal))
+            if (parameterValues.TryGetValue(paramName, out resolvedValue))
             {
-                return defaultVal;
+                if (resolvedValue.ValueKind == JsonValueKind.String &&
+                    IsArmExpression(resolvedValue.GetString() ?? string.Empty))
+                {
+                    resolvedValue = default;
+                    return false;
+                }
+
+                return true;
             }
         }
-        return null;
+
+        resolvedValue = default;
+        return false;
+    }
+
+    private static bool TryGetScalarString(JsonElement element, out string value)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.String:
+                value = element.GetString() ?? string.Empty;
+                return true;
+            case JsonValueKind.Number:
+            case JsonValueKind.True:
+            case JsonValueKind.False:
+                value = element.ToString();
+                return true;
+            default:
+                value = string.Empty;
+                return false;
+        }
     }
 
     private static string EscapeJsonString(string value) =>
