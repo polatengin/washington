@@ -21,7 +21,7 @@ code --install-extension polatengin.washington
 - **Hover details** — hover over a resource to see a detailed cost breakdown
 - **Status bar totals** — view the current file's estimated monthly cost at a glance
 - **Cost breakdown panel** — inspect per-resource totals in the explorer view
-- **Estimate on save** — refresh costs automatically when you save a `.bicep` file
+- **Automatic refresh** — estimates are refreshed when a `.bicep` file is opened, saved, or changed
 
 ## Configuration
 
@@ -37,3 +37,11 @@ Open VS Code settings and search for `washington`:
 | `washington.cacheTtlHours` | Pricing cache time-to-live in hours | `24` |
 
 If `washington.cliPath` is empty, the extension first tries the bundled `bce` binary, then a workspace build, then `bce` on your `PATH`.
+
+## Current Behavior and Limitations
+
+- The extension shells out to `bce lsp`; it does not implement pricing logic in TypeScript.
+- Workspace estimation scans all `.bicep` files recursively under the current workspace root.
+- The extension currently refreshes on open, save, and debounced change regardless of the `washington.estimateOnSave` setting.
+- `washington.showStatusBar` is wired today. Other exposed settings, such as `washington.defaultRegion`, `washington.showCodeLens`, and `washington.cacheTtlHours`, are currently reserved and documented here so the user-facing contract is visible while implementation catches up.
+- Estimates shown in the editor are based on the `.bicep` file path. Paired `.bicepparam` files are not yet selected automatically by the extension.
