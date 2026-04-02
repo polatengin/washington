@@ -12,6 +12,13 @@ export interface WashingtonConfig {
   cacheTtlHours: number;
 }
 
+export interface WashingtonInitializationOptions {
+  defaultRegion: string;
+  estimateOnSave: boolean;
+  showCodeLens: boolean;
+  cacheTtlHours: number;
+}
+
 export function getConfig(): WashingtonConfig {
   const cfg = vscode.workspace.getConfiguration(SECTION);
   return {
@@ -27,4 +34,13 @@ export function getConfig(): WashingtonConfig {
 
 export function getSetting<T>(key: keyof WashingtonConfig): T {
   return vscode.workspace.getConfiguration(SECTION).get<T>(key as string) as T;
+}
+
+export function toInitializationOptions(config: WashingtonConfig): WashingtonInitializationOptions {
+  return {
+    defaultRegion: config.defaultRegion,
+    estimateOnSave: config.estimateOnSave,
+    showCodeLens: config.showCodeLens,
+    cacheTtlHours: config.cacheTtlHours,
+  };
 }
