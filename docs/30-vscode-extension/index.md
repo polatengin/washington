@@ -21,7 +21,7 @@ code --install-extension polatengin.washington
 - **Hover details** — hover over a resource to see a detailed cost breakdown
 - **Status bar totals** — view the current file's estimated monthly cost at a glance
 - **Cost breakdown panel** — inspect per-resource totals in the explorer view
-- **Automatic refresh** — estimates are refreshed when a `.bicep` file is opened, saved, or changed
+- **Automatic refresh** — when `washington.estimateOnSave` is enabled, estimates are refreshed when a `.bicep` file is opened, saved, or changed
 
 ## Configuration
 
@@ -31,7 +31,7 @@ Open VS Code settings and search for `washington`:
 |---------|-------------|---------|
 | `washington.defaultRegion` | Default Azure region when not specified in a resource | `eastus` |
 | `washington.cliPath` | Path to the `bce` CLI binary; auto-detected if empty | `""` |
-| `washington.estimateOnSave` | Automatically estimate costs when saving `.bicep` files | `true` |
+| `washington.estimateOnSave` | Automatically refresh estimates for open `.bicep` files | `true` |
 | `washington.showCodeLens` | Show cost annotations as CodeLens above resources | `true` |
 | `washington.showStatusBar` | Show total estimated cost in the status bar | `true` |
 | `washington.cacheTtlHours` | Pricing cache time-to-live in hours | `24` |
@@ -42,6 +42,5 @@ If `washington.cliPath` is empty, the extension first tries the bundled `bce` bi
 
 - The extension shells out to `bce lsp`; it does not implement pricing logic in TypeScript.
 - Workspace estimation scans all `.bicep` files recursively under the current workspace root.
-- The extension currently refreshes on open, save, and debounced change regardless of the `washington.estimateOnSave` setting.
-- `washington.showStatusBar` is wired today. Other exposed settings, such as `washington.defaultRegion`, `washington.showCodeLens`, and `washington.cacheTtlHours`, are currently reserved and documented here so the user-facing contract is visible while implementation catches up.
-- Estimates shown in the editor are based on the `.bicep` file path. Paired `.bicepparam` files are not yet selected automatically by the extension.
+- `washington.defaultRegion`, `washington.estimateOnSave`, `washington.showCodeLens`, `washington.showStatusBar`, and `washington.cacheTtlHours` are applied by the language server on startup.
+- If a matching `.bicepparam` file in the same directory targets the active `.bicep` file, the extension applies its parameter values automatically during estimation.
