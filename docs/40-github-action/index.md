@@ -62,5 +62,5 @@ jobs:
 ## Current Behavior Notes
 
 - The action builds the CLI from source as part of the composite action run.
-- `params-file` and `base-params-file` are passed through to the CLI interface, but the current estimate pipeline is still driven by the compiled template output rather than merged parameter values.
+- `params-file` and `base-params-file` are passed through to the CLI and applied during parameter resolution.
 - Delta comparison is calculated as `current - base` using the two reported totals.
