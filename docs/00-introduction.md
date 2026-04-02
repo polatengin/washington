@@ -19,6 +19,7 @@ Washington is an open-source tool that estimates the cost of your Azure infrastr
 
 | Tool | Description |
 |------|-------------|
+| [Playground](/playground) | Paste standalone Bicep into the browser and get an on-demand estimate |
 | [CLI](/cli/commands) | Command-line interface for local and CI use, published as `bce` |
 | [VS Code Extension](/vscode-extension) | Real-time cost estimates in your editor |
 | [GitHub Action](/github-action) | Cost estimates on every pull request |
@@ -28,6 +29,7 @@ Washington is an open-source tool that estimates the cost of your Azure infrastr
 - [How Estimates Work](/guides/how-estimates-work) explains the compile, extract, price, and aggregate pipeline.
 - [Supported Resources](/guides/supported-resources) lists the Azure resource families mapped today.
 - [Troubleshooting](/guides/troubleshooting) covers unsupported resources, cache issues, region fallback, and extension setup.
+- [Playground](/playground) gives you a quick browser-based estimate for pasted Bicep templates.
 
 ## Quick Start
 
