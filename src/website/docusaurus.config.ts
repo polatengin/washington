@@ -62,13 +62,13 @@ const config: Config = {
       },
       items: [
         {
-          label: 'Getting Started',
-          href: '/getting-started',
+          label: 'Playground',
+          href: '/playground',
           position: 'left',
         },
         {
-          label: 'Playground',
-          href: '/playground',
+          label: 'Getting Started',
+          href: '/getting-started',
           position: 'left',
         },
         {
