@@ -95,9 +95,7 @@ export default function Playground() {
     <section>
       <form onSubmit={handleSubmit}>
         <div className={styles.panelHeader}>
-          <div>
-            <h2>Template input</h2>
-          </div>
+          <h2>Template input</h2>
 
           <div className={styles.editorActions}>
             <button
@@ -124,9 +122,6 @@ export default function Playground() {
           </div>
         </div>
 
-        <label className={styles.editorLabel} htmlFor="playground-source">
-          Bicep source
-        </label>
         <textarea
           id="playground-source"
           className={styles.editor}

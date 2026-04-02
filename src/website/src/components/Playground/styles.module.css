@@ -8,16 +8,14 @@
 }
 
 .panelHeader {
-  align-items: start;
   display: flex;
-  gap: 1rem;
   justify-content: space-between;
   margin-bottom: 1rem;
-}
 
-.panelHeader h2 {
-  font-size: 1.8rem;
-  margin: 0;
+  & h2 {
+    font-size: 1.8rem;
+    margin: 0;
+  }
 }
 
 .editorActions {
@@ -25,49 +23,30 @@
   gap: 0.65rem;
 }
 
-.editorLabel {
-  display: block;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
-  margin-bottom: 0.7rem;
-  text-transform: uppercase;
-}
-
 .editor {
   background: #13231b;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 18px;
+  margin-bottom: 1em;
   color: #f9f5e7;
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.95rem;
-  line-height: 1.65;
+  line-height: 1.5;
   min-height: 560px;
-  padding: 1rem 1.1rem;
+  padding: 0.8rem 1.1rem;
   resize: vertical;
   width: 100%;
 }
 
-.editor:focus {
-  border-color: rgba(246, 183, 60, 0.7);
-  box-shadow: 0 0 0 4px rgba(246, 183, 60, 0.14);
-  outline: none;
-}
-
 .helperRow {
-  align-items: center;
   display: flex;
-  gap: 1rem;
   justify-content: space-between;
-  margin-top: 1rem;
-}
 
-.helperRow p {
-  color: var(--playground-muted);
-  font-size: 0.95rem;
-  line-height: 1.6;
-  margin: 0;
-  max-width: 54ch;
+  & p {
+    color: var(--playground-muted);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+    max-width: 54ch;
+  }
 }
 
 button {
@@ -87,7 +66,7 @@ button:disabled {
   display: grid;
   gap: 0.9rem;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-bottom: 1rem;
+  margin-block: 1rem;
 }
 
 .summaryCard {
