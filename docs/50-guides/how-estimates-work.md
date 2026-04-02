@@ -24,11 +24,11 @@ Washington is intentionally thin at the edges. The CLI, VS Code extension, and G
 
 ### CLI
 
-The CLI is the canonical entry point. `bce estimate` can read either a `.bicep` file or a precompiled ARM JSON template.
+The CLI is the canonical entry point. `bce estimate` can read either a `.bicep` file or a precompiled ARM JSON template, and it can layer in values from a `.bicepparam` file plus repeatable `--param` overrides.
 
 ### VS Code Extension
 
-The extension launches `bce lsp` and talks to it over JSON-RPC. CodeLens, hover, the tree view, status bar, and workspace estimation all come from the same server-side report generation.
+The extension launches `bce lsp` and talks to it over JSON-RPC. CodeLens, hover, the tree view, status bar, and workspace estimation all come from the same server-side report generation. When a matching `.bicepparam` file in the same directory targets the active `.bicep` file, the extension applies those parameter values automatically.
 
 ### GitHub Action
 
@@ -53,8 +53,6 @@ The extractor does a pragmatic amount of ARM expression handling rather than try
 
 ## Current Limitations
 
-- `.bicepparam` files are accepted by the CLI and compiled for validation, but estimate values are still driven by the compiled template output.
-- Command-line `--param` overrides are parsed today but are not yet applied to the final estimate result.
 - Workspace estimation in the VS Code extension scans every `.bicep` file under the workspace root and aggregates the totals into a single report.
 - Unsupported Azure resource types are skipped with a warning rather than partially estimated.
 
