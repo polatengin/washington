@@ -61,6 +61,24 @@ public class InitializeParams
 
     [JsonPropertyName("rootUri")]
     public string? RootUri { get; set; }
+
+    [JsonPropertyName("initializationOptions")]
+    public WashingtonInitializationOptions? InitializationOptions { get; set; }
+}
+
+public class WashingtonInitializationOptions
+{
+    [JsonPropertyName("defaultRegion")]
+    public string? DefaultRegion { get; set; }
+
+    [JsonPropertyName("estimateOnSave")]
+    public bool? EstimateOnSave { get; set; }
+
+    [JsonPropertyName("showCodeLens")]
+    public bool? ShowCodeLens { get; set; }
+
+    [JsonPropertyName("cacheTtlHours")]
+    public double? CacheTtlHours { get; set; }
 }
 
 public class ServerCapabilities
