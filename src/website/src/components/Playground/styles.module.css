@@ -70,31 +70,17 @@
   max-width: 54ch;
 }
 
-.primaryButton,
-.secondaryButton,
-.ghostButton {
+button {
   cursor: pointer;
-}
-
-.primaryButton {
-  padding: 0.9rem 1.4rem;
-}
-
-.primaryButton:disabled {
-  cursor: progress;
-  opacity: 0.7;
-}
-
-.secondaryButton,
-.ghostButton {
-  background: transparent;
+  background: rgba(20, 119, 94, 0.08);
   border: 1px solid var(--playground-border);
   color: var(--playground-ink);
   padding: 0.7rem 1rem;
 }
 
-.secondaryButton {
-  background: rgba(20, 119, 94, 0.08);
+button:disabled {
+  cursor: progress;
+  opacity: 0.7;
 }
 
 .summaryGrid {
@@ -105,22 +91,15 @@
 }
 
 .summaryCard {
-  background: var(--playground-panel);
-  border: 1px solid var(--playground-border);
-  border-radius: 18px;
-  padding: 1rem;
-}
+  & span {
+    display: block;
+    font-size: 0.85rem;
+  }
 
-.summaryCard span {
-  color: var(--playground-muted);
-  display: block;
-  font-size: 0.85rem;
-  margin-bottom: 0.4rem;
-}
-
-.summaryCard strong {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.5rem;
+  & strong {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+  }
 }
 
 .errorBanner,
@@ -194,33 +173,4 @@
 .emptyState {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.55), rgba(20, 119, 94, 0.08));
   border: 1px dashed rgba(29, 49, 36, 0.18);
-}
-
-@media (max-width: 996px) {
-  .workspace {
-    grid-template-columns: 1fr;
-  }
-
-  .editor {
-    min-height: 420px;
-  }
-}
-
-@media (max-width: 720px) {
-  .panelHeader,
-  .helperRow,
-  .editorActions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .summaryGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .primaryButton,
-  .secondaryButton,
-  .ghostButton {
-    width: 100%;
-  }
 }
