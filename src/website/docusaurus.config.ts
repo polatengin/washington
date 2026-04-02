@@ -62,15 +62,53 @@ const config: Config = {
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
+          label: 'Getting Started',
+          href: '/getting-started',
           position: 'left',
-          label: 'Docs',
         },
         {
-          href: 'https://github.com/polatengin/washington',
-          label: 'GitHub',
+          label: 'CLI Commands',
+          href: '/cli/commands',
+          position: 'left',
+        },
+        {
+          label: 'VS Code Extension',
+          href: '/vscode-extension',
+          position: 'left',
+        },
+        {
+          label: 'GitHub Action',
+          href: '/github-action',
+          position: 'left',
+        },
+        {
+          html: `
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:4px;vertical-align:text-bottom;">
+              <circle cx="11" cy="11" r="8"/>
+              <path d="M21 21l-4.35-4.35"/>
+            </svg>
+            Search
+          `,
+          href: '/search',
           position: 'right',
+        },
+        {
+          label: 'GitHub',
+          href: 'https://github.com/polatengin/washington',
+          position: 'right',
+          className: 'navbar-github-link',
+        },
+        {
+          label: 'Issues',
+          href: 'https://github.com/polatengin/washington/issues',
+          position: 'right',
+          className: 'navbar-issues-link',
+        },
+        {
+          label: 'Discussions',
+          href: 'https://github.com/polatengin/washington/discussions',
+          position: 'right',
+          className: 'navbar-discussions-link',
         },
       ],
     },
