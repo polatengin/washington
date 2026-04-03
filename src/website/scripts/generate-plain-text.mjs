@@ -3,11 +3,13 @@
 import { readdir, readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { join, relative, dirname, basename, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import terminalImage from 'terminal-image';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..', '..', '..');
 const docsDir = join(repoRoot, 'docs');
 const outputDir = join(__dirname, '..', 'static', 'text');
+const faviconPath = join(__dirname, '..', 'static', 'assets', 'favicon-180x180.png');
 const contributingSource = join(repoRoot, 'CONTRIBUTING.md');
 const contributingDest = join(docsDir, '50-guides', 'contributing.md');
 const contributingFrontmatter = `---
@@ -89,14 +91,22 @@ function toOutputPath(filePath) {
 /**
  * Build the index.txt content — a tree of all available pages.
  */
-function buildIndex(files) {
-  const lines = [
+async function buildIndex(files) {
+  const lines = [];
+
+  const terminalFavicon = await terminalImage.file(faviconPath, {
+    width: 24,
+  });
+
+  lines.push(
+    terminalFavicon,
+    '',
     'Washington — Azure Cost Estimator',
     '='.repeat(38),
     '',
     'Available pages:',
     '',
-  ];
+  );
 
   const paths = files
     .map(f => {
@@ -155,7 +165,7 @@ for (const mdFile of mdFiles) {
 }
 
 // Generate index.txt
-const indexContent = buildIndex(outputFiles);
+const indexContent = await buildIndex(outputFiles);
 const indexPath = join(outputDir, 'index.txt');
 await writeFile(indexPath, indexContent, 'utf-8');
 console.log(`  → text/index.txt`);
