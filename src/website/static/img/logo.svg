@@ -1,39 +1,16 @@
-<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
-	<title id="title">Washington logo</title>
-	<desc id="desc">A layered green stack with a corrected green price tag badge.</desc>
-	<defs>
-		<linearGradient id="topLayer" x1="22" y1="34" x2="189" y2="112" gradientUnits="userSpaceOnUse">
-			<stop offset="0" stop-color="#B3D90A" />
-			<stop offset="1" stop-color="#75B61E" />
-		</linearGradient>
-		<linearGradient id="midLayer" x1="19" y1="82" x2="193" y2="159" gradientUnits="userSpaceOnUse">
-			<stop offset="0" stop-color="#8CC410" />
-			<stop offset="1" stop-color="#4D9B1D" />
-		</linearGradient>
-		<linearGradient id="bottomLayer" x1="18" y1="123" x2="191" y2="199" gradientUnits="userSpaceOnUse">
-			<stop offset="0" stop-color="#3E8F21" />
-			<stop offset="1" stop-color="#1F6E1D" />
-		</linearGradient>
-		<linearGradient id="tagFill" x1="151" y1="109" x2="226" y2="203" gradientUnits="userSpaceOnUse">
-			<stop offset="0" stop-color="#63B118" />
-			<stop offset="1" stop-color="#2C7B18" />
-		</linearGradient>
-	</defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" shape-rendering="crispEdges">
+  <path d="M112 110L248 158L112 206L2 158Z" fill="#2f8f5b" stroke="#1f5f3d" stroke-width="2"/>
+  <path d="M2 158L112 206L112 254L2 206Z" fill="#267a4d" stroke="#1f5f3d" stroke-width="2"/>
+  <path d="M112 206L248 158L248 206L112 254Z" fill="#216b44" stroke="#1f5f3d" stroke-width="2"/>
 
-	<g fill="none" fill-rule="evenodd">
-		<path d="M24 56 113 22a28 28 0 0 1 20 0l85 33c5 2 5 9 0 11l-85 33a28 28 0 0 1-20 0L24 67c-5-2-5-9 0-11Z" fill="url(#topLayer)" />
+  <path d="M112 56L248 104L112 152L2 104Z" fill="#4fbf7a" stroke="#1f5f3d" stroke-width="2"/>
+  <path d="M2 104L112 152L112 200L2 152Z" fill="#43ad6e" stroke="#1f5f3d" stroke-width="2"/>
+  <path d="M112 152L248 104L248 152L112 200Z" fill="#3a9c64" stroke="#1f5f3d" stroke-width="2"/>
 
-		<path d="M27 85 114 117a26 26 0 0 0 18 0l77-29" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="10" />
+  <path d="M112 2L248 50L112 98L2 50Z" fill="#7fdca4" stroke="#1f5f3d" stroke-width="2"/>
+  <path d="M2 50L112 98L112 146L2 98Z" fill="#6ccf98" stroke="#1f5f3d" stroke-width="2"/>
+  <path d="M112 98L248 50L248 98L112 146Z" fill="#5fbf8b" stroke="#1f5f3d" stroke-width="2"/>
 
-		<path d="M18 87c0-3 3-5 6-4l90 33a24 24 0 0 0 17 0l82-31c4-1 7 1 7 4v11c0 3-2 6-5 7l-84 32a28 28 0 0 1-19 0l-89-32c-3-1-5-4-5-7V87Z" fill="url(#midLayer)" />
-
-		<path d="M28 126 115 158a26 26 0 0 0 18 0l76-29" stroke="#FFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="10" />
-
-		<path d="M18 128c0-3 3-5 6-4l90 33a24 24 0 0 0 17 0l82-31c4-1 7 1 7 4v14c0 3-2 6-5 7l-84 32a28 28 0 0 1-19 0l-89-32c-3-1-5-4-5-7v-16Z" fill="url(#bottomLayer)" />
-
-		<path d="M175 109h34c9 0 16 7 16 16v62c0 9-7 16-16 16h-43c-9 0-16-7-16-16v-47c0-4 1-7 4-10l21-18Z" fill="url(#tagFill)" />
-		<path d="M177 109 150 133h14c7 0 13-6 13-13v-11Z" fill="#2C7B18" />
-		<circle cx="171" cy="130" r="5" fill="#EAF7D8" opacity="0.95" />
-		<text x="188" y="166" fill="#FFF" font-family="Segoe UI, Arial, sans-serif" font-size="76" font-weight="700" text-anchor="middle">$</text>
-	</g>
+  <path d="M176 182 L212 182 L224 194 L224 254 L164 254 L164 194 Z" fill="#9fe8bf" stroke="#1f5f3d" stroke-width="2"/>
+  <text x="194" y="235" font-family="monospace" font-size="46" text-anchor="middle" fill="#1f5f3d">$</text>
 </svg>
