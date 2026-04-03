@@ -101,7 +101,7 @@ async function buildIndex(files) {
   lines.push(
     terminalFavicon,
     '',
-    'Washington — Azure Cost Estimator',
+    'Bicep Cost Estimator',
     '='.repeat(38),
     '',
     'Available pages:',
