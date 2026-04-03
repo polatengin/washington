@@ -1,5 +1,4 @@
 import React, { FormEvent, useState } from 'react';
-import styles from './styles.module.css';
 
 type ResourceCostLine = {
   resourceType: string;
@@ -92,14 +91,14 @@ export default function Playground() {
   const warningCount = report?.warnings.length ?? 0;
 
   return (
-    <section>
+    <section className="playground">
       <form onSubmit={handleSubmit}>
-        <div className={styles.panelHeader}>
+        <div className="playground__panelHeader">
           <h2>Template input</h2>
 
-          <div className={styles.editorActions}>
+          <div className="playground__editorActions">
             <button
-              className={styles.secondaryButton}
+              className="playground__button"
               type="button"
               onClick={() => {
                 setSource(sampleTemplate);
@@ -109,7 +108,7 @@ export default function Playground() {
               Load sample
             </button>
             <button
-              className={styles.ghostButton}
+              className="playground__button"
               type="button"
               onClick={() => {
                 setReport(null);
@@ -124,46 +123,46 @@ export default function Playground() {
 
         <textarea
           id="playground-source"
-          className={styles.editor}
+          className="playground__editor"
           value={source}
           onChange={event => setSource(event.target.value)}
           spellCheck={false}
           placeholder="resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = { ... }"
         />
 
-        <div className={styles.helperRow}>
+        <div className="playground__helperRow">
           <p>
             Local modules and separate parameter files are not supported in the browser playground
             yet. Paste a self-contained template.
           </p>
-          <button className={styles.primaryButton} disabled={isSubmitting} type="submit">
+          <button className="playground__button" disabled={isSubmitting} type="submit">
             {isSubmitting ? 'Estimating...' : 'Estimate cost'}
           </button>
         </div>
       </form>
 
-      <section>
-        <div className={styles.summaryGrid}>
-          <article className={styles.summaryCard}>
+      <section className="playground__results">
+        <div className="playground__summaryGrid">
+          <article className="playground__summaryCard">
             <span>Estimated monthly total</span>
             <strong>{monthlyCurrency.format(report?.grandTotal ?? 0)}</strong>
           </article>
-          <article className={styles.summaryCard}>
+          <article className="playground__summaryCard">
             <span>Resources priced</span>
             <strong>{resourceCount}</strong>
           </article>
-          <article className={styles.summaryCard}>
+          <article className="playground__summaryCard">
             <span>Warnings</span>
             <strong>{warningCount}</strong>
           </article>
         </div>
 
-        {error ? <div className={styles.errorBanner}>{error}</div> : null}
+        {error ? <div className="playground__errorBanner">{error}</div> : null}
 
         {report ? (
           <>
             {report.warnings.length > 0 ? (
-              <div className={styles.warningPanel}>
+              <div className="playground__warningPanel">
                 <h3>Warnings</h3>
                 <ul>
                   {report.warnings.map(warning => (
@@ -173,7 +172,7 @@ export default function Playground() {
               </div>
             ) : null}
 
-            <table>
+            <table className="playground__table">
               <thead>
                 <tr>
                   <th>Resource</th>
@@ -197,7 +196,7 @@ export default function Playground() {
             </table>
           </>
         ) : (
-          <div>
+          <div className="playground__emptyState">
             <h3>No estimate yet</h3>
             <p>
               Paste a Bicep template on the left and run the estimator to see per-resource cost

@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;700&display=swap');
+
 :root {
   --ifm-color-primary: hsl(152, 52%, 35%); /* Same as #2e8555 */
 
@@ -24,4 +26,160 @@
   --ifm-color-primary-darkest:  color-mix(in srgb, var(--ifm-color-primary), black 45%);
 
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
+
+.playground {
+  --playground-border: rgba(20, 119, 94, 0.24);
+  --playground-ink: #13231b;
+  --playground-muted: #4d665b;
+}
+
+[data-theme='dark'] .playground {
+  --playground-border: rgba(132, 210, 181, 0.24);
+  --playground-ink: #f3f7f4;
+  --playground-muted: #b3c8bc;
+}
+
+.playground h2,
+.playground__emptyState h3,
+.playground__warningPanel h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.03em;
+}
+
+.playground__panelHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.playground__panelHeader h2 {
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.playground__editorActions {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.playground__button {
+  background: rgba(20, 119, 94, 0.08);
+  border: 1px solid var(--playground-border);
+  color: var(--playground-ink);
+  cursor: pointer;
+  padding: 0.7rem 1rem;
+}
+
+.playground__button:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.playground__editor {
+  background: #13231b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f9f5e7;
+  font-family: 'IBM Plex Mono', monospace;
+  line-height: 1.5;
+  margin-bottom: 1em;
+  min-height: 560px;
+  padding: 0.8rem 1.1rem;
+  resize: vertical;
+  width: 100%;
+}
+
+.playground__helperRow {
+  display: flex;
+  justify-content: space-between;
+}
+
+.playground__helperRow p {
+  color: var(--playground-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 54ch;
+}
+
+.playground__summaryGrid {
+  display: grid;
+  gap: 0.9rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-block: 1rem;
+}
+
+.playground__summaryCard span {
+  display: block;
+  font-size: 0.85rem;
+}
+
+.playground__summaryCard strong {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.5rem;
+}
+
+.playground__errorBanner,
+.playground__warningPanel,
+.playground__emptyState {
+  border-radius: 18px;
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+}
+
+.playground__errorBanner {
+  background: rgba(180, 44, 44, 0.12);
+  border: 1px solid rgba(180, 44, 44, 0.2);
+  color: #8d231f;
+  font-weight: 600;
+}
+
+.playground__warningPanel {
+  background: rgba(246, 183, 60, 0.14);
+  border: 1px solid rgba(246, 183, 60, 0.24);
+}
+
+.playground__warningPanel h3,
+.playground__emptyState h3 {
+  font-size: 1.15rem;
+  margin: 0 0 0.55rem;
+}
+
+.playground__warningPanel ul {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.playground__warningPanel li,
+.playground__emptyState p {
+  color: var(--playground-muted);
+  line-height: 1.6;
+}
+
+.playground__table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.playground__table th,
+.playground__table td {
+  border-bottom: 1px solid var(--playground-border);
+  padding: 0.8rem 0.7rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.playground__table th {
+  color: var(--playground-muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.playground__table td:nth-child(4),
+.playground__table td:nth-child(5),
+.playground__table th:nth-child(4),
+.playground__table th:nth-child(5) {
+  white-space: nowrap;
 }
