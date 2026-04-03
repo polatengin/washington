@@ -1,6 +1,33 @@
 import {themes as prismThemes} from 'prism-react-renderer';
+import type {PluginOptions} from '@docusaurus/plugin-content-docs';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+
+const doc = (id: string) => ({
+  type: 'doc' as const,
+  id,
+});
+
+const category = (label: string, items: readonly string[]) => ({
+  type: 'category' as const,
+  label,
+  items: items.map(doc),
+});
+
+const docsSidebar = [
+  doc('introduction'),
+  doc('playground/index'),
+  doc('getting-started'),
+  category('CLI', ['cli/commands', 'cli/configuration']),
+  category('VS Code Extension', ['vscode-extension/index', 'vscode-extension/settings']),
+  category('GitHub Action', ['github-action/index', 'github-action/examples']),
+  category('Guides', [
+    'guides/contributing',
+    'guides/how-estimates-work',
+    'guides/supported-resources',
+    'guides/troubleshooting',
+  ]),
+] satisfies Awaited<ReturnType<PluginOptions['sidebarItemsGenerator']>>;
 
 const config: Config = {
   title: 'Bicep Cost Estimator',
@@ -35,9 +62,9 @@ const config: Config = {
       'classic',
       {
         docs: {
-          sidebarPath: './sidebars.ts',
           path: '../../docs',
           routeBasePath: '/',
+          sidebarItemsGenerator: () => docsSidebar,
           editUrl:
             'https://github.com/polatengin/washington/tree/main/',
         },
