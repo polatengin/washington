@@ -173,30 +173,28 @@ export default function Playground() {
               </div>
             ) : null}
 
-            <div className={styles.tableShell}>
-              <table>
-                <thead>
-                  <tr>
-                    <th>Resource</th>
-                    <th>Type</th>
-                    <th>Details</th>
-                    <th>Hourly</th>
-                    <th>Monthly</th>
+            <table>
+              <thead>
+                <tr>
+                  <th>Resource</th>
+                  <th>Type</th>
+                  <th>Details</th>
+                  <th>Hourly</th>
+                  <th>Monthly</th>
+                </tr>
+              </thead>
+              <tbody>
+                {report.lines.map(line => (
+                  <tr key={`${line.resourceType}:${line.resourceName}`}>
+                    <td>{line.resourceName}</td>
+                    <td>{line.resourceType}</td>
+                    <td>{line.pricingDetails}</td>
+                    <td>{hourlyCurrency.format(line.hourlyCost)}</td>
+                    <td>{monthlyCurrency.format(line.monthlyCost)}</td>
                   </tr>
-                </thead>
-                <tbody>
-                  {report.lines.map(line => (
-                    <tr key={`${line.resourceType}:${line.resourceName}`}>
-                      <td>{line.resourceName}</td>
-                      <td>{line.resourceType}</td>
-                      <td>{line.pricingDetails}</td>
-                      <td>{hourlyCurrency.format(line.hourlyCost)}</td>
-                      <td>{monthlyCurrency.format(line.monthlyCost)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </>
         ) : (
           <div>

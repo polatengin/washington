@@ -118,33 +118,29 @@ button:disabled {
   line-height: 1.6;
 }
 
-.tableShell {
-  margin-top: 1rem;
-  overflow-x: auto;
-}
-
-.tableShell table {
+section table {
   border-collapse: collapse;
   width: 100%;
-}
 
-.tableShell th,
-.tableShell td {
-  border-bottom: 1px solid var(--playground-border);
-  padding: 0.8rem 0.7rem;
-  text-align: left;
-  vertical-align: top;
-}
+  & th, & td {
+    border-bottom: 1px solid var(--playground-border);
+    padding: 0.8rem 0.7rem;
+    text-align: left;
+    vertical-align: top;
+  }
 
-.tableShell th {
-  color: var(--playground-muted);
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
+  & th {
+    color: var(--playground-muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
 
-.tableShell td:nth-child(4),
-.tableShell td:nth-child(5) {
-  white-space: nowrap;
+  & td:nth-child(4),
+  & td:nth-child(5),
+  & th:nth-child(4),
+  & th:nth-child(5) {
+    white-space: nowrap;
+  }
 }
