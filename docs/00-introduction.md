@@ -8,12 +8,15 @@ sidebar_position: 0
 
 `Bicep Cost Estimator` (_bce_) is an open-source tool that estimates the cost of your Azure infrastructure **before** you deploy it. It works with Bicep and ARM templates.
 
+## Install the CLI
+
+```bash
+curl -sL https://bicepcostestimator.net/install.sh | bash
+```
+
 ## Quick Start
 
 ```bash
-# Install the CLI
-curl -sL https://bicepcostestimator.net/install.sh | bash
-
 # Estimate costs for a Bicep file
 bce estimate --file main.bicep
 ```
