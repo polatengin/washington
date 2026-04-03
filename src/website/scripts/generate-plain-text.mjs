@@ -182,7 +182,7 @@ function renderCodeBlock(lines, language) {
 }
 
 function isTableSeparator(line) {
-  return /^\s*\|?[\s:-|]+\|?\s*$/.test(line);
+  return /^\s*\|?[-\s:|]+\|?\s*$/.test(line);
 }
 
 function isTableStart(lines, index) {
