@@ -19,7 +19,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Getting Started',
-      items: ['getting-started/index'],
+      items: ['getting-started'],
     },
     {
       type: 'category',
