@@ -426,26 +426,20 @@ async function buildIndex(files) {
 
   return [
     terminalFavicon,
-    '',
     paint('Bicep Cost Estimator', ansi.bold, fg(palette.mint)),
     paint('Estimate Azure costs directly from Bicep and ARM templates.', ansi.italic, fg(palette.sage)),
     `${paint('site:', ansi.bold, fg(palette.leaf))} ${paint(siteUrl, fg(palette.sky), ansi.underline)}`,
     `${paint('repo:', ansi.bold, fg(palette.leaf))} ${paint('https://github.com/polatengin/washington', fg(palette.sky), ansi.underline)}`,
-    gradientBar(60),
     '',
     renderBox('About', [
-      formatInline('`bce` estimates monthly Azure costs **before** deployment.'),
-      'Use the CLI, the VS Code extension, the GitHub Action,',
-      'or the docs and plain-text pages below.',
+      formatInline('Bicep Cost Estimator (`bce`) estimates monthly Azure costs **before** deployment.'),
+      'Use the CLI, the VS Code extension, the GitHub Action, or the docs and plain-text pages below.',
     ], 72),
     '',
-    renderBox('Pages', paths.map(path => `${paint('•', fg(palette.leaf))} ${paint(path, fg(palette.sky), ansi.underline)}`), 72),
+    renderBox('Pages', paths.map(path => `${paint('$ curl https://bicepcostestimator.net', fg(palette.leaf))}${paint(path, fg(palette.sky), ansi.underline)}`), 72),
     '',
-    renderBox('Quick Commands', [
-      `${paint('$', fg(palette.leaf))} ${paint(`curl ${siteUrl}/`, ansi.bold, fg(palette.gold))} ${paint('this page', ansi.italic, fg(palette.dim))}`,
-      `${paint('$', fg(palette.leaf))} ${paint(`curl ${siteUrl}/getting-started`, ansi.bold, fg(palette.gold))}`,
-      `${paint('$', fg(palette.leaf))} ${paint(`curl ${siteUrl}/cli/commands`, ansi.bold, fg(palette.gold))}`,
-      `${paint('$', fg(palette.leaf))} ${paint(`curl -sL ${siteUrl}/install.sh | bash`, ansi.bold, fg(palette.gold))} ${paint('install bce', ansi.italic, fg(palette.dim))}`,
+    renderBox('Install Bicep Cost Estimator', [
+      `${paint('$', fg(palette.leaf))} ${paint(`curl -sL ${siteUrl}/install.sh | bash`, ansi.bold, fg(palette.gold))}`,
     ], 72),
     '',
   ].join('\n');
