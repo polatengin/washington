@@ -32,10 +32,10 @@ make setup-website
 
 ```bash
 make setup-website
-npm --prefix src/website start
+make dev-website
 ```
 
-This starts a local development server at `http://localhost:3000`.
+This starts the local docs stack at `http://localhost:3000` through the Express server, proxies browser traffic to Docusaurus with live reload, and serves the curl/plain-text pages. If you also want the playground API locally, build the CLI first with `make build-cli`.
 
 ## Submitting Changes
 

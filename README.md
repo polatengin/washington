@@ -66,6 +66,7 @@ make build-extension
 
 make setup-website
 make build-website
+make dev-website
 ```
 
 The repository depends on the embedded `bicep` submodule, so use `make setup-cli` or `git submodule update --init --recursive` before building from a fresh clone.

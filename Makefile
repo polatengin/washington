@@ -3,7 +3,7 @@ SHELL := bash
 
 .DEFAULT_GOAL := help
 
-.PHONY: help info setup-cli setup-extension setup-website clean build-cli build-extension build-website test-cli test-extension package-cli
+.PHONY: help info setup-cli setup-extension setup-website clean build-cli build-extension build-website dev-website test-cli test-extension package-cli
 
 help:
 	@echo "Washington development targets"
@@ -52,7 +52,7 @@ build-extension: clean ## Build the VS Code extension
 build-website: clean ## Build the documentation website
 	npm --prefix src/website run build
 
-dev-website: clean ## Run the documentation website locally with live reload
+dev-website: ## Run the documentation website locally with live reload and curl support
 	npm --prefix src/website run dev
 
 test-cli: build-cli ## Run the CLI test suite

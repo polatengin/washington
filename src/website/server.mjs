@@ -3,18 +3,47 @@ import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, join } from 'node:path';
+import { dirname, isAbsolute, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const buildDir = join(__dirname, 'build');
-const textDir = join(buildDir, 'text');
 const bceBinaryPath = process.env.BCE_BINARY_PATH || join(__dirname, 'bin', 'bce');
+const docsProxyTarget = process.env.DOCS_PROXY_TARGET?.trim();
+
+function resolveRuntimePath(value) {
+  if (!value) {
+    return null;
+  }
+
+  return isAbsolute(value) ? value : join(__dirname, value);
+}
+
+const textDir = resolveRuntimePath(process.env.TEXT_DIR)
+  || (existsSync(join(buildDir, 'text')) ? join(buildDir, 'text') : join(__dirname, 'static', 'text'));
 
 const PORT = process.env.PORT || 3000;
 const ESTIMATE_TIMEOUT_MS = Number(process.env.BCE_ESTIMATE_TIMEOUT_MS || 60000);
 const MAX_SOURCE_LENGTH = Number(process.env.BCE_PLAYGROUND_MAX_SOURCE_LENGTH || 200000);
 const app = express();
+let docsProxy;
+
+if (docsProxyTarget) {
+  const proxyModule = await import('http-proxy-middleware');
+  const createProxyMiddleware = proxyModule.createProxyMiddleware
+    || proxyModule.default?.createProxyMiddleware;
+
+  if (!createProxyMiddleware) {
+    throw new Error('Could not load http-proxy-middleware.');
+  }
+
+  docsProxy = createProxyMiddleware({
+    target: docsProxyTarget,
+    changeOrigin: true,
+    ws: true,
+    logLevel: 'warn',
+  });
+}
 
 app.disable('x-powered-by');
 app.use(express.json({ limit: '256kb' }));
@@ -213,17 +242,25 @@ app.use((req, res, next) => {
   return res.send('404 - Page not found\n\nRun: curl https://bicepcostestimator.net/ for available pages.\n');
 });
 
-// Browser: serve Docusaurus static build
-app.use(express.static(buildDir, { index: ['index.html'] }));
+if (docsProxy) {
+  app.use((req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+      return next();
+    }
 
-// SPA fallback for client-side routing
-app.get('/{*splat}', (req, res) => {
-  const indexHtml = join(buildDir, 'index.html');
-  if (existsSync(indexHtml)) {
-    return res.sendFile(indexHtml);
-  }
-  res.status(404).send('Not found');
-});
+    return docsProxy(req, res, next);
+  });
+} else {
+  app.use(express.static(buildDir, { index: ['index.html'] }));
+
+  app.get('/{*splat}', (req, res) => {
+    const indexHtml = join(buildDir, 'index.html');
+    if (existsSync(indexHtml)) {
+      return res.sendFile(indexHtml);
+    }
+    res.status(404).send('Not found');
+  });
+}
 
 app.use((error, req, res, next) => {
   if (!req.path.startsWith('/api/')) {
@@ -238,6 +275,15 @@ app.use((error, req, res, next) => {
   return res.status(500).json({ error: 'Internal server error.' });
 });
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
+  if (docsProxyTarget) {
+    console.log(`Washington docs server listening on port ${PORT} and proxying browser traffic to ${docsProxyTarget}`);
+    return;
+  }
+
   console.log(`Washington docs server listening on port ${PORT}`);
 });
+
+if (docsProxy?.upgrade) {
+  server.on('upgrade', docsProxy.upgrade);
+}
