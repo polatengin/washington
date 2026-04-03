@@ -32,7 +32,7 @@ const docsSidebar = [
 const config: Config = {
   title: 'Bicep Cost Estimator',
   tagline: 'Azure Cost Estimator',
-  favicon: 'img/logo.svg',
+  favicon: 'assets/logo.svg',
   url: 'https://bicepcostestimator.net',
 
   future: {
@@ -70,14 +70,14 @@ const config: Config = {
         },
         blog: false,
         theme: {
-          customCss: './src/css/custom.css',
+          customCss: './static/assets/custom.css',
         },
       } satisfies Preset.Options,
     ],
   ],
 
   themeConfig: {
-    image: 'img/social-card.jpg',
+    image: 'assets/social-card.png',
     colorMode: {
       respectPrefersColorScheme: true,
     },
@@ -85,7 +85,7 @@ const config: Config = {
       title: 'Bicep Cost Estimator',
       logo: {
         alt: 'Bicep Cost Estimator Logo',
-        src: 'img/logo.svg',
+        src: 'assets/logo.svg',
       },
       items: [
         {
