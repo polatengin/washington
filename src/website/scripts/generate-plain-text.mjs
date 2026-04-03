@@ -123,7 +123,7 @@ async function buildIndex(files) {
 
   lines.push('');
   lines.push('Usage:');
-  lines.push('  curl https://bicepcostestimator.net/              # this page');
+  lines.push('  curl https://bicepcostestimator.net/');
   lines.push('  curl https://bicepcostestimator.net/getting-started');
   lines.push('  curl https://bicepcostestimator.net/cli/commands');
   lines.push('');
