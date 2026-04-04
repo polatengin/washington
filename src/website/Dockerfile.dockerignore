@@ -3,7 +3,9 @@ node_modules/
 .git/
 .github/
 src/vscode-extension/
-tests/
+tests/*
+!tests/fixtures/
+!tests/fixtures/**
 *.sln
 *.md
 !CONTRIBUTING.md
