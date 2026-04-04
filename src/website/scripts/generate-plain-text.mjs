@@ -3,7 +3,10 @@
 import { readdir, readFile, writeFile, mkdir, rm } from 'node:fs/promises';
 import { join, relative, dirname, basename, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import terminalImage from 'terminal-image';
+
+process.env.FORCE_COLOR = '3';
+
+const { default: terminalImage } = await import('terminal-image');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..', '..', '..');
