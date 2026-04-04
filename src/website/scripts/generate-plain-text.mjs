@@ -140,13 +140,20 @@ function formatInline(text) {
 }
 
 function renderBox(title, lines, minWidth = 0) {
-  const body = title ? [paint(title, ansi.bold, fg(palette.mint)), '', ...lines] : lines;
-  const innerWidth = Math.max(minWidth, 0, ...body.map(line => visibleLength(line)));
+  const innerWidth = Math.max(
+    minWidth,
+    0,
+    ...lines.map(line => visibleLength(line)),
+    title ? visibleLength(title) + 3 : 0,
+  );
   const border = value => paint(value, fg(palette.pine));
+  const topBorder = title
+    ? `${border('┌─')}${paint(` ${title} `, ansi.bold, fg(palette.mint))}${border(`${'─'.repeat(Math.max(0, innerWidth - visibleLength(title) - 3))}┐`)}`
+    : border(`┌${'─'.repeat(innerWidth)}┐`);
 
   return [
-    border(`┌${'─'.repeat(innerWidth)}┐`),
-    ...body.map(line => `${border('│')}${padRight(line, innerWidth)}${border('│')}`),
+    topBorder,
+    ...lines.map(line => `${border('│')}${padRight(line, innerWidth)}${border('│')}`),
     border(`└${'─'.repeat(innerWidth)}┘`),
   ].join('\n');
 }
