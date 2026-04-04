@@ -70,7 +70,7 @@ const config: Config = {
         },
         blog: false,
         theme: {
-          customCss: './static/assets/custom.css',
+          customCss: './static/assets/bundle.css',
         },
       } satisfies Preset.Options,
     ],
