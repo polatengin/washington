@@ -68,6 +68,9 @@ export default function Playground() {
     setSelectedFixtureId(fixtureId);
 
     if (!fixtureId) {
+      setReport(null);
+      setError(null);
+      setSource('');
       return;
     }
 
@@ -136,18 +139,6 @@ export default function Playground() {
                 ))}
               </select>
             </div>
-            <button
-              className="playground__button"
-              type="button"
-              onClick={() => {
-                setSelectedFixtureId('');
-                setReport(null);
-                setError(null);
-                setSource('');
-              }}
-            >
-              Clear
-            </button>
           </div>
         </div>
 
