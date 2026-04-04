@@ -4,7 +4,6 @@ import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import BrowserOnly from '@docusaurus/BrowserOnly';
-import styles from './search.module.css';
 
 interface SearchResult {
   title: string;
@@ -167,10 +166,10 @@ function SearchContent() {
   }, [loading, query, runSearch]);
 
   return (
-    <div className={styles.searchContainer}>
-      <div className={styles.inputWrapper}>
+    <div className="searchPage">
+      <div className="searchPage__inputWrapper">
         <svg
-          className={styles.searchIcon}
+          className="searchPage__icon"
           width="20"
           height="20"
           viewBox="0 0 24 24"
@@ -184,7 +183,7 @@ function SearchContent() {
         </svg>
         <input
           type="text"
-          className={styles.searchInput}
+          className="searchPage__input"
           placeholder="Search documentation..."
           value={query}
           onChange={event => setQuery(event.target.value)}
@@ -192,26 +191,26 @@ function SearchContent() {
         />
       </div>
 
-      {error && <div className={styles.statusError}>{error}</div>}
+      {error && <div className="searchPage__statusError">{error}</div>}
 
       {!loading && !error && query.trim() && results.length === 0 && (
-        <div className={styles.resultCount}>No results found for &ldquo;{query.trim()}&rdquo;</div>
+        <div className="searchPage__resultCount">No results found for &ldquo;{query.trim()}&rdquo;</div>
       )}
 
       {results.length > 0 && (
-        <div className={styles.results}>
-          <p className={styles.resultCount}>
+        <div className="searchPage__results">
+          <p className="searchPage__resultCount">
             {results.length} result{results.length === 1 ? '' : 's'} found
           </p>
 
           {results.map(result => (
-            <Link key={`${result.href}:${result.title}`} to={result.href} className={styles.resultCard}>
-              <div className={styles.resultHeader}>
-                <span className={styles.resultTitle}>{result.title}</span>
-                <span className={styles.resultCategory}>{result.category}</span>
+            <Link key={`${result.href}:${result.title}`} to={result.href} className="searchPage__resultCard">
+              <div className="searchPage__resultHeader">
+                <span className="searchPage__resultTitle">{result.title}</span>
+                <span className="searchPage__resultCategory">{result.category}</span>
               </div>
 
-              {result.body && <p className={styles.resultBody}>{result.body}</p>}
+              {result.body && <p className="searchPage__resultBody">{result.body}</p>}
             </Link>
           ))}
         </div>
