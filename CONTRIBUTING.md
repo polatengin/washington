@@ -8,7 +8,7 @@ We welcome contributions to Washington! This guide explains how to set up a deve
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Node.js 20+](https://nodejs.org/)
-- GNU Make
+- [GNU Make](https://www.gnu.org/software/make/)
 - [Docker](https://www.docker.com/) (for website development)
 
 ### Clone and Build
