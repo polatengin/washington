@@ -32,12 +32,18 @@ setup-cli: ## Initialize submodules and restore .NET dependencies
 setup-extension: ## Install VS Code extension dependencies
 	npm ci --prefix src/vscode-extension
 
-setup-website: ## Install website dependencies
+
+setup-website: ## Install website dependencies and docfind
 	npm ci --prefix src/website
+	@if command -v docfind >/dev/null 2>&1 || [ -x "$$HOME/.local/bin/docfind" ]; then \
+		echo "docfind is already installed"; \
+	else \
+		curl -fsSL https://microsoft.github.io/docfind/install.sh | sh; \
+	fi
 
 clean: ## Remove generated outputs
 	dotnet clean washington.slnx
-	rm -rf src/vscode-extension/bin src/vscode-extension/dist src/vscode-extension/out src/website/build src/website/.docusaurus src/website/static/text publish
+	rm -rf src/vscode-extension/bin src/vscode-extension/dist src/vscode-extension/out src/website/build src/website/.docusaurus src/website/static/docfind src/website/static/text publish
 
 build-cli: clean ## Build the BCE CLI
 	dotnet build src/cli/washington.csproj --configuration Release

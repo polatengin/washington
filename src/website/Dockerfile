@@ -11,7 +11,9 @@ COPY src/cli/Mappers/ ./src/cli/Mappers/
 # Copy website source
 COPY src/website/package*.json ./src/website/
 WORKDIR /app/src/website
+RUN apk add --no-cache curl
 RUN npm ci
+RUN curl -fsSL https://microsoft.github.io/docfind/install.sh | sh
 
 # Copy website source files
 COPY src/website/ ./

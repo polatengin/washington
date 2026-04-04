@@ -186,8 +186,13 @@ async function generatePlainText() {
   await runCommand('Generating plain-text documentation...', nodeCommand, [join(__dirname, 'generate-plain-text.mjs')]);
 }
 
+async function generateSearchIndex() {
+  await runCommand('Generating website search index...', nodeCommand, [join(__dirname, 'generate-search-index.mjs')]);
+}
+
 async function cleanupGeneratedFiles() {
   await runCommand('Cleaning up generated documentation...', nodeCommand, [join(__dirname, 'generate-plain-text.mjs'), '--cleanup']);
+  await runCommand('Cleaning up website search index...', nodeCommand, [join(__dirname, 'generate-search-index.mjs'), '--cleanup']);
 }
 
 async function startDocusaurus() {
@@ -294,6 +299,7 @@ if (!(await hasCliBinary())) {
 
 await generateSupportedResources();
 await generatePlainText();
+await generateSearchIndex();
 await startDocusaurus();
 startExpress();
 
@@ -307,8 +313,11 @@ watchFiles(
   (eventName, filePath) => {
     debounce(
       'plain-text',
-      `Regenerating plain-text docs after ${eventName} in ${rel(filePath)}...`,
-      generatePlainText
+      `Regenerating plain-text docs and search index after ${eventName} in ${rel(filePath)}...`,
+      async () => {
+        await generatePlainText();
+        await generateSearchIndex();
+      }
     );
   },
   filePath => filePath === generatedContributingPath

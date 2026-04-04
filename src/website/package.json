@@ -5,10 +5,10 @@
   "scripts": {
     "docusaurus": "docusaurus",
     "generate:supported-resources": "node scripts/generate-supported-resources.mjs",
-    "prebuild": "node scripts/generate-supported-resources.mjs && node scripts/generate-plain-text.mjs",
+    "prebuild": "node scripts/generate-supported-resources.mjs && node scripts/generate-plain-text.mjs && node scripts/generate-search-index.mjs",
     "start": "docusaurus start",
     "build": "docusaurus build",
-    "postbuild": "node scripts/generate-plain-text.mjs --cleanup",
+    "postbuild": "node scripts/generate-search-index.mjs --cleanup && node scripts/generate-plain-text.mjs --cleanup",
     "dev": "node scripts/dev.mjs",
     "preview": "npm run build && node server.mjs",
     "swizzle": "docusaurus swizzle",

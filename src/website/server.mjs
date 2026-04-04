@@ -71,7 +71,7 @@ function isCLIClient(req) {
 }
 
 // File extensions that should be served as-is (not routed through text/)
-const STATIC_EXTENSIONS = /\.(sh|js|css|json|xml|svg|png|jpg|jpeg|gif|ico|woff2?|ttf|eot|map|txt)$/i;
+const STATIC_EXTENSIONS = /\.(sh|js|css|json|xml|svg|png|jpg|jpeg|gif|ico|woff2?|ttf|eot|map|txt|wasm)$/i;
 
 function createHttpError(status, message, details) {
   const error = new Error(message);
