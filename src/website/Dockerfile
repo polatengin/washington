@@ -3,10 +3,11 @@ FROM node:22-alpine AS website-build
 
 WORKDIR /app
 
-# Copy docs and root CONTRIBUTING.md
+# Copy repository inputs consumed by website prebuild scripts
 COPY docs/ ./docs/
 COPY CONTRIBUTING.md ./CONTRIBUTING.md
 COPY src/cli/Mappers/ ./src/cli/Mappers/
+COPY tests/fixtures/ ./tests/fixtures/
 
 # Copy website source
 COPY src/website/package*.json ./src/website/
