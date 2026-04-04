@@ -294,6 +294,10 @@ async function renderMarkdownPage(markdown, route) {
     index += 1;
   }
 
+  while (index < lines.length && !lines[index].trim()) {
+    index += 1;
+  }
+
   output.push(await renderHero(title, toAbsoluteUrl(route)));
 
   while (index < lines.length) {
