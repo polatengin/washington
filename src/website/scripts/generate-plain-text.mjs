@@ -259,14 +259,14 @@ function renderTable(headers, rows) {
 function renderSection(line) {
   const title = line.replace(/^##\s+/, '').trim();
   return [
-    `${paint('◆', ansi.bold, fg(palette.leaf))} ${formatInline(title)}`,
+    `${paint(formatInline(title), ansi.bold, fg(palette.leaf))}`,
     paint('─'.repeat(Math.max(18, stripMarkdown(title).length + 2)), fg(palette.pine)),
   ];
 }
 
 function renderSubsection(line) {
   const title = line.replace(/^#{3,6}\s+/, '').trim();
-  return [`${paint('›', ansi.bold, fg(palette.sage))} ${formatInline(title)}`];
+  return [`${paint('>', ansi.bold, fg(palette.sage))} ${formatInline(title)}`];
 }
 
 function isSpecialLine(line, nextLine = '') {
