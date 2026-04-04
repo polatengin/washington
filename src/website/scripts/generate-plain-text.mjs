@@ -98,17 +98,6 @@ function renderColumns(left, right, gap = 3) {
   }).join('\n');
 }
 
-function interpolateColor(start, end, ratio) {
-  return start.map((value, index) => Math.round(value + (end[index] - value) * ratio));
-}
-
-function gradientBar(width) {
-  return Array.from({ length: width }, (_, index) => {
-    const ratio = width === 1 ? 1 : index / (width - 1);
-    return paint('▀', fg(interpolateColor(palette.forest, palette.mint, ratio)));
-  }).join('');
-}
-
 function storeToken(tokens, value) {
   const token = `\u0000${tokens.length}\u0000`;
   tokens.push(value);
@@ -162,13 +151,23 @@ function renderBox(title, lines, minWidth = 0) {
   ].join('\n');
 }
 
-function renderPageHeader(title, route) {
+async function renderPageHeader(title, route) {
   return [
-    paint('Bicep Cost Estimator', ansi.bold, fg(palette.mint)),
-    paint(title, ansi.bold, fg(palette.leaf)),
-    paint(toAbsoluteUrl(route), ansi.italic, fg(palette.sky), ansi.underline),
-    gradientBar(Math.max(28, Math.min(64, stripMarkdown(title).length + 12))),
     '',
+    (renderColumns((await terminalImage.file(faviconPath, {
+      width: 30,
+    })), [
+      ...Array.from({
+        length: Math.max(0, Math.floor(((await terminalImage.file(faviconPath, {
+          width: 30,
+        })).split('\n').length - 4) / 2))
+      }, () => ''),
+      paint('Bicep Cost Estimator', ansi.bold, fg(palette.mint)),
+      paint('Estimate Azure costs directly from Bicep and ARM templates.', ansi.italic, fg(palette.sage)),
+      `${paint('title :', ansi.bold, fg(palette.leaf))} ${paint(title, fg(palette.sky))}`,
+      `${paint('page  :', ansi.bold, fg(palette.leaf))} ${paint(toAbsoluteUrl(route), fg(palette.sky), ansi.underline)}`,
+      `${paint('repo  :', ansi.bold, fg(palette.leaf))} ${paint('https://github.com/polatengin/washington', fg(palette.sky), ansi.underline)}`,
+    ])),
   ];
 }
 
@@ -280,7 +279,7 @@ function isSpecialLine(line, nextLine = '') {
     || /^>\s+/.test(line);
 }
 
-function renderMarkdownPage(markdown, route) {
+async function renderMarkdownPage(markdown, route) {
   const lines = markdown.replace(/\r/g, '').split('\n');
   const output = [];
   let index = 0;
@@ -295,11 +294,10 @@ function renderMarkdownPage(markdown, route) {
     index += 1;
   }
 
-  output.push(...renderPageHeader(title, route));
+  output.push(...await renderPageHeader(title, route));
 
   while (index < lines.length) {
     const line = lines[index];
-    const nextLine = lines[index + 1] ?? '';
 
     if (!line.trim()) {
       if (output.at(-1) !== '') {
@@ -432,19 +430,17 @@ function toRoutePath(outPath) {
 }
 
 async function buildIndex(files) {
-  const terminalFavicon = await terminalImage.file(faviconPath, {
-    width: 30,
-  });
-  const heroText = [
+  const hero = renderColumns((await terminalImage.file(faviconPath, {
+      width: 30,
+    })), [
+    ...Array.from({ length: Math.max(0, Math.floor(((await terminalImage.file(faviconPath, {
+      width: 30,
+    })).split('\n').length - 4) / 2)) }, () => ''),
     paint('Bicep Cost Estimator', ansi.bold, fg(palette.mint)),
     paint('Estimate Azure costs directly from Bicep and ARM templates.', ansi.italic, fg(palette.sage)),
-    `${paint('site:', ansi.bold, fg(palette.leaf))} ${paint(siteUrl, fg(palette.sky), ansi.underline)}`,
-    `${paint('repo:', ansi.bold, fg(palette.leaf))} ${paint('https://github.com/polatengin/washington', fg(palette.sky), ansi.underline)}`,
-  ];
-  const heroTopPadding = Math.max(0, Math.floor((terminalFavicon.split('\n').length - heroText.length) / 2));
-  const hero = renderColumns(terminalFavicon, [
-    ...Array.from({ length: heroTopPadding }, () => ''),
-    ...heroText,
+    `${paint('title :', ansi.bold, fg(palette.leaf))} ${paint("Introduction", fg(palette.sky))}`,
+    `${paint('page  :', ansi.bold, fg(palette.leaf))} ${paint(siteUrl, fg(palette.sky), ansi.underline)}`,
+    `${paint('repo  :', ansi.bold, fg(palette.leaf))} ${paint('https://github.com/polatengin/washington', fg(palette.sky), ansi.underline)}`,
   ]);
 
   const paths = files
@@ -456,15 +452,13 @@ async function buildIndex(files) {
     '',
     hero,
     renderBox('About', [
-      formatInline('Bicep Cost Estimator (`bce`) estimates monthly Azure costs **before** deployment.'),
-      'Use the CLI, the VS Code extension, the GitHub Action, or the docs and plain-text pages below.',
-    ], 72),
-    '',
-    renderBox('Pages', paths.map(path => `${paint('$ curl https://bicepcostestimator.net', fg(palette.leaf))}${paint(path, fg(palette.sky), ansi.underline)}`), 72),
-    '',
+      formatInline('_Bicep Cost Estimator_ (`bce`) estimates monthly Azure costs **before** deployment.'),
+      'Use the CLI, the VS Code extension, the GitHub Action, or the docs.',
+    ], 80),
+    renderBox('Pages', paths.map(path => `${paint('$ curl ', fg(palette.leaf))}${paint("https://bicepcostestimator.net" + path, fg(palette.sky), ansi.underline)}`), 80),
     renderBox('Install Bicep Cost Estimator', [
-      `${paint('$', fg(palette.leaf))} ${paint(`curl -sL ${siteUrl}/install.sh | bash`, ansi.bold, fg(palette.gold))}`,
-    ], 72),
+      `${paint('$ curl', fg(palette.leaf))} ${paint("-sL", ansi.bold, fg(palette.gold))} ${paint("https://bicepcostestimator.net/install.sh", ansi.bold, fg(palette.sky), ansi.underline)} ${paint("| bash", fg(palette.dim))}`,
+    ], 80),
     '',
   ].join('\n');
 }
@@ -489,7 +483,7 @@ for (const mdFile of mdFiles) {
   const cleaned = stripFrontmatter(content).trim();
   const outPath = toOutputPath(mdFile);
   const route = toRoutePath(outPath);
-  const rendered = renderMarkdownPage(cleaned, route);
+  const rendered = await renderMarkdownPage(cleaned, route);
 
   await mkdir(dirname(outPath), { recursive: true });
   await writeFile(outPath, rendered, 'utf-8');
