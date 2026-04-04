@@ -4,8 +4,11 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
+    "generate:playground-fixtures": "node scripts/generate-playground-fixtures.mjs",
     "generate:supported-resources": "node scripts/generate-supported-resources.mjs",
-    "prebuild": "node scripts/generate-supported-resources.mjs && node scripts/generate-plain-text.mjs && node scripts/generate-search-index.mjs",
+    "prestart": "node scripts/generate-playground-fixtures.mjs",
+    "prebuild": "node scripts/generate-playground-fixtures.mjs && node scripts/generate-supported-resources.mjs && node scripts/generate-plain-text.mjs && node scripts/generate-search-index.mjs",
+    "pretypecheck": "node scripts/generate-playground-fixtures.mjs",
     "start": "docusaurus start",
     "build": "docusaurus build",
     "postbuild": "node scripts/generate-search-index.mjs --cleanup && node scripts/generate-plain-text.mjs --cleanup",

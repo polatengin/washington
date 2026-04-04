@@ -1,4 +1,6 @@
-import React, { FormEvent, useState } from 'react';
+import React, { ChangeEvent, FormEvent, useState } from 'react';
+
+import { playgroundFixtures } from '../generated/playgroundFixtures';
 
 type ResourceCostLine = {
   resourceType: string;
@@ -51,11 +53,33 @@ const hourlyCurrency = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 4,
 });
 
+const defaultFixture = playgroundFixtures.find(fixture => fixture.id === 'showcase.bicep')
+  ?? playgroundFixtures[0];
+
 export default function Playground() {
-  const [source, setSource] = useState(sampleTemplate);
+  const [source, setSource] = useState(defaultFixture?.source ?? sampleTemplate);
+  const [selectedFixtureId, setSelectedFixtureId] = useState(defaultFixture?.id ?? '');
   const [report, setReport] = useState<CostReport | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function handleFixtureChange(event: ChangeEvent<HTMLSelectElement>) {
+    const fixtureId = event.target.value;
+    setSelectedFixtureId(fixtureId);
+
+    if (!fixtureId) {
+      return;
+    }
+
+    const fixture = playgroundFixtures.find(candidate => candidate.id === fixtureId);
+    if (!fixture) {
+      return;
+    }
+
+    setReport(null);
+    setError(null);
+    setSource(fixture.source);
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -97,20 +121,26 @@ export default function Playground() {
           <h2>Template input</h2>
 
           <div className="playground__editorActions">
+            <div className="playground__fixturePicker">
+              <select
+                id="playground-fixture"
+                className="playground__select"
+                onChange={handleFixtureChange}
+                value={selectedFixtureId}
+              >
+                <option value="">Custom template</option>
+                {playgroundFixtures.map(fixture => (
+                  <option key={fixture.id} value={fixture.id}>
+                    {fixture.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             <button
               className="playground__button"
               type="button"
               onClick={() => {
-                setSource(sampleTemplate);
-                setError(null);
-              }}
-            >
-              Load sample
-            </button>
-            <button
-              className="playground__button"
-              type="button"
-              onClick={() => {
+                setSelectedFixtureId('');
                 setReport(null);
                 setError(null);
                 setSource('');
@@ -125,7 +155,10 @@ export default function Playground() {
           id="playground-source"
           className="playground__editor"
           value={source}
-          onChange={event => setSource(event.target.value)}
+          onChange={event => {
+            setSelectedFixtureId('');
+            setSource(event.target.value);
+          }}
           spellCheck={false}
           placeholder="resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = { ... }"
         />

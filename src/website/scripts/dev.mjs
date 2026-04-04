@@ -182,6 +182,10 @@ async function generateSupportedResources() {
   await runCommand('Updating supported resources documentation...', nodeCommand, [join(__dirname, 'generate-supported-resources.mjs')]);
 }
 
+async function generatePlaygroundFixtures() {
+  await runCommand('Generating playground fixtures...', nodeCommand, [join(__dirname, 'generate-playground-fixtures.mjs')]);
+}
+
 async function generatePlainText() {
   await runCommand('Generating plain-text documentation...', nodeCommand, [join(__dirname, 'generate-plain-text.mjs')]);
 }
@@ -297,11 +301,26 @@ if (!(await hasCliBinary())) {
   log(`CLI binary not found at ${bceBinaryPath}. The docs and curl routes will work, but /api/estimate needs a local CLI build.`);
 }
 
+await generatePlaygroundFixtures();
 await generateSupportedResources();
 await generatePlainText();
 await generateSearchIndex();
 await startDocusaurus();
 startExpress();
+
+watchFiles(
+  [
+    join(repoRoot, 'tests', 'fixtures', '**', '*.bicep'),
+    join(__dirname, 'generate-playground-fixtures.mjs'),
+  ],
+  (eventName, filePath) => {
+    debounce(
+      'playground-fixtures',
+      `Regenerating playground fixtures after ${eventName} in ${rel(filePath)}...`,
+      generatePlaygroundFixtures
+    );
+  }
+);
 
 watchFiles(
   [

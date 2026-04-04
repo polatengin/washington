@@ -48,7 +48,10 @@
 }
 
 .playground__panelHeader {
+  align-items: flex-end;
   display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
   justify-content: space-between;
   margin-bottom: 1rem;
 }
@@ -59,8 +62,17 @@
 }
 
 .playground__editorActions {
+  align-items: flex-end;
   display: flex;
+  flex-wrap: wrap;
   gap: 0.65rem;
+}
+
+.playground__fixturePicker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 16rem;
 }
 
 .playground__button {
@@ -68,7 +80,39 @@
   border: 1px solid var(--playground-border);
   color: var(--playground-ink);
   cursor: pointer;
+  min-height: 44px;
   padding: 0.7rem 1rem;
+}
+
+.playground__select {
+  appearance: none;
+  background: rgba(20, 119, 94, 0.08);
+  border: 1px solid var(--playground-border);
+  border-radius: 0;
+  color-scheme: light;
+  color: var(--playground-ink);
+  min-height: 44px;
+  padding: 0.7rem 0.85rem;
+}
+
+.playground__select option {
+  background: #f3f7f4;
+  color: #13231b;
+}
+
+[data-theme='dark'] .playground__select {
+  color-scheme: dark;
+}
+
+[data-theme='dark'] .playground__select option {
+  background: #13231b;
+  color: #f3f7f4;
+}
+
+.playground__select:focus,
+.playground__button:focus {
+  outline: 2px solid var(--ifm-color-primary-lightest);
+  outline-offset: 2px;
 }
 
 .playground__button:disabled {
@@ -182,6 +226,18 @@
 .playground__table th:nth-child(4),
 .playground__table th:nth-child(5) {
   white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .playground__helperRow {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .playground__summaryGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .searchPage {
@@ -300,6 +356,13 @@
 }
 
 @media (max-width: 640px) {
+  .playground__editorActions,
+  .playground__fixturePicker,
+  .playground__button,
+  .playground__select {
+    width: 100%;
+  }
+
   .searchPage {
     margin-top: 1.25rem;
     padding-inline: 0.75rem;
