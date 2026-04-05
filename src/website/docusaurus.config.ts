@@ -136,12 +136,6 @@ const config: Config = {
           position: 'right',
           className: 'navbar-issues-link',
         },
-        {
-          label: 'Discussions',
-          href: 'https://github.com/polatengin/washington/discussions',
-          position: 'right',
-          className: 'navbar-discussions-link',
-        },
       ],
     },
     prism: {
