@@ -7,12 +7,13 @@ import { fileURLToPath } from 'node:url';
 process.env.FORCE_COLOR = '3';
 
 const { default: terminalImage } = await import('terminal-image');
+const { Resvg } = await import('@resvg/resvg-js');
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..', '..', '..');
 const docsDir = join(repoRoot, 'docs');
 const outputDir = join(__dirname, '..', 'static', 'text');
-const faviconPath = join(__dirname, '..', 'static', 'assets', 'favicon-180x180.png');
+const logoPath = join(__dirname, '..', 'static', 'assets', 'logo.svg');
 const contributingSource = join(repoRoot, 'CONTRIBUTING.md');
 const contributingDest = join(docsDir, '50-guides', 'contributing.md');
 const siteUrl = 'https://bicepcostestimator.net';
@@ -158,8 +159,17 @@ function renderBox(title, lines, minWidth = 0) {
   ].join('\n');
 }
 
+async function renderTerminalAsset(filePath, options) {
+  const source = await readFile(filePath);
+  const imageBuffer = extname(filePath).toLowerCase() === '.svg'
+    ? new Resvg(source).render().asPng()
+    : source;
+
+  return terminalImage.buffer(imageBuffer, options);
+}
+
 async function renderHero(title, pageUrl) {
-  return renderColumns(await terminalImage.file(faviconPath, {width: 20}), [
+  return renderColumns(await renderTerminalAsset(logoPath, {width: 20}), [
     '',
     '',
     paint('Bicep Cost Estimator', ansi.bold, fg(palette.mint)),
