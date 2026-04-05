@@ -11,6 +11,6 @@
   <path d="M2 50L112 98L112 146L2 98Z" fill="#6ccf98" stroke="#1f5f3d" stroke-width="2"/>
   <path d="M112 98L248 50L248 98L112 146Z" fill="#5fbf8b" stroke="#1f5f3d" stroke-width="2"/>
 
-  <path d="M176 182 L212 182 L224 194 L224 254 L164 254 L164 194 Z" fill="#9fe8bf" stroke="#1f5f3d" stroke-width="2"/>
-  <text x="194" y="235" font-family="monospace" font-size="46" text-anchor="middle" fill="#1f5f3d">$</text>
+  <path d="M148 112 L212 112 L232 132 L232 254 L128 254 L128 132 Z" fill="#9fe8bf" stroke="#1f5f3d" stroke-width="2"/>
+  <text x="180" y="220" font-family="monospace" font-size="100" text-anchor="middle" fill="#1f5f3d">$</text>
 </svg>
