@@ -122,7 +122,7 @@ public class ResourceExtractor
         if (string.IsNullOrEmpty(value))
             return _defaultRegion;
 
-        // Not an ARM expression — use as-is
+        // Not an ARM expression - use as-is
         if (!value.StartsWith('[') || !value.EndsWith(']'))
             return value;
 
@@ -133,7 +133,7 @@ public class ResourceExtractor
             return resolvedString;
         }
 
-        // Unresolvable expression — fall back to default region
+        // Unresolvable expression - fall back to default region
         return _defaultRegion;
     }
 

@@ -27,7 +27,7 @@ public class CostAggregator
             var mapper = _mapperRegistry.GetMapper(resource);
             if (mapper == null)
             {
-                warnings.Add($"⚠ No pricing mapper for {resource.ResourceType} — skipped");
+                warnings.Add($"⚠ No pricing mapper for {resource.ResourceType} - skipped");
                 continue;
             }
 
