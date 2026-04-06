@@ -155,10 +155,7 @@ export default function Playground() {
         />
 
         <div className="playground__helperRow">
-          <p>
-            Local modules and separate parameter files are not supported in the browser playground
-            yet. Paste a self-contained template.
-          </p>
+          <p>⚠ Local modules and separate parameter files are not supported in the browser playground yet. Paste a self-contained template.</p>
           <button className="playground__button" disabled={isSubmitting} type="submit">
             {isSubmitting ? 'Estimating...' : 'Estimate cost'}
           </button>
