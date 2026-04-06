@@ -56,7 +56,7 @@ make build-cli
 
 - Unsupported resource types are skipped with a warning.
 - Spot and low-priority prices are excluded from default estimates.
-- The VS Code extension auto-refresh behavior is controlled by `washington.estimateOnSave`.
+- The VS Code extension auto-refresh behavior is controlled by `bce.estimateOnSave`.
 
 ## Development
 
@@ -74,7 +74,7 @@ make build-website
 make dev-website
 ```
 
-`make setup-cli` restores the .NET dependencies needed for the CLI and tests. Washington resolves the Bicep CLI at runtime through the Azure.Bicep.RpcClient package.
+`make setup-cli` restores the .NET dependencies needed for the CLI and tests. `bce` resolves the Bicep CLI at runtime through the `Azure.Bicep.RpcClient` nuget package.
 
 ## Roadmap
 
