@@ -1,0 +1,39 @@
+name: Cost Estimate
+
+on:
+  workflow_dispatch:
+
+jobs:
+  estimate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: cost-json
+        uses: polatengin/washington@main
+        with:
+          file: tests/fixtures/all.bicep
+          output-format: json
+
+      - name: Print estimate
+        run: |
+          echo "Monthly total: ${{ steps.cost-json.outputs.total-cost }}"
+
+      - id: cost-threshold
+        uses: polatengin/washington@main
+        with:
+          file: tests/fixtures/all.bicep
+          fail-on-threshold: 1000
+
+      - id: cost-markdown
+        uses: polatengin/washington@main
+        with:
+          file: tests/fixtures/all.bicep
+          output-format: markdown
+
+      - name: Append summary
+        run: |
+          {
+            echo '## Cost Estimate'
+            echo '${{ steps.cost-markdown.outputs.estimation-result }}'
+          } >> "$GITHUB_STEP_SUMMARY"
