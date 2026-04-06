@@ -41,7 +41,7 @@ public class ManagedGrafanaMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Managed Grafana ({sku}) — no pricing found");
+            return new MonthlyCost(0, $"Managed Grafana ({sku}) - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"Managed Grafana ({sku}) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

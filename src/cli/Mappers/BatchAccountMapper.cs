@@ -43,9 +43,9 @@ public class BatchAccountMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Batch ({poolAllocationMode}) — base free, pool VMs billed separately");
+            return new MonthlyCost(0, $"Batch ({poolAllocationMode}) - base free, pool VMs billed separately");
 
-        return new MonthlyCost(0, $"Batch ({poolAllocationMode}) — base free, pool VMs billed separately");
+        return new MonthlyCost(0, $"Batch ({poolAllocationMode}) - base free, pool VMs billed separately");
     }
 
     private static string GetPoolAllocationMode(ResourceDescriptor resource)

@@ -65,7 +65,7 @@ public class CognitiveServicesMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Cognitive Services ({kind}/{sku}) — usage-based");
+            return new MonthlyCost(0, $"Cognitive Services ({kind}/{sku}) - usage-based");
 
         // Estimate 1000 transactions/month
         var txnCount = 1_000m;

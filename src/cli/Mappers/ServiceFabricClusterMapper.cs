@@ -43,7 +43,7 @@ public class ServiceFabricClusterMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Service Fabric {nodeCount}× {vmSize} — no pricing found");
+            return new MonthlyCost(0, $"Service Fabric {nodeCount}× {vmSize} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * nodeCount;
         return new MonthlyCost(monthlyCost, $"Service Fabric {nodeCount}× {vmSize} @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

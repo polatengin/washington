@@ -11,12 +11,12 @@ public class NetworkInterfaceMapper : IResourceCostMapper
 
     public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
-        // NICs are free — no pricing queries needed
+        // NICs are free - no pricing queries needed
         return new List<PricingQuery>();
     }
 
     public MonthlyCost CalculateCost(ResourceDescriptor resource, List<PriceRecord> prices)
     {
-        return new MonthlyCost(0, "Network Interface — free");
+        return new MonthlyCost(0, "Network Interface - free");
     }
 }

@@ -31,8 +31,8 @@ public class CommunicationServicesMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Communication Services — usage-based (chat, SMS, voice)");
+            return new MonthlyCost(0, "Communication Services - usage-based (chat, SMS, voice)");
 
-        return new MonthlyCost(0, "Communication Services — usage-based (chat, SMS, voice)");
+        return new MonthlyCost(0, "Communication Services - usage-based (chat, SMS, voice)");
     }
 }

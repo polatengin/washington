@@ -44,7 +44,7 @@ public class NotificationHubMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Notification Hub {sku} — no pricing found");
+            return new MonthlyCost(0, $"Notification Hub {sku} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice;
         return new MonthlyCost(monthlyCost, $"Notification Hub {sku} @ ${price.UnitPrice:F2}/mo + pushes");

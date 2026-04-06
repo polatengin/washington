@@ -40,7 +40,7 @@ public class DataFactoryMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (orchestrationPrice == null && dataMovementPrice == null)
-            return new MonthlyCost(0, "Data Factory — usage-based (per activity run + data movement)");
+            return new MonthlyCost(0, "Data Factory - usage-based (per activity run + data movement)");
 
         var monthlyCost = 0m;
         var details = "Data Factory";

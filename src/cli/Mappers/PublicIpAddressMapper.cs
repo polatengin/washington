@@ -39,7 +39,7 @@ public class PublicIpAddressMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Public IP {skuName} {allocation} — no pricing found");
+            return new MonthlyCost(0, $"Public IP {skuName} {allocation} - no pricing found");
 
         decimal monthlyCost;
         if (price.UnitOfMeasure == "1 Hour")

@@ -11,12 +11,12 @@ public class RouteTableMapper : IResourceCostMapper
 
     public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
-        // Route Tables are free — no pricing queries needed
+        // Route Tables are free - no pricing queries needed
         return new List<PricingQuery>();
     }
 
     public MonthlyCost CalculateCost(ResourceDescriptor resource, List<PriceRecord> prices)
     {
-        return new MonthlyCost(0, "Route Table — free");
+        return new MonthlyCost(0, "Route Table - free");
     }
 }

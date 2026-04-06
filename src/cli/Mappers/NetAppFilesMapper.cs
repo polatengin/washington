@@ -44,7 +44,7 @@ public class NetAppFilesMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"NetApp Files ({serviceLevel}) {sizeInTiB} TiB — no pricing found");
+            return new MonthlyCost(0, $"NetApp Files ({serviceLevel}) {sizeInTiB} TiB - no pricing found");
 
         // Pricing is typically per GiB/hr
         var sizeInGiB = sizeInTiB * 1024m;

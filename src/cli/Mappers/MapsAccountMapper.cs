@@ -40,7 +40,7 @@ public class MapsAccountMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Azure Maps ({sku}) — usage-based (transactions)");
+            return new MonthlyCost(0, $"Azure Maps ({sku}) - usage-based (transactions)");
 
         // Estimate 10,000 transactions/month
         var transactions = 10_000m;

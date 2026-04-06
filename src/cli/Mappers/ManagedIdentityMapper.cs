@@ -11,12 +11,12 @@ public class ManagedIdentityMapper : IResourceCostMapper
 
     public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
-        // Managed Identities are free — no pricing queries needed
+        // Managed Identities are free - no pricing queries needed
         return new List<PricingQuery>();
     }
 
     public MonthlyCost CalculateCost(ResourceDescriptor resource, List<PriceRecord> prices)
     {
-        return new MonthlyCost(0, "User Assigned Managed Identity — free");
+        return new MonthlyCost(0, "User Assigned Managed Identity - free");
     }
 }

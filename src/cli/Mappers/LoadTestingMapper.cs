@@ -37,7 +37,7 @@ public class LoadTestingMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Azure Load Testing — usage-based (VUH)");
+            return new MonthlyCost(0, "Azure Load Testing - usage-based (VUH)");
 
         // Estimate 100 VUH/month
         var vuh = 100m;

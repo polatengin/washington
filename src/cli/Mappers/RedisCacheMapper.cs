@@ -46,7 +46,7 @@ public class RedisCacheMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Redis {skuName} {family}{capacity} — no pricing found");
+            return new MonthlyCost(0, $"Redis {skuName} {family}{capacity} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"Redis {skuName} {family}{capacity} @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

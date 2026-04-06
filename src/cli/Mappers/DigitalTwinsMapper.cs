@@ -37,7 +37,7 @@ public class DigitalTwinsMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Azure Digital Twins — usage-based (messages + queries)");
+            return new MonthlyCost(0, "Azure Digital Twins - usage-based (messages + queries)");
 
         // Estimate 100K messages/month
         var messages = 100_000m;

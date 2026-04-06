@@ -45,7 +45,7 @@ public class MySqlFlexibleServerMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"MySQL Flexible {skuName} — no pricing found");
+            return new MonthlyCost(0, $"MySQL Flexible {skuName} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"MySQL Flexible {skuName} @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs + storage");

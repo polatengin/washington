@@ -31,7 +31,7 @@ public class StaticWebAppMapper : IResourceCostMapper
         var skuName = GetSkuName(resource);
 
         if (skuName.Equals("Free", StringComparison.OrdinalIgnoreCase))
-            return new MonthlyCost(0, "Static Web App Free — no charge");
+            return new MonthlyCost(0, "Static Web App Free - no charge");
 
         var price = prices
             .Where(p => p.SkuName != null &&
@@ -45,7 +45,7 @@ public class StaticWebAppMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Static Web App {skuName} — no pricing found");
+            return new MonthlyCost(0, $"Static Web App {skuName} - no pricing found");
 
         decimal monthlyCost;
         if (price.UnitOfMeasure == "1/Month")

@@ -35,7 +35,7 @@ public class LoadBalancerMapper : IResourceCostMapper
 
         // Basic SKU is free
         if (skuName.Equals("Basic", StringComparison.OrdinalIgnoreCase))
-            return new MonthlyCost(0, "Load Balancer Basic — free");
+            return new MonthlyCost(0, "Load Balancer Basic - free");
 
         // Standard SKU: look for hourly pricing
         var price = prices
@@ -51,7 +51,7 @@ public class LoadBalancerMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null && rulesPrice == null)
-            return new MonthlyCost(0, $"Load Balancer {skuName} — no pricing found");
+            return new MonthlyCost(0, $"Load Balancer {skuName} - no pricing found");
 
         var monthlyCost = 0m;
         var details = $"Load Balancer {skuName}";

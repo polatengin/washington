@@ -38,7 +38,7 @@ public class MachineLearningWorkspaceMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"ML Workspace ({sku}) — base free, compute billed separately");
+            return new MonthlyCost(0, $"ML Workspace ({sku}) - base free, compute billed separately");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"ML Workspace ({sku}) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs + compute");

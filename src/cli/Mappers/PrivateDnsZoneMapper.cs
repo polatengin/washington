@@ -34,7 +34,7 @@ public class PrivateDnsZoneMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (zonePrice == null)
-            return new MonthlyCost(0, "Private DNS Zone — no pricing found");
+            return new MonthlyCost(0, "Private DNS Zone - no pricing found");
 
         var monthlyCost = (decimal)zonePrice.UnitPrice;
         return new MonthlyCost(monthlyCost, $"Private DNS Zone @ ${zonePrice.UnitPrice:F4}/zone/mo + queries");

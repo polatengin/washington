@@ -37,7 +37,7 @@ public class DatabricksWorkspaceMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Databricks ({sku}) — usage-based (DBU + VM costs)");
+            return new MonthlyCost(0, $"Databricks ({sku}) - usage-based (DBU + VM costs)");
 
         // Estimate 100 DBU-hours/month
         var dbuHours = 100m;

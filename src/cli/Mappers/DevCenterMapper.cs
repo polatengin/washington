@@ -33,7 +33,7 @@ public class DevCenterMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Dev Center — usage-based (Dev Box compute + storage)");
+            return new MonthlyCost(0, "Dev Center - usage-based (Dev Box compute + storage)");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"Dev Center ~1 Dev Box @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

@@ -38,7 +38,7 @@ public class CosmosDbAccountMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Cosmos DB {throughput} RU/s — no pricing found");
+            return new MonthlyCost(0, $"Cosmos DB {throughput} RU/s - no pricing found");
 
         // Pricing is per 100 RU/s per hour
         var ruBlocks = throughput / 100m;

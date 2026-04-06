@@ -39,7 +39,7 @@ public class HdInsightClusterMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"HDInsight ({clusterKind}) {vmSize} — no pricing found");
+            return new MonthlyCost(0, $"HDInsight ({clusterKind}) {vmSize} - no pricing found");
 
         // Estimate 2 head nodes + 3 worker nodes
         var nodeCount = 5;

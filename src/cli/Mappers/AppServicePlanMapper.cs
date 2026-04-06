@@ -48,7 +48,7 @@ public class AppServicePlanMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"App Service Plan {skuName} — no pricing found");
+            return new MonthlyCost(0, $"App Service Plan {skuName} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"App Service Plan {skuName} @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

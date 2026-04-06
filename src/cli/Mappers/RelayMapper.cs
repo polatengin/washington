@@ -42,7 +42,7 @@ public class RelayMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Azure Relay ({sku}) — usage-based (listeners + messages)");
+            return new MonthlyCost(0, $"Azure Relay ({sku}) - usage-based (listeners + messages)");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"Azure Relay ({sku}) @ ${price.UnitPrice:F4}/listener/hr × {HoursPerMonth} hrs");

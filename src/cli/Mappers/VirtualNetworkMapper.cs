@@ -29,7 +29,7 @@ public class VirtualNetworkMapper : IResourceCostMapper
         var peeringCount = GetPeeringCount(resource);
 
         if (peeringCount == 0)
-            return new MonthlyCost(0, "Virtual Network — free (no peering)");
+            return new MonthlyCost(0, "Virtual Network - free (no peering)");
 
         // VNet peering data transfer pricing
         var price = prices
@@ -39,7 +39,7 @@ public class VirtualNetworkMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Virtual Network ({peeringCount} peerings) — peering data billed on usage");
+            return new MonthlyCost(0, $"Virtual Network ({peeringCount} peerings) - peering data billed on usage");
 
         // Estimate 100 GB/month data transfer per peering
         var estimatedGb = 100m * peeringCount;

@@ -38,7 +38,7 @@ public class LogicAppMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (actionPrice == null && triggerPrice == null)
-            return new MonthlyCost(0, "Logic App — usage-based (per execution)");
+            return new MonthlyCost(0, "Logic App - usage-based (per execution)");
 
         var monthlyCost = 0m;
         var details = "Logic App";

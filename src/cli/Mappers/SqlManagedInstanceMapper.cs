@@ -45,7 +45,7 @@ public class SqlManagedInstanceMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"SQL MI {skuName} {vCores} vCores — no pricing found");
+            return new MonthlyCost(0, $"SQL MI {skuName} {vCores} vCores - no pricing found");
 
         decimal monthlyCost;
         if (price.UnitOfMeasure == "1 Hour")

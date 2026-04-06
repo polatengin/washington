@@ -37,7 +37,7 @@ public class SpringAppMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Spring Apps {sku} — no pricing found");
+            return new MonthlyCost(0, $"Spring Apps {sku} - no pricing found");
 
         // Estimate 2 vCPU baseline
         var vCpus = 2m;

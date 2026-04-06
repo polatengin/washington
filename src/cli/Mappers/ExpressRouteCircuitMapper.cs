@@ -41,7 +41,7 @@ public class ExpressRouteCircuitMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"ExpressRoute {tier} {bandwidth} — no pricing found");
+            return new MonthlyCost(0, $"ExpressRoute {tier} {bandwidth} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice;
         return new MonthlyCost(monthlyCost, $"ExpressRoute {tier} {bandwidth} @ ${price.UnitPrice:F2}/mo + data");

@@ -39,7 +39,7 @@ public class PrivateEndpointMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Private Endpoint — no pricing found");
+            return new MonthlyCost(0, "Private Endpoint - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"Private Endpoint @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs + data");

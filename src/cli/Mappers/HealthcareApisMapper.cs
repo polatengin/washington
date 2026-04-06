@@ -38,7 +38,7 @@ public class HealthcareApisMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Azure API for FHIR — usage-based (RU + storage)");
+            return new MonthlyCost(0, "Azure API for FHIR - usage-based (RU + storage)");
 
         // Estimate 10 GB storage
         var estimatedGb = 10m;

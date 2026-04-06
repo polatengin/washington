@@ -46,7 +46,7 @@ public class IoTHubMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"IoT Hub {skuName} × {units} — no pricing found");
+            return new MonthlyCost(0, $"IoT Hub {skuName} × {units} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * units;
         return new MonthlyCost(monthlyCost, $"IoT Hub {skuName} × {units} unit(s) @ ${price.UnitPrice:F2}/unit/mo");

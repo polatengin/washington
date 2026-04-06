@@ -40,7 +40,7 @@ public class SearchServiceMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"AI Search {skuName} ({replicaCount}R × {partitionCount}P) — no pricing found");
+            return new MonthlyCost(0, $"AI Search {skuName} ({replicaCount}R × {partitionCount}P) - no pricing found");
 
         var units = replicaCount * partitionCount;
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * units;

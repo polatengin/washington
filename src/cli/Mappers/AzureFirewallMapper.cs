@@ -44,7 +44,7 @@ public class AzureFirewallMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Azure Firewall {skuTier} — no pricing found");
+            return new MonthlyCost(0, $"Azure Firewall {skuTier} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"Azure Firewall {skuTier} @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs + data");

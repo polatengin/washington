@@ -40,7 +40,7 @@ public class LogAnalyticsWorkspaceMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Log Analytics {sku} — base cost + ingestion");
+            return new MonthlyCost(0, $"Log Analytics {sku} - base cost + ingestion");
 
         // Estimate 5 GB/day ingestion = ~150 GB/month
         var estimatedGbPerMonth = 150m;

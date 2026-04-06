@@ -45,7 +45,7 @@ public class RedisEnterpriseMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Redis Enterprise ({skuName}) — no pricing found");
+            return new MonthlyCost(0, $"Redis Enterprise ({skuName}) - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * capacity;
         return new MonthlyCost(monthlyCost, $"Redis Enterprise ({skuName}) ({capacity} instances) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

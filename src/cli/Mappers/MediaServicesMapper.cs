@@ -37,8 +37,8 @@ public class MediaServicesMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Media Services — usage-based (encoding, streaming, storage)");
+            return new MonthlyCost(0, "Media Services - usage-based (encoding, streaming, storage)");
 
-        return new MonthlyCost(0, "Media Services — usage-based (encoding, streaming, storage)");
+        return new MonthlyCost(0, "Media Services - usage-based (encoding, streaming, storage)");
     }
 }

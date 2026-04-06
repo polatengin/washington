@@ -43,7 +43,7 @@ public class SynapseWorkspaceMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (sqlPrice == null && poolPrice == null)
-            return new MonthlyCost(0, "Synapse Workspace — usage-based (serverless + pools)");
+            return new MonthlyCost(0, "Synapse Workspace - usage-based (serverless + pools)");
 
         var monthlyCost = 0m;
         var details = "Synapse Workspace";

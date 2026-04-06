@@ -39,7 +39,7 @@ public class ContainerAppMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (vCpuPrice == null && memPrice == null)
-            return new MonthlyCost(0, $"Container App {vCpu} vCPU / {memoryGb} GB — no pricing found");
+            return new MonthlyCost(0, $"Container App {vCpu} vCPU / {memoryGb} GB - no pricing found");
 
         // Assume always-on: 730 hrs/month
         var hoursPerMonth = 730m;

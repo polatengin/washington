@@ -36,7 +36,7 @@ public class VirtualDesktopHostPoolMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Azure Virtual Desktop ({hostPoolType}) — usage-based (session hosts + licensing)");
+            return new MonthlyCost(0, $"Azure Virtual Desktop ({hostPoolType}) - usage-based (session hosts + licensing)");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"Azure Virtual Desktop ({hostPoolType}) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

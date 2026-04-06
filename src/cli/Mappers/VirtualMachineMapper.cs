@@ -43,7 +43,7 @@ public class VirtualMachineMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"{vmSize} — no pricing found");
+            return new MonthlyCost(0, $"{vmSize} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"{vmSize} @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

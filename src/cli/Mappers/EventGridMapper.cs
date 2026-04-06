@@ -33,7 +33,7 @@ public class EventGridMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Event Grid — usage-based (per million operations)");
+            return new MonthlyCost(0, "Event Grid - usage-based (per million operations)");
 
         // Estimate 1M operations/month
         var estimatedMillions = 1m;

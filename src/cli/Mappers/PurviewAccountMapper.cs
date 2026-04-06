@@ -37,7 +37,7 @@ public class PurviewAccountMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Microsoft Purview — usage-based (capacity units + scanning)");
+            return new MonthlyCost(0, "Microsoft Purview - usage-based (capacity units + scanning)");
 
         // Estimate 1 capacity unit
         var monthlyCost = (decimal)price.UnitPrice;

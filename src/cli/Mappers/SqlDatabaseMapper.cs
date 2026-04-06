@@ -49,7 +49,7 @@ public class SqlDatabaseMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"SQL DB {skuName} — no pricing found");
+            return new MonthlyCost(0, $"SQL DB {skuName} - no pricing found");
 
         decimal monthlyCost;
         if (price.UnitOfMeasure == "1 Hour")

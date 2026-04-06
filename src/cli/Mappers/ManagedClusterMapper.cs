@@ -43,7 +43,7 @@ public class ManagedClusterMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"AKS {nodeCount}× {vmSize} — no pricing found");
+            return new MonthlyCost(0, $"AKS {nodeCount}× {vmSize} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * nodeCount;
         return new MonthlyCost(monthlyCost, $"AKS {nodeCount}× {vmSize} @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

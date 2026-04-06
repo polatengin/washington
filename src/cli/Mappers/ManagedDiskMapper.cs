@@ -45,7 +45,7 @@ public class ManagedDiskMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Managed Disk {skuName} {diskSize} GB — no pricing found");
+            return new MonthlyCost(0, $"Managed Disk {skuName} {diskSize} GB - no pricing found");
 
         decimal monthlyCost;
         if (price.UnitOfMeasure == "1/Month")

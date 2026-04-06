@@ -44,7 +44,7 @@ public class VirtualNetworkGatewayMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"VPN Gateway {skuName} — no pricing found");
+            return new MonthlyCost(0, $"VPN Gateway {skuName} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"VPN Gateway {skuName} @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

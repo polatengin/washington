@@ -37,7 +37,7 @@ public class DdosProtectionPlanMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "DDoS Protection Plan — no pricing found");
+            return new MonthlyCost(0, "DDoS Protection Plan - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice;
         return new MonthlyCost(monthlyCost, $"DDoS Protection Plan @ ${price.UnitPrice:F2}/mo + overage");

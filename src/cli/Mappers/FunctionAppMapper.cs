@@ -45,7 +45,7 @@ public class FunctionAppMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (execPrice == null && memoryPrice == null)
-            return new MonthlyCost(0, "Azure Functions Consumption — pay per execution + free grant");
+            return new MonthlyCost(0, "Azure Functions Consumption - pay per execution + free grant");
 
         // Estimate 1M executions/month and 400,000 GB-s
         var monthlyCost = 0m;

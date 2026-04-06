@@ -32,7 +32,7 @@ public class SignalRMapper : IResourceCostMapper
         var units = GetUnitCount(resource);
 
         if (skuName.Equals("Free_F1", StringComparison.OrdinalIgnoreCase))
-            return new MonthlyCost(0, "SignalR Free — no charge");
+            return new MonthlyCost(0, "SignalR Free - no charge");
 
         var price = prices
             .Where(p => p.MeterName != null && p.MeterName.Contains("Unit") &&
@@ -46,7 +46,7 @@ public class SignalRMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"SignalR {skuName} {units} unit(s) — no pricing found");
+            return new MonthlyCost(0, $"SignalR {skuName} {units} unit(s) - no pricing found");
 
         decimal monthlyCost;
         if (price.UnitOfMeasure == "1/Day")

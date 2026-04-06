@@ -45,7 +45,7 @@ public class PostgreSqlFlexibleServerMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"PostgreSQL Flexible {skuName} — no pricing found");
+            return new MonthlyCost(0, $"PostgreSQL Flexible {skuName} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"PostgreSQL Flexible {skuName} @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs + storage");

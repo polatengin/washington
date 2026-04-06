@@ -40,7 +40,7 @@ public class ServiceBusMapper : IResourceCostMapper
                 .FirstOrDefault();
 
             if (opPrice == null)
-                return new MonthlyCost(0, $"Service Bus {tier} — pay per operation");
+                return new MonthlyCost(0, $"Service Bus {tier} - pay per operation");
 
             // Estimate 1M operations/month
             var estimatedOps = 1_000_000m;
@@ -62,7 +62,7 @@ public class ServiceBusMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Service Bus {tier} — no pricing found");
+            return new MonthlyCost(0, $"Service Bus {tier} - no pricing found");
 
         var mu = GetMessagingUnits(resource);
         var cost = (decimal)price.UnitPrice * HoursPerMonth * mu;

@@ -41,7 +41,7 @@ public class ContainerInstanceMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (cpuPrice == null && memPrice == null)
-            return new MonthlyCost(0, $"Container Instance {totalCpu} vCPU / {totalMemoryGb} GB — no pricing found");
+            return new MonthlyCost(0, $"Container Instance {totalCpu} vCPU / {totalMemoryGb} GB - no pricing found");
 
         var secondsPerMonth = HoursPerMonth * 3600m;
         var monthlyCost = 0m;

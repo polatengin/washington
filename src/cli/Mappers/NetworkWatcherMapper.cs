@@ -31,8 +31,8 @@ public class NetworkWatcherMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Network Watcher — usage-based (flow logs, diagnostics)");
+            return new MonthlyCost(0, "Network Watcher - usage-based (flow logs, diagnostics)");
 
-        return new MonthlyCost(0, "Network Watcher — usage-based (flow logs, diagnostics)");
+        return new MonthlyCost(0, "Network Watcher - usage-based (flow logs, diagnostics)");
     }
 }

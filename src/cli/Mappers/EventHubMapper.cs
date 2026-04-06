@@ -46,7 +46,7 @@ public class EventHubMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Event Hubs {tier} {capacity} TU — no pricing found");
+            return new MonthlyCost(0, $"Event Hubs {tier} {capacity} TU - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * capacity;
         return new MonthlyCost(monthlyCost, $"Event Hubs {tier} {capacity} TU @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

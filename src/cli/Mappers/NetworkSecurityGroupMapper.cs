@@ -11,12 +11,12 @@ public class NetworkSecurityGroupMapper : IResourceCostMapper
 
     public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
-        // NSGs are free — no pricing queries needed
+        // NSGs are free - no pricing queries needed
         return new List<PricingQuery>();
     }
 
     public MonthlyCost CalculateCost(ResourceDescriptor resource, List<PriceRecord> prices)
     {
-        return new MonthlyCost(0, "Network Security Group — free");
+        return new MonthlyCost(0, "Network Security Group - free");
     }
 }

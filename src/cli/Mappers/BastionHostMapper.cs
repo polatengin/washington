@@ -43,7 +43,7 @@ public class BastionHostMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Bastion {sku} — no pricing found");
+            return new MonthlyCost(0, $"Bastion {sku} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * scaleUnits;
         return new MonthlyCost(monthlyCost, $"Bastion {sku} ({scaleUnits} scale units) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

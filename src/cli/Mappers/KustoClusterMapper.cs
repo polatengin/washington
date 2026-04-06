@@ -39,7 +39,7 @@ public class KustoClusterMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Data Explorer {skuName} ({capacity} instances) — no pricing found");
+            return new MonthlyCost(0, $"Data Explorer {skuName} ({capacity} instances) - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * capacity;
         return new MonthlyCost(monthlyCost, $"Data Explorer {skuName} ({capacity} instances) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

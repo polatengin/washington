@@ -42,7 +42,7 @@ public class TrafficManagerMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null && queryPrice == null)
-            return new MonthlyCost(0, $"Traffic Manager ({endpointCount} endpoints) — no pricing found");
+            return new MonthlyCost(0, $"Traffic Manager ({endpointCount} endpoints) - no pricing found");
 
         var monthlyCost = 0m;
         var details = $"Traffic Manager ({endpointCount} endpoints)";

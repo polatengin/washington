@@ -40,7 +40,7 @@ public class RecoveryServicesVaultMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Recovery Services Vault ({sku}) — usage-based (backup storage + instances)");
+            return new MonthlyCost(0, $"Recovery Services Vault ({sku}) - usage-based (backup storage + instances)");
 
         // Estimate 1 protected instance
         var monthlyCost = (decimal)price.UnitPrice;

@@ -45,7 +45,7 @@ public class FrontDoorMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Front Door {skuName} — no pricing found");
+            return new MonthlyCost(0, $"Front Door {skuName} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"Front Door {skuName} @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs + data transfer");

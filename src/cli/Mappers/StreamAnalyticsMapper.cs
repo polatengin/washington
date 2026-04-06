@@ -43,7 +43,7 @@ public class StreamAnalyticsMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Stream Analytics ({streamingUnits} SU) — no pricing found");
+            return new MonthlyCost(0, $"Stream Analytics ({streamingUnits} SU) - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * streamingUnits;
         return new MonthlyCost(monthlyCost, $"Stream Analytics ({streamingUnits} SU) @ ${price.UnitPrice:F4}/SU/hr × {HoursPerMonth} hrs");

@@ -48,7 +48,7 @@ public class SqlElasticPoolMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"SQL Elastic Pool {skuName} ({dtuCapacity} DTU) — no pricing found");
+            return new MonthlyCost(0, $"SQL Elastic Pool {skuName} ({dtuCapacity} DTU) - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"SQL Elastic Pool {skuName} ({dtuCapacity} DTU) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

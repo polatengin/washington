@@ -31,7 +31,7 @@ public class ConfidentialLedgerMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Confidential Ledger — usage-based (writes + storage)");
+            return new MonthlyCost(0, "Confidential Ledger - usage-based (writes + storage)");
 
         var monthlyCost = (decimal)price.UnitPrice;
         return new MonthlyCost(monthlyCost, $"Confidential Ledger @ ${price.UnitPrice:F4}/unit + storage");

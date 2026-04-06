@@ -11,12 +11,12 @@ public class DevTestLabMapper : IResourceCostMapper
 
     public List<PricingQuery> BuildQueries(ResourceDescriptor resource)
     {
-        // DevTest Labs itself is free — costs come from underlying VMs, disks, etc.
+        // DevTest Labs itself is free - costs come from underlying VMs, disks, etc.
         return new List<PricingQuery>();
     }
 
     public MonthlyCost CalculateCost(ResourceDescriptor resource, List<PriceRecord> prices)
     {
-        return new MonthlyCost(0, "DevTest Lab — free (costs from underlying VMs/disks)");
+        return new MonthlyCost(0, "DevTest Lab - free (costs from underlying VMs/disks)");
     }
 }

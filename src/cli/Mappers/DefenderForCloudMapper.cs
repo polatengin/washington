@@ -31,7 +31,7 @@ public class DefenderForCloudMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Defender for Cloud — usage-based (per resource/node)");
+            return new MonthlyCost(0, "Defender for Cloud - usage-based (per resource/node)");
 
         var monthlyCost = (decimal)price.UnitPrice;
         return new MonthlyCost(monthlyCost, $"Defender for Cloud @ ${price.UnitPrice:F2}/node/mo");

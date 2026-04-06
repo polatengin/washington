@@ -37,7 +37,7 @@ public class CosmosDbMongoClusterMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Cosmos DB Mongo vCore ({sku}) {nodeCount} nodes — no pricing found");
+            return new MonthlyCost(0, $"Cosmos DB Mongo vCore ({sku}) {nodeCount} nodes - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * nodeCount;
         return new MonthlyCost(monthlyCost, $"Cosmos DB Mongo vCore ({sku}) {nodeCount} nodes @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

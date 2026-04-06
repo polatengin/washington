@@ -41,7 +41,7 @@ public class FirewallPolicyMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Firewall Policy ({sku}) — no pricing found");
+            return new MonthlyCost(0, $"Firewall Policy ({sku}) - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"Firewall Policy ({sku}) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

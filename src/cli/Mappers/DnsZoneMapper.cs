@@ -32,7 +32,7 @@ public class DnsZoneMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Azure DNS Zone — no pricing found");
+            return new MonthlyCost(0, "Azure DNS Zone - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice;
         return new MonthlyCost(monthlyCost, $"Azure DNS Zone @ ${price.UnitPrice:F4}/mo + query charges");

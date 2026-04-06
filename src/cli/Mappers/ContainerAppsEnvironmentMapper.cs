@@ -32,7 +32,7 @@ public class ContainerAppsEnvironmentMapper : IResourceCostMapper
 
         // Consumption-only environments are free (apps pay per use)
         if (workloadProfile.Equals("Consumption", StringComparison.OrdinalIgnoreCase))
-            return new MonthlyCost(0, "Container Apps Environment (Consumption) — apps billed per use");
+            return new MonthlyCost(0, "Container Apps Environment (Consumption) - apps billed per use");
 
         var price = prices
             .Where(p => p.MeterName != null &&
@@ -41,7 +41,7 @@ public class ContainerAppsEnvironmentMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Container Apps Environment ({workloadProfile}) — no pricing found");
+            return new MonthlyCost(0, $"Container Apps Environment ({workloadProfile}) - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         return new MonthlyCost(monthlyCost, $"Container Apps Environment ({workloadProfile}) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

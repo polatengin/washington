@@ -37,7 +37,7 @@ public class MonitorWorkspaceMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Azure Monitor Workspace — usage-based (metrics ingestion)");
+            return new MonthlyCost(0, "Azure Monitor Workspace - usage-based (metrics ingestion)");
 
         // Estimate 1M samples/month
         var estimatedSamples = 1_000_000m;

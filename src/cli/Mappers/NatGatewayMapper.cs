@@ -41,7 +41,7 @@ public class NatGatewayMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "NAT Gateway — no pricing found");
+            return new MonthlyCost(0, "NAT Gateway - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth;
         var details = $"NAT Gateway @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs";

@@ -46,7 +46,7 @@ public class ContainerRegistryMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Container Registry {tier} — no pricing found");
+            return new MonthlyCost(0, $"Container Registry {tier} - no pricing found");
 
         decimal monthlyCost;
         if (price.UnitOfMeasure == "1/Day")

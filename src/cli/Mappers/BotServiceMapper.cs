@@ -34,11 +34,11 @@ public class BotServiceMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Bot Service ({sku}) — usage-based (messages)");
+            return new MonthlyCost(0, $"Bot Service ({sku}) - usage-based (messages)");
 
         // Standard channels are free, Premium is per-message
         if (sku.Equals("F0", StringComparison.OrdinalIgnoreCase))
-            return new MonthlyCost(0, $"Bot Service ({sku}) — free tier");
+            return new MonthlyCost(0, $"Bot Service ({sku}) - free tier");
 
         var monthlyCost = (decimal)price.UnitPrice * 1000m;
         return new MonthlyCost(monthlyCost, $"Bot Service ({sku}) ~1000 messages @ ${price.UnitPrice:F4}/msg");

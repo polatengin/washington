@@ -34,7 +34,7 @@ public class AutomationAccountMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Automation Account — 500 free mins/mo + usage");
+            return new MonthlyCost(0, "Automation Account - 500 free mins/mo + usage");
 
         // Estimate 1000 minutes/month (500 free)
         var billableMinutes = 500m;
