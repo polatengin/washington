@@ -331,7 +331,6 @@ watchFiles(
   [
     join(repoRoot, 'docs', '**', '*.md'),
     join(repoRoot, 'CONTRIBUTING.md'),
-    join(websiteRoot, 'static', 'assets', 'favicon-180x180.png'),
     join(__dirname, 'generate-plain-text.mjs'),
   ],
   (eventName, filePath) => {
