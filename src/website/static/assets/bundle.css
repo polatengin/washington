@@ -44,7 +44,7 @@
 .playground__emptyState h3,
 .playground__warningPanel h3 {
   font-family: 'Space Grotesk', sans-serif;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.03rem;
 }
 
 .playground__panelHeader {
@@ -91,7 +91,7 @@
   border-radius: 0;
   color-scheme: light;
   color: var(--playground-ink);
-  min-height: 44px;
+  min-height: 2.5rem;
   padding: 0.7rem 0.85rem;
 }
 
@@ -126,8 +126,8 @@
   color: #f9f5e7;
   font-family: 'IBM Plex Mono', monospace;
   line-height: 1.5;
-  margin-bottom: 1em;
-  min-height: 560px;
+  margin-bottom: 1rem;
+  min-height: 36rem;
   padding: 0.8rem 1.1rem;
   resize: vertical;
   width: 100%;
@@ -135,7 +135,6 @@
 
 .playground__helperRow {
   display: flex;
-  justify-content: space-between;
 }
 
 .playground__helperRow p {
@@ -143,7 +142,8 @@
   font-size: 0.95rem;
   line-height: 1.6;
   margin: 0;
-  margin-right: 1em;
+  padding: 0.5rem 0.8rem;
+  margin-right: 1rem;
   background: #f6b73c24;
   border: 1px solid #f6b73c3d;
 
