@@ -52,8 +52,8 @@ public static class OutputFormatter
 
         foreach (var line in report.Lines)
         {
-            var hourly = line.HourlyCost > 0 ? $"${line.HourlyCost:N4}" : "—";
-            var cost = line.MonthlyCost > 0 ? $"${line.MonthlyCost:N2}" : "—";
+            var hourly = line.HourlyCost > 0 ? $"${line.HourlyCost:N4}" : "-";
+            var cost = line.MonthlyCost > 0 ? $"${line.MonthlyCost:N2}" : "-";
             sb.AppendLine($"{line.ResourceName.PadRight(nameWidth)}{line.ResourceType.PadRight(typeWidth)}{line.PricingDetails.PadRight(detailsWidth)}{hourly.PadLeft(hourlyCostWidth)}{cost.PadLeft(costWidth)}");
         }
 
@@ -96,8 +96,8 @@ public static class OutputFormatter
 
         foreach (var line in report.Lines)
         {
-            var hourly = line.HourlyCost > 0 ? $"${line.HourlyCost:N4}" : "—";
-            var cost = line.MonthlyCost > 0 ? $"${line.MonthlyCost:N2}" : "—";
+            var hourly = line.HourlyCost > 0 ? $"${line.HourlyCost:N4}" : "-";
+            var cost = line.MonthlyCost > 0 ? $"${line.MonthlyCost:N2}" : "-";
             sb.AppendLine($"| {line.ResourceName} | {line.ResourceType} | {line.PricingDetails} | {hourly} | {cost} |");
         }
 
