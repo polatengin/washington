@@ -35,7 +35,7 @@ make build-cli
 
 ## What It Does
 
-- Compiles Bicep to ARM JSON using the embedded Bicep submodule
+- Compiles Bicep to ARM JSON through the Bicep CLI via the Azure.Bicep.RpcClient package
 - Extracts nested resources, copy loops, and conditionally skipped resources
 - Maps 87 Azure resource types to Azure Retail Prices API queries
 - Queries pricing with pagination, retry, and a local 24-hour file cache
@@ -74,7 +74,7 @@ make build-website
 make dev-website
 ```
 
-The repository depends on the embedded `bicep` submodule, so use `make setup-cli` or `git submodule update --init --recursive` before building from a fresh clone.
+`make setup-cli` restores the .NET dependencies needed for the CLI and tests. Washington resolves the Bicep CLI at runtime through the Azure.Bicep.RpcClient package.
 
 ## Roadmap
 

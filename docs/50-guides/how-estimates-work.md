@@ -10,7 +10,7 @@ Washington is intentionally thin at the edges. The CLI, VS Code extension, and G
 ## Pipeline Overview
 
 1. **Compile** the source file.
-   For `.bicep` input, Washington invokes the embedded Bicep compiler from the repository submodule and produces an ARM JSON template.
+   For `.bicep` input, Washington invokes the Bicep CLI through the Azure.Bicep.RpcClient package and produces an ARM JSON template.
 2. **Extract** Azure resources from the resulting template.
    The extractor walks the `resources` array, handles nested resources, skips `condition: false`, expands simple copy loops, and resolves a limited set of ARM expressions.
 3. **Map** each resource type to pricing queries.
@@ -32,7 +32,7 @@ The extension launches `bce lsp` and talks to it over JSON-RPC. CodeLens, hover,
 
 ### GitHub Action
 
-The action builds the CLI from source inside the workflow, runs `bce estimate`, and exposes the result as workflow outputs. Optional base-file inputs let you calculate cost deltas in pull request workflows.
+The action builds the CLI from source inside the workflow, runs `bce estimate`, and exposes the result as workflow outputs. On first use, `bce` reuses a configured `bicep` binary if one is available or downloads a pinned Bicep CLI release automatically. Optional base-file inputs let you calculate cost deltas in pull request workflows.
 
 ## Pricing Source
 

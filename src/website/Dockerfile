@@ -28,7 +28,6 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS cli-build
 WORKDIR /app
 
 COPY src/cli/ ./src/cli/
-COPY bicep/ ./bicep/
 
 RUN dotnet publish src/cli/washington.csproj \
 	--configuration Release \

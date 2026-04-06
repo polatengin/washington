@@ -25,8 +25,7 @@ info: ## Show tool versions and current paths
 	@echo "  Node.js:        $$(node --version 2>/dev/null || echo 'not found')"
 	@echo "  npm:            $$(npm --version 2>/dev/null || echo 'not found')"
 
-setup-cli: ## Initialize submodules and restore .NET dependencies
-	git submodule update --init --recursive
+setup-cli: ## Restore .NET dependencies for the CLI and tests
 	dotnet restore washington.slnx
 
 setup-extension: ## Install VS Code extension dependencies

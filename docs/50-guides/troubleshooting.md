@@ -18,7 +18,9 @@ curl -sL https://bicepcostestimator.net/install.sh | bash
 ./src/cli/bin/Release/net10.0/bce estimate --file ./tests/fixtures/simple-vm.bicep
 ```
 
-If you are building from source, remember to initialize the embedded `bicep` submodule first:
+When you estimate a `.bicep` file, Washington will use a configured `bicep` binary if one is available on `PATH` or through `WASHINGTON_BICEP_CLI_PATH`. Otherwise it downloads a pinned Bicep CLI release automatically.
+
+To restore the repo's .NET dependencies from a fresh clone, run:
 
 ```bash
 make setup-cli
