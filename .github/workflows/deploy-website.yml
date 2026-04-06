@@ -31,6 +31,8 @@ jobs:
       AZURE_ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
       AZURE_CONTAINER_APP_NAME: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
       AZURE_CONTAINER_APP_RESOURCE_GROUP: ${{ secrets.AZURE_CONTAINER_APP_RESOURCE_GROUP }}
+      WEBSITE_IMAGE_REPOSITORY: washington-website
+      WEBSITE_IMAGE_TAG_RETENTION_COUNT: 10
 
     steps:
       - name: Checkout code
@@ -56,8 +58,8 @@ jobs:
           az account set --subscription "$AZURE_SUBSCRIPTION_ID"
 
           acr_login_server="$(az acr show --name "$AZURE_ACR_NAME" --query loginServer --output tsv)"
-          image_sha="$acr_login_server/washington-website:$GITHUB_SHA"
-          image_latest="$acr_login_server/washington-website:latest"
+          image_sha="$acr_login_server/$WEBSITE_IMAGE_REPOSITORY:$GITHUB_SHA"
+          image_latest="$acr_login_server/$WEBSITE_IMAGE_REPOSITORY:latest"
 
           echo "ACR_LOGIN_SERVER=$acr_login_server" >> "$GITHUB_ENV"
           echo "IMAGE_SHA=$image_sha" >> "$GITHUB_ENV"
@@ -118,3 +120,26 @@ jobs:
 
           echo "Deployed revision: $revision"
           echo "Website URL: https://$fqdn"
+
+      - name: Purge old website images from Azure Container Registry
+        run: |
+          set -euo pipefail
+
+          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+
+          mapfile -t old_tags < <(
+            az acr repository show-tags \
+              --name "$AZURE_ACR_NAME" \
+              --repository "$WEBSITE_IMAGE_REPOSITORY" \
+              --orderby time_desc \
+              --output tsv | \
+              awk -v keep="$WEBSITE_IMAGE_TAG_RETENTION_COUNT" '/^[0-9a-f]{40}$/ { count++; if (count > keep) print }'
+          )
+
+          for tag in "${old_tags[@]}"; do
+            echo "Deleting $WEBSITE_IMAGE_REPOSITORY:$tag"
+            az acr repository delete \
+              --name "$AZURE_ACR_NAME" \
+              --image "$WEBSITE_IMAGE_REPOSITORY:$tag" \
+              --yes
+          done
