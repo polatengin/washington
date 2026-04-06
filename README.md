@@ -1,5 +1,9 @@
 # Bicep Cost Estimator
 
+[![CodeQL](https://github.com/polatengin/washington/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/polatengin/washington/actions/workflows/github-code-scanning/codeql)
+[![Deploy Website](https://github.com/polatengin/washington/actions/workflows/deploy-website.yml/badge.svg)](https://github.com/polatengin/washington/actions/workflows/deploy-website.yml)
+[![Release BCE CLI](https://github.com/polatengin/washington/actions/workflows/release-cli.yml/badge.svg)](https://github.com/polatengin/washington/actions/workflows/release-cli.yml)
+
 Bicep Cost Estimator (_Washington_) estimates monthly Azure costs from Bicep and ARM templates before you deploy. The published CLI command is `bce`.
 
 It currently ships as:
