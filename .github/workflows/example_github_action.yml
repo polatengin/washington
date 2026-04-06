@@ -1,4 +1,4 @@
-name: Cost Estimate
+name: Example Cost Estimate Pipeline
 
 on:
   workflow_dispatch:
