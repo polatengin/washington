@@ -135,6 +135,7 @@ const config: Config = {
       ],
     },
     prism: {
+      additionalLanguages: ['bash', 'yaml'],
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
     },
