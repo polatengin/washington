@@ -2,6 +2,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import type {PluginOptions} from '@docusaurus/plugin-content-docs';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import type {PrismTheme} from 'prism-react-renderer';
 
 const doc = (id: string) => ({
   type: 'doc' as const,
@@ -29,6 +30,42 @@ const docsSidebar = [
   ]),
   doc('release-notes'),
 ] satisfies Awaited<ReturnType<PluginOptions['sidebarItemsGenerator']>>;
+
+const withYamlTokenStyles = (
+  theme: PrismTheme,
+  keyColor: string,
+  punctuationColor: string,
+): PrismTheme => ({
+  ...theme,
+  styles: [
+    ...theme.styles,
+    {
+      types: ['atrule', 'key'],
+      languages: ['yaml'],
+      style: {
+        color: keyColor,
+        fontStyle: 'normal',
+      },
+    },
+    {
+      types: ['scalar', 'string'],
+      languages: ['yaml'],
+      style: {
+        color: theme.plain.color ?? 'inherit',
+      },
+    },
+    {
+      types: ['punctuation'],
+      languages: ['yaml'],
+      style: {
+        color: punctuationColor,
+      },
+    },
+  ],
+});
+
+const prismTheme = withYamlTokenStyles(prismThemes.github, '#005cc5', '#6a737d');
+const prismDarkTheme = withYamlTokenStyles(prismThemes.dracula, '#8be9fd', '#f8f8f2');
 
 const config: Config = {
   title: 'Bicep Cost Estimator',
@@ -136,8 +173,8 @@ const config: Config = {
     },
     prism: {
       additionalLanguages: ['bash', 'yaml'],
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismTheme,
+      darkTheme: prismDarkTheme,
     },
   } satisfies Preset.ThemeConfig,
 };
