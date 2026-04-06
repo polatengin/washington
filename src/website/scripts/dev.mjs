@@ -182,6 +182,10 @@ async function generateSupportedResources() {
   await runCommand('Updating supported resources documentation...', nodeCommand, [join(__dirname, 'generate-supported-resources.mjs')]);
 }
 
+async function generateReleaseNotes() {
+  await runCommand('Updating release notes documentation...', nodeCommand, [join(__dirname, 'generate-release-notes.mjs')]);
+}
+
 async function generatePlaygroundFixtures() {
   await runCommand('Generating playground fixtures...', nodeCommand, [join(__dirname, 'generate-playground-fixtures.mjs')]);
 }
@@ -303,6 +307,7 @@ if (!(await hasCliBinary())) {
 
 await generatePlaygroundFixtures();
 await generateSupportedResources();
+await generateReleaseNotes();
 await generatePlainText();
 await generateSearchIndex();
 await startDocusaurus();
@@ -352,6 +357,17 @@ watchFiles(
       'supported-resources',
       `Updating supported resources docs after ${eventName} in ${rel(filePath)}...`,
       generateSupportedResources
+    );
+  }
+);
+
+watchFiles(
+  [join(__dirname, 'generate-release-notes.mjs')],
+  (eventName, filePath) => {
+    debounce(
+      'release-notes',
+      `Updating release notes docs after ${eventName} in ${rel(filePath)}...`,
+      generateReleaseNotes
     );
   }
 );

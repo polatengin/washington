@@ -27,6 +27,7 @@ const docsSidebar = [
     'guides/supported-resources',
     'guides/troubleshooting',
   ]),
+  doc('release-notes'),
 ] satisfies Awaited<ReturnType<PluginOptions['sidebarItemsGenerator']>>;
 
 const config: Config = {
@@ -111,6 +112,11 @@ const config: Config = {
         {
           label: 'GitHub Action',
           href: '/github-action',
+          position: 'left',
+        },
+        {
+          label: 'Release Notes',
+          href: '/release-notes',
           position: 'left',
         },
         {
