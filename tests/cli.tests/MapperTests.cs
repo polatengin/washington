@@ -51,6 +51,24 @@ public class MapperTests
     }
 
     [Fact]
+    public void StorageBlobServiceMapper_CanMap_CorrectType()
+    {
+        var mapper = new StorageBlobServiceMapper();
+        var resource = CreateResource("Microsoft.Storage/storageAccounts/blobServices");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
+    public void StorageBlobContainerMapper_CanMap_CorrectType()
+    {
+        var mapper = new StorageBlobContainerMapper();
+        var resource = CreateResource("Microsoft.Storage/storageAccounts/blobServices/containers");
+
+        Assert.True(mapper.CanMap(resource));
+    }
+
+    [Fact]
     public void SqlDatabaseMapper_BuildQueries_CorrectServiceName()
     {
         var mapper = new SqlDatabaseMapper();
@@ -85,6 +103,8 @@ public class MapperTests
 
         var vmResource = CreateResource("Microsoft.Compute/virtualMachines");
         var storageResource = CreateResource("Microsoft.Storage/storageAccounts");
+        var blobServiceResource = CreateResource("Microsoft.Storage/storageAccounts/blobServices");
+        var blobContainerResource = CreateResource("Microsoft.Storage/storageAccounts/blobServices/containers");
         var nicResource = CreateResource("Microsoft.Network/networkInterfaces");
         var aksResource = CreateResource("Microsoft.ContainerService/managedClusters");
         var publicIpResource = CreateResource("Microsoft.Network/publicIPAddresses");
@@ -97,6 +117,8 @@ public class MapperTests
 
         Assert.NotNull(registry.GetMapper(vmResource));
         Assert.NotNull(registry.GetMapper(storageResource));
+        Assert.NotNull(registry.GetMapper(blobServiceResource));
+        Assert.NotNull(registry.GetMapper(blobContainerResource));
         Assert.NotNull(registry.GetMapper(nicResource));
         Assert.Null(registry.GetMapper(unknownResource));
         Assert.NotNull(registry.GetMapper(aksResource));

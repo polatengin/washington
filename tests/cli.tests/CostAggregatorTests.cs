@@ -129,6 +129,27 @@ public class CostAggregatorTests
     }
 
     [Fact]
+    public async Task GenerateReport_StorageBlobChildResources_DoNotWarn()
+    {
+        var mockPricingClient = new MockPricingApiClient(new List<PriceRecord>());
+        var registry = new MapperRegistry();
+        var aggregator = new CostAggregator(registry, mockPricingClient);
+        var resources = new List<ResourceDescriptor>
+        {
+            CreateResource("Microsoft.Storage/storageAccounts/blobServices", "default"),
+            CreateResource("Microsoft.Storage/storageAccounts/blobServices/containers", "logs")
+        };
+
+        var report = await aggregator.GenerateReportAsync(resources);
+
+        Assert.Equal(2, report.Lines.Count);
+        Assert.Empty(report.Warnings);
+        Assert.All(report.Lines, line => Assert.Equal(0m, line.MonthlyCost));
+        Assert.Contains("Blob Service", report.Lines[0].PricingDetails);
+        Assert.Contains("Blob Container", report.Lines[1].PricingDetails);
+    }
+
+    [Fact]
     public async Task GenerateReport_EmptyResources_ReturnsEmptyReport()
     {
         var mockPricingClient = new MockPricingApiClient(new List<PriceRecord>());
