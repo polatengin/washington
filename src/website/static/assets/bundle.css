@@ -80,8 +80,8 @@
   border: 1px solid var(--playground-border);
   color: var(--playground-ink);
   cursor: pointer;
-  min-height: 44px;
   padding: 0.7rem 1rem;
+  white-space: nowrap;
 }
 
 .playground__select {
@@ -143,7 +143,10 @@
   font-size: 0.95rem;
   line-height: 1.6;
   margin: 0;
-  max-width: 54ch;
+  margin-right: 1em;
+  background: #f6b73c24;
+  border: 1px solid #f6b73c3d;
+
 }
 
 .playground__summaryGrid {
@@ -166,8 +169,7 @@
 .playground__errorBanner,
 .playground__warningPanel,
 .playground__emptyState {
-  border-radius: 18px;
-  margin-top: 1rem;
+  margin-block: 1rem;
   padding: 1rem 1.1rem;
 }
 
