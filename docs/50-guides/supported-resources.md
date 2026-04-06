@@ -5,7 +5,7 @@ sidebar_position: 51
 
 # Supported Resources
 
-Washington currently ships with pricing mappers for <!-- GENERATED:RESOURCE_COUNT -->87<!-- /GENERATED:RESOURCE_COUNT --> Azure resource types. Support is implemented in the CLI mapper registry and shared by the CLI, VS Code extension, and GitHub Action.
+Washington currently ships with pricing mappers for <!-- GENERATED:RESOURCE_COUNT -->0<!-- /GENERATED:RESOURCE_COUNT --> Azure resource types. Support is implemented in the CLI mapper registry and shared by the CLI, VS Code extension, and GitHub Action.
 
 ## Generated Matrix
 
@@ -17,33 +17,6 @@ The registry order is preserved so the table stays aligned with the implementati
 
 | Registry Group | Mappers |
 | --- | ---: |
-| P0: Core resource types | 4 |
-| P1: High-impact resource types | 4 |
-| P2: Additional resource types | 3 |
-| P3: Extended resource types | 17 |
-| P4: Compute | 3 |
-| P4: Networking | 8 |
-| P4: Databases | 2 |
-| P4: AI / ML | 3 |
-| P4: Storage & Messaging | 2 |
-| P4: Containers | 2 |
-| P4: Monitoring & Management | 2 |
-| P4: Integration | 2 |
-| P4: Analytics & Other | 4 |
-| P5: Networking (extended) | 5 |
-| P5: Security | 3 |
-| P5: AI / ML | 1 |
-| P5: Analytics | 4 |
-| P5: Storage | 1 |
-| P5: Databases | 2 |
-| P5: Developer | 3 |
-| P5: Integration | 3 |
-| P5: Media & Maps | 2 |
-| P5: IoT | 1 |
-| P5: Governance | 2 |
-| P5: Virtual Desktop | 1 |
-| P5: Service Fabric | 1 |
-| P5: Monitoring | 2 |
 
 ### Coverage Matrix
 
@@ -51,6 +24,8 @@ The registry order is preserved so the table stays aligned with the implementati
 | --- | --- | --- |
 | P0: Core resource types | `Microsoft.Compute/virtualMachines` | `VirtualMachineMapper` |
 | P0: Core resource types | `Microsoft.Storage/storageAccounts` | `StorageAccountMapper` |
+| P0: Core resource types | `Microsoft.Storage/storageAccounts/blobServices` | `StorageBlobServiceMapper` |
+| P0: Core resource types | `Microsoft.Storage/storageAccounts/blobServices/containers` | `StorageBlobContainerMapper` |
 | P0: Core resource types | `Microsoft.Sql/servers/databases` | `SqlDatabaseMapper` |
 | P0: Core resource types | `Microsoft.Web/serverfarms` | `AppServicePlanMapper` |
 | P1: High-impact resource types | `Microsoft.ContainerService/managedClusters` | `ManagedClusterMapper` |
