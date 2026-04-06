@@ -170,7 +170,6 @@
 .playground__warningPanel,
 .playground__emptyState {
   margin-block: 1rem;
-  padding: 1rem 1.1rem;
 }
 
 .playground__errorBanner {
@@ -178,6 +177,7 @@
   border: 1px solid rgba(180, 44, 44, 0.2);
   color: #8d231f;
   font-weight: 600;
+  padding: .5rem .8rem;
 }
 
 .playground__warningPanel {
