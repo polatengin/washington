@@ -85,10 +85,7 @@ Request markdown output when you want to reuse the formatted result in a job sum
 
 - name: Append summary
   run: |
-    {
-      echo '## Cost Estimate'
-      echo '${{ steps.cost.outputs.estimation-result }}'
-    } >> "$GITHUB_STEP_SUMMARY"
+    echo '${{ steps.cost.outputs.estimation-result }}' >> "$GITHUB_STEP_SUMMARY"
 ```
 
 ## Related Reading
