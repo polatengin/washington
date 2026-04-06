@@ -456,10 +456,10 @@ async function buildIndex(files) {
       formatInline('_Bicep Cost Estimator_ (`bce`) estimates monthly Azure costs **before** deployment.'),
       'Use the CLI, the VS Code extension, the GitHub Action, or the docs.',
     ], 80),
-    renderBox('Pages', paths.map(path => `${paint('$ curl ', fg(palette.leaf))}${paint("https://bicepcostestimator.net" + path, fg(palette.sky), ansi.underline)}`), 80),
     renderBox('Install Bicep Cost Estimator', [
       `${paint('$ curl', fg(palette.leaf))} ${paint("-sL", ansi.bold, fg(palette.gold))} ${paint("https://bicepcostestimator.net/install.sh", ansi.bold, fg(palette.sky), ansi.underline)} ${paint("| bash", fg(palette.dim))}`,
     ], 80),
+    renderBox('Pages', paths.map(path => `${paint('$ curl ', fg(palette.leaf))}${paint("https://bicepcostestimator.net" + path, fg(palette.sky), ansi.underline)}`), 80),
     '',
   ].join('\n');
 }
