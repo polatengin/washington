@@ -16,6 +16,6 @@ public class StorageBlobServiceMapper : IResourceCostMapper
 
     public MonthlyCost CalculateCost(ResourceDescriptor resource, List<PriceRecord> prices)
     {
-        return new MonthlyCost(0, "Blob Service — configuration only; advanced features billed through storage usage are not modeled");
+        return new MonthlyCost(0, "Blob Service - configuration only; advanced features billed through storage usage are not modeled");
     }
 }

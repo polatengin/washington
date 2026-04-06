@@ -240,7 +240,7 @@ public class CostEstimatorLanguageServer
             {
                 var lineIndex = FindResourceLine(lines, line.ResourceName, line.ResourceType);
                 var costText = line.MonthlyCost > 0
-                    ? $"💰 {line.ResourceName}: ${line.MonthlyCost:N2}/mo — {line.PricingDetails}"
+                    ? $"💰 {line.ResourceName}: ${line.MonthlyCost:N2}/mo - {line.PricingDetails}"
                     : $"💰 {line.ResourceName}: no pricing available";
 
                 codeLenses.Add(new CodeLens

@@ -39,7 +39,7 @@ public class ApplicationInsightsMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, "Application Insights — first 5 GB/mo free + ingestion");
+            return new MonthlyCost(0, "Application Insights - first 5 GB/mo free + ingestion");
 
         // Estimate 10 GB/month, 5 GB free
         var billableGb = 5m;

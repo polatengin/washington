@@ -43,7 +43,7 @@ public class AppConfigurationMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"App Configuration {sku} — no pricing found");
+            return new MonthlyCost(0, $"App Configuration {sku} - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice;
         return new MonthlyCost(monthlyCost, $"App Configuration {sku} @ ${price.UnitPrice:F2}/day + requests");

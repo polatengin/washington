@@ -41,10 +41,10 @@ public class ApiManagementMapper : IResourceCostMapper
                 .FirstOrDefault();
 
             if (callPrice == null)
-                return new MonthlyCost(0, "APIM Consumption — pay per call");
+                return new MonthlyCost(0, "APIM Consumption - pay per call");
 
             // Estimate 1M calls/month (first 1M free)
-            return new MonthlyCost(0, "APIM Consumption — first 1M calls free");
+            return new MonthlyCost(0, "APIM Consumption - first 1M calls free");
         }
 
         var price = prices
@@ -60,7 +60,7 @@ public class ApiManagementMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"APIM {skuName} {units} unit(s) — no pricing found");
+            return new MonthlyCost(0, $"APIM {skuName} {units} unit(s) - no pricing found");
 
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * units;
         return new MonthlyCost(monthlyCost, $"APIM {skuName} {units} unit(s) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");

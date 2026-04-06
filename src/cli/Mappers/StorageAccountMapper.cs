@@ -37,7 +37,7 @@ public class StorageAccountMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"{sku} — base cost + usage");
+            return new MonthlyCost(0, $"{sku} - base cost + usage");
 
         // Estimate 100 GB as a baseline
         var estimatedGb = 100m;

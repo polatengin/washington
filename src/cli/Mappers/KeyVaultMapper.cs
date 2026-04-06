@@ -44,7 +44,7 @@ public class KeyVaultMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Key Vault {skuName} — base cost + usage");
+            return new MonthlyCost(0, $"Key Vault {skuName} - base cost + usage");
 
         // Estimate 10,000 operations/month as baseline
         var estimatedOps = 10_000m;
