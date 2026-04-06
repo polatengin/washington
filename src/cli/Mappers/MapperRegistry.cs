@@ -11,6 +11,8 @@ public class MapperRegistry
         // P0: Core resource types
         Register(new VirtualMachineMapper());
         Register(new StorageAccountMapper());
+        Register(new StorageBlobServiceMapper());
+        Register(new StorageBlobContainerMapper());
         Register(new SqlDatabaseMapper());
         Register(new AppServicePlanMapper());
 
