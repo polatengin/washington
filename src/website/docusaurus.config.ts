@@ -69,7 +69,7 @@ const prismDarkTheme = withYamlTokenStyles(prismThemes.dracula, '#8be9fd', '#f8f
 
 const config: Config = {
   title: 'Bicep Cost Estimator',
-  tagline: 'Azure Cost Estimator',
+  tagline: 'Bicep Cost Estimator',
   favicon: 'assets/logo.svg',
   url: 'https://bicepcostestimator.net',
 

@@ -1,4 +1,4 @@
-name: 'Azure Cost Estimator'
+name: 'Bicep Cost Estimator'
 description: 'Estimate monthly Azure costs from Bicep files'
 inputs:
   file:
