@@ -5,14 +5,14 @@ sidebar_position: 30
 
 # VS Code Extension
 
-The Washington VS Code extension shows real-time Azure cost estimates directly in your editor as you write infrastructure-as-code. It resolves costs by invoking the `bce` CLI in LSP mode.
+The Bicep Cost Estimator VS Code extension shows real-time Azure cost estimates directly in your editor as you write infrastructure-as-code. It resolves costs by invoking the `bce` CLI in LSP mode.
 
 ## Installation
 
-Search for **Washington** in the VS Code Extensions marketplace, or install from the command line:
+Search for **Bicep Cost Estimator** in the VS Code Extensions marketplace, or install from the command line:
 
 ```bash
-code --install-extension polatengin.washington
+code --install-extension polatengin.bce
 ```
 
 ## Features
@@ -21,22 +21,22 @@ code --install-extension polatengin.washington
 - **Hover details** - hover over a resource to see a detailed cost breakdown
 - **Status bar totals** - view the current file's estimated monthly cost at a glance
 - **Cost breakdown panel** - inspect per-resource totals in the explorer view
-- **Automatic refresh** - when `washington.estimateOnSave` is enabled, estimates are refreshed when a `.bicep` file is opened, saved, or changed
+- **Automatic refresh** - when `bce.estimateOnSave` is enabled, estimates are refreshed when a `.bicep` file is opened, saved, or changed
 
 ## Configuration
 
-Open VS Code settings and search for `washington`:
+Open VS Code settings and search for `bce`:
 
 | Setting | Description | Default |
 |---------|-------------|---------|
-| `washington.defaultRegion` | Default Azure region when not specified in a resource | `eastus` |
-| `washington.cliPath` | Path to the `bce` CLI binary; auto-detected if empty | `""` |
-| `washington.estimateOnSave` | Automatically refresh estimates for open `.bicep` files | `true` |
-| `washington.showCodeLens` | Show cost annotations as CodeLens above resources | `true` |
-| `washington.showStatusBar` | Show total estimated cost in the status bar | `true` |
-| `washington.cacheTtlHours` | Pricing cache time-to-live in hours | `24` |
+| `bce.defaultRegion` | Default Azure region when not specified in a resource | `eastus` |
+| `bce.cliPath` | Path to the `bce` CLI binary; auto-detected if empty | `""` |
+| `bce.estimateOnSave` | Automatically refresh estimates for open `.bicep` files | `true` |
+| `bce.showCodeLens` | Show cost annotations as CodeLens above resources | `true` |
+| `bce.showStatusBar` | Show total estimated cost in the status bar | `true` |
+| `bce.cacheTtlHours` | Pricing cache time-to-live in hours | `24` |
 
-If `washington.cliPath` is empty, the extension first tries the bundled `bce` binary, then a workspace build, then `bce` on your `PATH`.
+If `bce.cliPath` is empty, the extension first tries the bundled `bce` binary, then a workspace build, then `bce` on your `PATH`.
 
 For a full settings reference, see [Extension Settings](/vscode-extension/settings).
 
@@ -44,5 +44,5 @@ For a full settings reference, see [Extension Settings](/vscode-extension/settin
 
 - The extension shells out to `bce lsp`; it does not implement pricing logic in TypeScript.
 - Workspace estimation scans all `.bicep` files recursively under the current workspace root.
-- `washington.defaultRegion`, `washington.estimateOnSave`, `washington.showCodeLens`, `washington.showStatusBar`, and `washington.cacheTtlHours` are applied by the language server on startup.
+- `bce.defaultRegion`, `bce.estimateOnSave`, `bce.showCodeLens`, `bce.showStatusBar`, and `bce.cacheTtlHours` are applied by the language server on startup.
 - If a matching `.bicepparam` file in the same directory targets the active `.bicep` file, the extension applies its parameter values automatically during estimation.

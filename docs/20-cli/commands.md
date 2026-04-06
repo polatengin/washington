@@ -5,7 +5,9 @@ sidebar_position: 20
 
 # CLI Commands
 
-Washington's CLI is published as `bce`.
+_Bicep Cost Estimator_ CLI can be installed by running the following command: `curl -sL https://bicepcostestimator.net/install.sh | bash`
+
+After it is installed, you can use it with the `bce` command.
 
 ## `bce estimate`
 
