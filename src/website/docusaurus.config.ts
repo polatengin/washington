@@ -95,12 +95,7 @@ const config: Config = {
           position: 'left',
         },
         {
-          label: 'Getting Started',
-          href: '/getting-started',
-          position: 'left',
-        },
-        {
-          label: 'CLI Commands',
+          label: 'CLI',
           href: '/cli/commands',
           position: 'left',
         },
@@ -112,11 +107,6 @@ const config: Config = {
         {
           label: 'GitHub Action',
           href: '/github-action',
-          position: 'left',
-        },
-        {
-          label: 'Release Notes',
-          href: '/release-notes',
           position: 'left',
         },
         {
