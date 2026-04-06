@@ -56,7 +56,8 @@ jobs:
 
 ```yaml
 - name: Show estimated total
-  run: echo "Monthly total: ${{ steps.cost.outputs.total-cost }}"
+  run: |
+    echo "Monthly total: ${{ steps.cost.outputs.total-cost }}"
 ```
 
 ## Current Behavior Notes

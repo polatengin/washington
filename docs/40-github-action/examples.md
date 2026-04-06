@@ -34,7 +34,8 @@ jobs:
           output-format: json
 
       - name: Print estimate
-        run: echo "Monthly total: ${{ steps.cost.outputs.total-cost }}"
+        run: |
+          echo "Monthly total: ${{ steps.cost.outputs.total-cost }}"
 ```
 
 ## Threshold Gate
