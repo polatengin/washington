@@ -17,11 +17,11 @@ code --install-extension polatengin.washington
 
 ## Features
 
-- **CodeLens annotations** — see estimated monthly costs above each resource
-- **Hover details** — hover over a resource to see a detailed cost breakdown
-- **Status bar totals** — view the current file's estimated monthly cost at a glance
-- **Cost breakdown panel** — inspect per-resource totals in the explorer view
-- **Automatic refresh** — when `washington.estimateOnSave` is enabled, estimates are refreshed when a `.bicep` file is opened, saved, or changed
+- **CodeLens annotations** - see estimated monthly costs above each resource
+- **Hover details** - hover over a resource to see a detailed cost breakdown
+- **Status bar totals** - view the current file's estimated monthly cost at a glance
+- **Cost breakdown panel** - inspect per-resource totals in the explorer view
+- **Automatic refresh** - when `washington.estimateOnSave` is enabled, estimates are refreshed when a `.bicep` file is opened, saved, or changed
 
 ## Configuration
 

@@ -20,8 +20,8 @@ bce estimate --file <path> [options]
 | Option | Description | Default |
 |--------|-------------|---------|
 | `--file <path>` | Path to a `.bicep` or ARM JSON file | required |
-| `--params-file <path>` | Path to a `.bicepparam` file whose values should be applied during estimation | — |
-| `--param <key=value>` | Override a parameter value from the command line | — |
+| `--params-file <path>` | Path to a `.bicepparam` file whose values should be applied during estimation | - |
+| `--param <key=value>` | Override a parameter value from the command line | - |
 | `--output <format>` | Output format: `table`, `json`, `csv`, or `markdown` | `table` |
 
 ### Examples

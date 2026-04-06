@@ -45,10 +45,10 @@ The output shows a table of resources with their estimated monthly costs.
 
 ## Next Steps
 
-- [CLI Commands](/cli/commands) — full command reference
-- [CLI Configuration](/cli/configuration) — configure defaults and output formats
-- [VS Code Extension](/vscode-extension) — get estimates in your editor
-- [VS Code Extension Settings](/vscode-extension/settings) — detailed editor configuration reference
-- [GitHub Action](/github-action) — automate cost estimates in CI
-- [How Estimates Work](/guides/how-estimates-work) — understand the estimation pipeline and current behavior
-- [Troubleshooting](/guides/troubleshooting) — resolve setup, cache, and unsupported-resource issues
+- [CLI Commands](/cli/commands) - full command reference
+- [CLI Configuration](/cli/configuration) - configure defaults and output formats
+- [VS Code Extension](/vscode-extension) - get estimates in your editor
+- [VS Code Extension Settings](/vscode-extension/settings) - detailed editor configuration reference
+- [GitHub Action](/github-action) - automate cost estimates in CI
+- [How Estimates Work](/guides/how-estimates-work) - understand the estimation pipeline and current behavior
+- [Troubleshooting](/guides/troubleshooting) - resolve setup, cache, and unsupported-resource issues

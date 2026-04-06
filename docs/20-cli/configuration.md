@@ -13,8 +13,8 @@ The current CLI does not support a dedicated config file or `BCE_*` environment 
 
 | Option | Description | Default |
 |----------|-------------|---------|
-| `--params-file <path>` | Apply parameter values from a `.bicepparam` file | — |
-| `--param <key=value>` | Override a parameter value on the command line | — |
+| `--params-file <path>` | Apply parameter values from a `.bicepparam` file | - |
+| `--param <key=value>` | Override a parameter value on the command line | - |
 | `--output <format>` | Choose `table`, `json`, `csv`, or `markdown` output | `table` |
 
 ## Runtime Defaults

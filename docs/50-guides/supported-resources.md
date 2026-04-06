@@ -155,7 +155,7 @@ Some services have a simple one-to-one mapping. Others are approximated from the
 When a resource type does not have a mapper yet, Washington does not fail the whole estimate. It emits a warning like this instead:
 
 ```text
-⚠ No pricing mapper for Microsoft.Xyz/abc — skipped
+⚠ No pricing mapper for Microsoft.Xyz/abc - skipped
 ```
 
 That behavior is useful in mixed templates, but it also means your total can be incomplete if some resource types are not yet mapped.

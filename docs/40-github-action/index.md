@@ -36,12 +36,12 @@ jobs:
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `file` | Path to the `.bicep` file to estimate | Yes | — |
-| `params-file` | Optional `.bicepparam` file | No | — |
-| `base-file` | Base branch `.bicep` file for delta comparison | No | — |
-| `base-params-file` | Base branch `.bicepparam` file for delta comparison | No | — |
+| `file` | Path to the `.bicep` file to estimate | Yes | - |
+| `params-file` | Optional `.bicepparam` file | No | - |
+| `base-file` | Base branch `.bicep` file for delta comparison | No | - |
+| `base-params-file` | Base branch `.bicepparam` file for delta comparison | No | - |
 | `output-format` | Result format: `json`, `table`, or `markdown` | No | `json` |
-| `fail-on-threshold` | Fail the step if the monthly total exceeds this value | No | — |
+| `fail-on-threshold` | Fail the step if the monthly total exceeds this value | No | - |
 
 ## Outputs
 
