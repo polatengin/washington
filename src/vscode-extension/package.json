@@ -1,6 +1,6 @@
 {
   "name": "washington",
-  "displayName": "Washington — Azure Cost Estimator",
+  "displayName": "Washington - Azure Cost Estimator",
   "description": "Estimate monthly Azure costs from Bicep files",
   "version": "0.1.0",
   "engines": {

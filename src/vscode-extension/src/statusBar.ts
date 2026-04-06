@@ -4,7 +4,7 @@ import { CostReport } from './types';
 export function createStatusBarItem(): vscode.StatusBarItem {
   const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
   item.command = 'washington.estimateFile';
-  item.text = '$(symbol-operator) Cost: —';
+  item.text = '$(symbol-operator) Cost: -';
   item.tooltip = 'Click to estimate Azure costs';
   item.hide();
   return item;

@@ -8,7 +8,7 @@ suite('StatusBar', () => {
   test('creates status bar item with correct properties', () => {
     const item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
     item.command = 'washington.estimateFile';
-    item.text = '$(symbol-operator) Cost: —';
+    item.text = '$(symbol-operator) Cost: -';
 
     assert.strictEqual(item.command, 'washington.estimateFile');
     assert.ok(item.text.includes('Cost:'));

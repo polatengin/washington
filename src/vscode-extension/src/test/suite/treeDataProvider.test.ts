@@ -51,7 +51,7 @@ suite('TreeDataProvider', () => {
       lines: [],
       grandTotal: 0,
       currency: 'USD',
-      warnings: ['⚠ No pricing mapper for Microsoft.Network/networkInterfaces — skipped'],
+      warnings: ['⚠ No pricing mapper for Microsoft.Network/networkInterfaces - skipped'],
     };
 
     provider.update(report);

@@ -15,7 +15,7 @@ suite('Types', () => {
       ],
       grandTotal: 70.08,
       currency: 'USD',
-      warnings: ['⚠ No pricing mapper for Microsoft.Network/networkInterfaces — skipped'],
+      warnings: ['⚠ No pricing mapper for Microsoft.Network/networkInterfaces - skipped'],
     };
 
     assert.strictEqual(report.lines.length, 1);

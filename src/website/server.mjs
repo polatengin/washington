@@ -222,7 +222,7 @@ app.post('/api/estimate', async (req, res) => {
   }
 });
 
-// CLI client middleware — skip for static file extensions
+// CLI client middleware - skip for static file extensions
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/')) {
     return next();
