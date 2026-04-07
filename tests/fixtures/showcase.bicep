@@ -19,7 +19,7 @@ param agentCount int = 3
 
 param agentVMSize string = 'Standard_DS2_v2'
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
+resource showcaseAppServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: 'washington-showcase-plan'
   location: location
   sku: {
@@ -239,7 +239,7 @@ resource appConfiguration 'Microsoft.AppConfiguration/configurationStores@2023-0
   }
 }
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' = {
+resource firewallVirtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' = {
   name: 'washingtonfirewallvnet'
   location: location
   properties: {
@@ -272,7 +272,7 @@ resource azureFirewall 'Microsoft.Network/azureFirewalls@2023-09-01' = {
         name: 'azureFirewallIpConfig'
         properties: {
           subnet: {
-            id: resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetwork.name, 'AzureFirewallSubnet')
+            id: resourceId('Microsoft.Network/virtualNetworks/subnets', firewallVirtualNetwork.name, 'AzureFirewallSubnet')
           }
           publicIPAddress: {
             id: publicIp.id
@@ -391,7 +391,7 @@ resource sqlDatabase 'Microsoft.Sql/servers/databases@2021-11-01' = {
   }
 }
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' = {
+resource managedInstanceVirtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' = {
   name: 'washingtonmivnet'
   location: location
   properties: {
@@ -431,7 +431,7 @@ resource sqlManagedInstance 'Microsoft.Sql/managedInstances@2023-08-01-preview' 
   properties: {
     administratorLogin: 'sqlmiadmin'
     administratorLoginPassword: 'Placeholder123!'
-    subnetId: resourceId('Microsoft.Network/virtualNetworks/subnets', virtualNetwork.name, 'managedinstancesubnet')
+    subnetId: resourceId('Microsoft.Network/virtualNetworks/subnets', managedInstanceVirtualNetwork.name, 'managedinstancesubnet')
     licenseType: 'LicenseIncluded'
     vCores: 4
     storageSizeInGB: 32
@@ -449,7 +449,7 @@ resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {
   properties: {}
 }
 
-resource appServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
+resource websiteAppServicePlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   name: 'washingtonwebplan'
   location: location
   sku: {
@@ -463,7 +463,7 @@ resource webSite 'Microsoft.Web/sites@2023-12-01' = {
   location: location
   kind: 'app'
   properties: {
-    serverFarmId: appServicePlan.id
+    serverFarmId: websiteAppServicePlan.id
     httpsOnly: true
   }
 }
