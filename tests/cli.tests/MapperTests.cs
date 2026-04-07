@@ -709,6 +709,38 @@ public class MapperTests
     }
 
     [Fact]
+    public void LogAnalyticsWorkspaceMapper_CalculateCost_UsesPaidTierAfterIncludedAllowance()
+    {
+        var mapper = new LogAnalyticsWorkspaceMapper();
+        var resource = CreateResource("Microsoft.OperationalInsights/workspaces",
+            properties: new { sku = new { name = "PerGB2018" }, retentionInDays = 30 });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                MeterName = "Analytics Logs Data Ingestion",
+                UnitOfMeasure = "1 GB",
+                TierMinimumUnits = 0,
+                UnitPrice = 0.0
+            },
+            new PriceRecord
+            {
+                MeterName = "Analytics Logs Data Ingestion",
+                UnitOfMeasure = "1 GB",
+                TierMinimumUnits = 5,
+                UnitPrice = 2.3
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(333.5m, cost.Amount);
+        Assert.Contains("145 billable", cost.Details);
+        Assert.Contains("$2.3000/GB", cost.Details);
+    }
+
+    [Fact]
     public void RedisCacheMapper_BuildQueries_CorrectServiceName()
     {
         var mapper = new RedisCacheMapper();
