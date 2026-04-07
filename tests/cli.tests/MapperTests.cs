@@ -755,6 +755,44 @@ public class MapperTests
     }
 
     [Fact]
+    public void RedisCacheMapper_CalculateCost_MatchesExactCacheCodeAndTier()
+    {
+        var mapper = new RedisCacheMapper();
+        var resource = CreateResource("Microsoft.Cache/redis",
+            properties: new { sku = new { name = "Basic", family = "C", capacity = 1 } });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                MeterName = "C0",
+                SkuName = "Basic",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.022
+            },
+            new PriceRecord
+            {
+                MeterName = "C1",
+                SkuName = "Standard",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.138
+            },
+            new PriceRecord
+            {
+                MeterName = "C1",
+                SkuName = "Basic",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.055
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(40.15m, cost.Amount);
+        Assert.Contains("$0.0550/hr", cost.Details);
+    }
+
+    [Fact]
     public void EventHubMapper_BuildQueries_CorrectServiceName()
     {
         var mapper = new EventHubMapper();
