@@ -22,7 +22,7 @@ public class AppServicePlanMapper : IResourceCostMapper
             new PricingQuery(
                 ServiceName: "Azure App Service",
                 ArmRegionName: region,
-                ArmSkuName: skuName,
+                SkuName: skuName,
                 PriceType: "Consumption"
             )
         };
@@ -31,19 +31,17 @@ public class AppServicePlanMapper : IResourceCostMapper
     public MonthlyCost CalculateCost(ResourceDescriptor resource, List<PriceRecord> prices)
     {
         var skuName = GetSkuName(resource);
+        var isLinuxPlan = IsLinuxPlan(resource);
 
-        var price = prices
-            .Where(p => p.ArmSkuName != null
-                && p.ArmSkuName.Equals(skuName, StringComparison.OrdinalIgnoreCase)
-                && p.UnitOfMeasure == "1 Hour")
-            .OrderBy(p => p.UnitPrice)
-            .FirstOrDefault();
+        var matchingPrices = prices
+            .Where(p => p.UnitOfMeasure == "1 Hour" && MatchesSku(p, skuName))
+            .ToList();
 
-        // Fallback: match by SKU name in the skuName field
-        price ??= prices
-            .Where(p => p.SkuName != null
-                && p.SkuName.Contains(skuName, StringComparison.OrdinalIgnoreCase)
-                && p.UnitOfMeasure == "1 Hour")
+        var platformPrices = matchingPrices
+            .Where(p => IsLinuxPrice(p) == isLinuxPlan)
+            .ToList();
+
+        var price = (platformPrices.Count != 0 ? platformPrices : matchingPrices)
             .OrderBy(p => p.UnitPrice)
             .FirstOrDefault();
 
@@ -60,4 +58,31 @@ public class AppServicePlanMapper : IResourceCostMapper
             return name.GetString() ?? "F1";
         return "F1";
     }
+
+    private static bool MatchesSku(PriceRecord price, string skuName)
+    {
+        var normalizedSkuName = NormalizeSkuName(skuName);
+
+        if (!string.IsNullOrEmpty(price.ArmSkuName) && NormalizeSkuName(price.ArmSkuName) == normalizedSkuName)
+            return true;
+
+        return !string.IsNullOrEmpty(price.SkuName) && NormalizeSkuName(price.SkuName) == normalizedSkuName;
+    }
+
+    private static string NormalizeSkuName(string skuName) =>
+        string.Concat(skuName.Where(c => !char.IsWhiteSpace(c)));
+
+    private static bool IsLinuxPlan(ResourceDescriptor resource)
+    {
+        if (resource.Properties.TryGetValue("reserved", out var reserved) && reserved.ValueKind == JsonValueKind.True)
+            return true;
+
+        return resource.Properties.TryGetValue("_kind", out var kind)
+            && kind.ValueKind == JsonValueKind.String
+            && kind.GetString()?.Contains("linux", StringComparison.OrdinalIgnoreCase) == true;
+    }
+
+    private static bool IsLinuxPrice(PriceRecord price) =>
+        (price.ProductName?.Contains("Linux", StringComparison.OrdinalIgnoreCase) ?? false)
+        || (price.MeterName?.Contains("Linux", StringComparison.OrdinalIgnoreCase) ?? false);
 }
