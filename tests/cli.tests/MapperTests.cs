@@ -155,7 +155,71 @@ public class MapperTests
 
         Assert.Single(queries);
         Assert.Equal("Azure App Service", queries[0].ServiceName);
-        Assert.Equal("P1v3", queries[0].ArmSkuName);
+        Assert.Equal("P1v3", queries[0].SkuName);
+        Assert.Null(queries[0].ArmSkuName);
+    }
+
+    [Fact]
+    public void AppServicePlanMapper_CalculateCost_PrefersWindowsPriceByDefault()
+    {
+        var mapper = new AppServicePlanMapper();
+        var resource = CreateResource("Microsoft.Web/serverfarms",
+            sku: new { name = "B1" });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                SkuName = "B1",
+                ProductName = "Azure App Service Basic Plan - Linux",
+                UnitPrice = 0.017,
+                UnitOfMeasure = "1 Hour"
+            },
+            new PriceRecord
+            {
+                SkuName = "B1",
+                ProductName = "Azure App Service Basic Plan",
+                UnitPrice = 0.075,
+                UnitOfMeasure = "1 Hour"
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(54.75m, cost.Amount);
+        Assert.Contains("$0.0750/hr", cost.Details);
+    }
+
+    [Fact]
+    public void AppServicePlanMapper_CalculateCost_UsesLinuxPrice_WhenReserved()
+    {
+        var mapper = new AppServicePlanMapper();
+        var resource = CreateResource("Microsoft.Web/serverfarms",
+            properties: new { reserved = true },
+            sku: new { name = "B1" });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                SkuName = "B1",
+                ProductName = "Azure App Service Basic Plan",
+                UnitPrice = 0.075,
+                UnitOfMeasure = "1 Hour"
+            },
+            new PriceRecord
+            {
+                SkuName = "B1",
+                ProductName = "Azure App Service Basic Plan - Linux",
+                UnitPrice = 0.017,
+                UnitOfMeasure = "1 Hour"
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(12.41m, cost.Amount);
+        Assert.Contains("$0.0170/hr", cost.Details);
     }
 
     [Fact]

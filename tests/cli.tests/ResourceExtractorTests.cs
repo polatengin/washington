@@ -149,6 +149,39 @@ public class ResourceExtractorTests
         Assert.Equal("Standard_D4s_v3", hardwareProfile.GetProperty("vmSize").GetString());
     }
 
+    [Fact]
+    public void Extract_AppServicePlan_PreservesTopLevelReservedFlag()
+    {
+        var json = """
+        {
+            "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+            "contentVersion": "1.0.0.0",
+            "resources": [
+                {
+                    "type": "Microsoft.Web/serverfarms",
+                    "apiVersion": "2023-12-01",
+                    "name": "linux-plan",
+                    "location": "eastus",
+                    "kind": "linux",
+                    "reserved": true,
+                    "sku": {
+                        "name": "B1",
+                        "tier": "Basic"
+                    },
+                    "properties": {}
+                }
+            ]
+        }
+        """;
+
+        var resources = _extractor.Extract(json);
+
+        Assert.Single(resources);
+        Assert.True(resources[0].Properties.ContainsKey("reserved"));
+        Assert.True(resources[0].Properties["reserved"].GetBoolean());
+        Assert.Equal("linux", resources[0].Properties["_kind"].GetString());
+    }
+
     private static string GetFixturePath(string fileName) =>
         Path.Combine("fixtures", fileName);
 }
