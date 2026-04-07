@@ -1,21 +1,19 @@
-using System.CommandLine;
 using System.Text.Json;
+using Washington.Commands;
 using Washington.Services;
 using Xunit;
 
 namespace Washington.Tests;
 
-public class ProgramTests
+public class EstimateCommandTests
 {
     [Fact]
-    public async Task InvokeAsync_WhenBicepCompilationFails_ReturnsNonZeroAndWritesError()
+    public async Task ExecuteAsync_WhenBicepCompilationFails_ReturnsNonZeroAndWritesError()
     {
-        var rootCommand = new RootCommand();
-        rootCommand.SetAction((Func<ParseResult, int>)(_ => throw new BicepCompilationException("Bicep compilation failed for 'showcase.bicep'.")));
-
         using var errorWriter = new StringWriter();
+        Func<Task<int>> commandAction = () => throw new BicepCompilationException("Bicep compilation failed for 'showcase.bicep'.");
 
-        var exitCode = await global::Program.InvokeAsync(rootCommand, [], errorWriter);
+        var exitCode = await EstimateCommand.ExecuteAsync(commandAction, errorWriter);
 
         Assert.Equal(1, exitCode);
         Assert.Equal(
@@ -24,14 +22,12 @@ public class ProgramTests
     }
 
     [Fact]
-    public async Task InvokeAsync_WhenTemplateJsonIsInvalid_ReturnsNonZeroAndWritesError()
+    public async Task ExecuteAsync_WhenTemplateJsonIsInvalid_ReturnsNonZeroAndWritesError()
     {
-        var rootCommand = new RootCommand();
-        rootCommand.SetAction((Func<ParseResult, int>)(_ => throw new JsonException("Bad JSON.")));
-
         using var errorWriter = new StringWriter();
+        Func<Task<int>> commandAction = () => throw new JsonException("Bad JSON.");
 
-        var exitCode = await global::Program.InvokeAsync(rootCommand, [], errorWriter);
+        var exitCode = await EstimateCommand.ExecuteAsync(commandAction, errorWriter);
 
         Assert.Equal(1, exitCode);
         Assert.Equal(
