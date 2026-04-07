@@ -9,6 +9,13 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - id: cost-csv
+        name: Estimate cost with output in csv format
+        uses: polatengin/washington@main
+        with:
+          file: tests/fixtures/all.bicep
+          output-format: csv
+
       - id: cost-json
         name: Estimate cost with output in json format
         uses: polatengin/washington@main
