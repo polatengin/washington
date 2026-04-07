@@ -1650,7 +1650,8 @@ public class MapperTests
         var queries = mapper.BuildQueries(resource);
 
         Assert.Single(queries);
-        Assert.Equal("Azure App Configuration", queries[0].ServiceName);
+        Assert.Equal("App Configuration", queries[0].ServiceName);
+        Assert.Equal("Standard", queries[0].SkuName);
     }
 
     [Fact]
@@ -1664,6 +1665,44 @@ public class MapperTests
 
         Assert.Equal(0m, cost.Amount);
         Assert.Contains("Free", cost.Details);
+    }
+
+    [Fact]
+    public void AppConfigurationMapper_CalculateCost_UsesStandardInstancePrice()
+    {
+        var mapper = new AppConfigurationMapper();
+        var resource = CreateResource("Microsoft.AppConfiguration/configurationStores",
+            sku: new { name = "Standard" });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                SkuName = "Standard",
+                MeterName = "Standard Experimentation Events",
+                UnitOfMeasure = "1K",
+                UnitPrice = 0.0
+            },
+            new PriceRecord
+            {
+                SkuName = "Standard",
+                MeterName = "Standard Overage Operations",
+                UnitOfMeasure = "10K",
+                UnitPrice = 0.06
+            },
+            new PriceRecord
+            {
+                SkuName = "Standard",
+                MeterName = "Standard Instance",
+                UnitOfMeasure = "1/Day",
+                UnitPrice = 1.2
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(36m, cost.Amount);
+        Assert.Contains("$1.20/day", cost.Details);
     }
 
     // ===== Registry covers all new mappers =====
