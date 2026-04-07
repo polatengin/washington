@@ -344,6 +344,46 @@ public class MapperTests
     }
 
     [Fact]
+    public void KeyVaultMapper_BuildQueries_UsesAdvancedOperationsMeterAndNormalizedSku()
+    {
+        var mapper = new KeyVaultMapper();
+        var resource = CreateResource("Microsoft.KeyVault/vaults",
+            properties: new { sku = new { name = "premium", family = "A" } });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Key Vault", queries[0].ProductName);
+        Assert.Equal("Premium", queries[0].SkuName);
+        Assert.Equal("Advanced Key Operations", queries[0].MeterName);
+    }
+
+    [Fact]
+    public void KeyVaultMapper_CalculateCost_UsesOneMillionAdvancedOperations()
+    {
+        var mapper = new KeyVaultMapper();
+        var resource = CreateResource("Microsoft.KeyVault/vaults",
+            properties: new { sku = new { name = "standard", family = "A" } });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                MeterName = "Advanced Key Operations",
+                SkuName = "Standard",
+                UnitOfMeasure = "10K",
+                UnitPrice = 0.15
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(15.0m, cost.Amount);
+        Assert.Contains("1000000 Advanced Operations", cost.Details);
+        Assert.Contains("$0.1500/10K ops", cost.Details);
+    }
+
+    [Fact]
     public void ContainerRegistryMapper_BuildQueries_CorrectServiceName()
     {
         var mapper = new ContainerRegistryMapper();

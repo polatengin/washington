@@ -5,6 +5,9 @@ namespace Washington.Mappers;
 
 public class KeyVaultMapper : IResourceCostMapper
 {
+    private const decimal EstimatedAdvancedOperations = 1_000_000m;
+    private const decimal OperationUnitSize = 10_000m;
+
     public string ResourceType => "Microsoft.KeyVault/vaults";
 
     public bool CanMap(ResourceDescriptor resource) =>
@@ -20,7 +23,9 @@ public class KeyVaultMapper : IResourceCostMapper
             new PricingQuery(
                 ServiceName: "Key Vault",
                 ArmRegionName: region,
-                ProductName: $"Key Vault {skuName}",
+                ProductName: "Key Vault",
+                SkuName: skuName,
+                MeterName: "Advanced Key Operations",
                 PriceType: "Consumption"
             )
         };
@@ -30,38 +35,51 @@ public class KeyVaultMapper : IResourceCostMapper
     {
         var skuName = GetSkuName(resource);
 
-        // Look for operations-based pricing (secrets, keys)
         var price = prices
-            .Where(p => p.MeterName != null &&
-                (p.MeterName.Contains("Operations") || p.MeterName.Contains("Secret")))
-            .OrderBy(p => p.UnitPrice)
+            .Where(p => string.Equals(p.MeterName, "Advanced Key Operations", StringComparison.OrdinalIgnoreCase)
+                && string.Equals(p.SkuName, skuName, StringComparison.OrdinalIgnoreCase)
+                && string.Equals(p.UnitOfMeasure, "10K", StringComparison.OrdinalIgnoreCase)
+                && p.UnitPrice > 0)
             .FirstOrDefault();
 
-        // Fallback: any matching price
         price ??= prices
-            .Where(p => p.UnitPrice > 0)
+            .Where(p => p.MeterName != null &&
+                p.MeterName.Contains("Advanced Key Operations", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(p.UnitOfMeasure, "10K", StringComparison.OrdinalIgnoreCase) &&
+                p.UnitPrice > 0)
+            .FirstOrDefault();
+
+        price ??= prices
+            .Where(p => p.MeterName != null &&
+                p.MeterName.Contains("Operations", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(p.UnitOfMeasure, "10K", StringComparison.OrdinalIgnoreCase) &&
+                p.UnitPrice > 0)
             .OrderBy(p => p.UnitPrice)
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"Key Vault {skuName} - base cost + usage");
+            return new MonthlyCost(0, $"Key Vault {skuName} - no advanced operations pricing found");
 
-        // Estimate 10,000 operations/month as baseline
-        var estimatedOps = 10_000m;
-        var unitSize = 10_000m; // pricing is per 10,000 operations
-        var monthlyCost = (decimal)price.UnitPrice * (estimatedOps / unitSize);
-        return new MonthlyCost(monthlyCost, $"Key Vault {skuName} ~{estimatedOps:N0} ops @ ${price.UnitPrice:F4}/10K ops + usage");
+        var monthlyCost = (decimal)price.UnitPrice * (EstimatedAdvancedOperations / OperationUnitSize);
+        return new MonthlyCost(monthlyCost, $"Key Vault {skuName} ~{EstimatedAdvancedOperations:F0} Advanced Operations @ ${price.UnitPrice:F4}/10K ops");
     }
 
     private static string GetSkuName(ResourceDescriptor resource)
     {
         if (resource.Sku.TryGetValue("name", out var name) && name.ValueKind == JsonValueKind.String)
-            return name.GetString() ?? "standard";
+            return NormalizeSkuName(name.GetString());
         if (resource.Properties.TryGetValue("sku", out var skuProp) &&
             skuProp.ValueKind == JsonValueKind.Object &&
             skuProp.TryGetProperty("name", out var skuName) &&
             skuName.ValueKind == JsonValueKind.String)
-            return skuName.GetString() ?? "standard";
-        return "standard";
+            return NormalizeSkuName(skuName.GetString());
+        return "Standard";
     }
+
+    private static string NormalizeSkuName(string? skuName) =>
+        skuName?.Trim().ToLowerInvariant() switch
+        {
+            "premium" => "Premium",
+            _ => "Standard"
+        };
 }
