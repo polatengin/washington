@@ -1,5 +1,9 @@
 name: 'Bicep Cost Estimator'
 description: 'Estimate monthly Azure costs from Bicep files'
+author: polatengin
+branding:
+  color: green
+  icon: box
 inputs:
   file:
     description: 'Path to the .bicep file'
