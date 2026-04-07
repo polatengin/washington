@@ -168,6 +168,11 @@ public class ResourceExtractor
             properties["_kind"] = ResolveJsonElement(kindElement, parameterValues);
         }
 
+        if (resource.TryGetProperty("reserved", out var reservedElement))
+        {
+            properties["reserved"] = ResolveJsonElement(reservedElement, parameterValues);
+        }
+
         return new ResourceDescriptor(type, apiVersion, name, location, sku, properties);
     }
 
