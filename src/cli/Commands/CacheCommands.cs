@@ -9,7 +9,7 @@ public class CacheClearCommand
     {
         var command = new Command("clear", "Clear the pricing cache");
 
-        command.SetHandler(() =>
+        command.SetAction(_ =>
         {
             var cache = new FilePricingCache();
             cache.Clear();
@@ -26,7 +26,7 @@ public class CacheInfoCommand
     {
         var command = new Command("info", "Show pricing cache information");
 
-        command.SetHandler(() =>
+        command.SetAction(_ =>
         {
             var cache = new FilePricingCache();
             var (fileCount, totalBytes) = cache.GetInfo();
