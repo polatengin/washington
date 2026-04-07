@@ -10,37 +10,44 @@ public class EstimateCommand
 {
     public static Command Create()
     {
-        var fileOption = new Option<FileInfo>(
-            name: "--file",
-            description: "Path to the .bicep or ARM JSON file")
-        { IsRequired = true };
-
-        var paramsFileOption = new Option<FileInfo?>(
-            name: "--params-file",
-            description: "Path to the .bicepparam file");
-
-        var outputFormatOption = new Option<string>(
-            name: "--output",
-            getDefaultValue: () => "table",
-            description: "Output format: table, json, csv, markdown");
-
-        var paramOption = new Option<string[]>(
-            name: "--param",
-            description: "Parameter value override in key=value format (can be specified multiple times)")
-        { AllowMultipleArgumentsPerToken = true };
-
-        var command = new Command("estimate", "Estimate monthly Azure costs from a Bicep or ARM file")
+        var fileOption = new Option<FileInfo>("--file")
         {
-            fileOption,
-            paramsFileOption,
-            outputFormatOption,
-            paramOption
+            Description = "Path to the .bicep or ARM JSON file",
+            Required = true
+        }.AcceptExistingOnly();
+
+        var paramsFileOption = new Option<FileInfo>("--params-file")
+        {
+            Description = "Path to the .bicepparam file"
+        }.AcceptExistingOnly();
+
+        var outputFormatOption = new Option<string>("--output")
+        {
+            Description = "Output format: table, json, csv, markdown",
+            DefaultValueFactory = _ => "table"
         };
 
-        command.SetHandler(async (file, paramsFile, outputFormat, paramOverrides) =>
+        var paramOption = new Option<string[]>("--param")
         {
+            Description = "Parameter value override in key=value format (can be specified multiple times)",
+            AllowMultipleArgumentsPerToken = true
+        };
+
+        var command = new Command("estimate", "Estimate monthly Azure costs from a Bicep or ARM file");
+        command.Options.Add(fileOption);
+        command.Options.Add(paramsFileOption);
+        command.Options.Add(outputFormatOption);
+        command.Options.Add(paramOption);
+
+        command.SetAction(async parseResult =>
+        {
+            var file = parseResult.GetRequiredValue(fileOption);
+            FileInfo? paramsFile = parseResult.GetValue(paramsFileOption);
+            var outputFormat = parseResult.GetValue(outputFormatOption) ?? "table";
+            var paramOverrides = parseResult.GetValue(paramOption) ?? Array.Empty<string>();
+
             await RunAsync(file, paramsFile, outputFormat, paramOverrides);
-        }, fileOption, paramsFileOption, outputFormatOption, paramOption);
+        });
 
         return command;
     }
