@@ -73,6 +73,11 @@ public class EstimateCommand
             await effectiveErrorWriter.WriteLineAsync($"Error: Failed to parse template JSON. {ex.Message}");
             return 1;
         }
+        catch (Exception ex)
+        {
+            await effectiveErrorWriter.WriteLineAsync($"Error: {ex.Message}");
+            return 1;
+        }
     }
 
     private static async Task<int> RunAsync(
