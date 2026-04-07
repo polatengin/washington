@@ -17,7 +17,16 @@ const defaultDocfindPaths = [
   join(homedir(), '.docfind', 'bin', 'docfind.exe'),
 ];
 
-const categoryByTopLevelPath = {
+type Frontmatter = Record<string, string>;
+
+type SearchDocument = {
+  body: string;
+  category: string;
+  href: string;
+  title: string;
+};
+
+const categoryByTopLevelPath: Record<string, string> = {
   cli: 'CLI',
   'github-action': 'GitHub Action',
   guides: 'Guides',
@@ -52,7 +61,7 @@ function parseFrontmatter(content) {
     return {body: content, frontmatter: {}};
   }
 
-  const frontmatter = {};
+  const frontmatter: Frontmatter = {};
 
   for (const line of match[1].split(/\r?\n/)) {
     const frontmatterMatch = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
@@ -181,13 +190,13 @@ async function resolveDocfindCommand() {
 async function runDocfind() {
   const docfindCommand = await resolveDocfindCommand();
 
-  await new Promise((resolve, reject) => {
+  await new Promise<void>((resolve, reject) => {
     const child = spawn(docfindCommand, [documentsPath, outputDir], {
       cwd: repoRoot,
       stdio: 'inherit',
     });
 
-    child.once('error', error => {
+    child.once('error', (error: NodeJS.ErrnoException) => {
       if (error.code === 'ENOENT') {
         reject(new Error('docfind CLI not found. Run `make setup-website` or install it with `curl -fsSL https://microsoft.github.io/docfind/install.sh | sh`.'));
         return;
@@ -215,7 +224,7 @@ async function runDocfind() {
 async function collectDocuments() {
   const markdownFiles = (await walk(docsDir)).sort();
 
-  const documents = [];
+  const documents: SearchDocument[] = [];
 
   for (const filePath of markdownFiles) {
     const content = await readFile(filePath, 'utf8');

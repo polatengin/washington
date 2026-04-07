@@ -9,6 +9,16 @@ const repoRoot = join(__dirname, '..', '..', '..');
 const docPath = join(repoRoot, 'docs', '60-release-notes.md');
 const releasesApiUrl = 'https://api.github.com/repos/polatengin/washington/releases?per_page=100';
 
+type GithubRelease = {
+  body?: string | null;
+  created_at?: string | null;
+  draft?: boolean;
+  html_url: string;
+  prerelease: boolean;
+  published_at?: string | null;
+  tag_name: string;
+};
+
 function demoteMarkdownHeadings(markdown) {
   let activeFence = null;
   return markdown.split(/\r?\n/).map(line => {
@@ -79,7 +89,7 @@ function buildDocument(releases) {
 
 async function fetchReleases() {
   const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
-  const headers = {
+  const headers: Record<string, string> = {
     accept: 'application/vnd.github+json',
     'user-agent': 'washington-website-release-notes-generator',
     'x-github-api-version': '2022-11-28',
@@ -101,7 +111,7 @@ async function fetchReleases() {
     throw new Error('GitHub releases response did not return an array.');
   }
 
-  return releases.filter(release => !release.draft);
+  return releases.filter((release): release is GithubRelease => !release.draft);
 }
 
 async function main() {

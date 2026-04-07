@@ -10,11 +10,20 @@ const registryPath = join(repoRoot, 'src', 'cli', 'Mappers', 'MapperRegistry.cs'
 const mappersDir = join(repoRoot, 'src', 'cli', 'Mappers');
 const docPath = join(repoRoot, 'docs', '50-guides', 'supported-resources.md');
 
+type RegistryEntry = {
+  group: string;
+  mapperClass: string;
+};
+
+type RegistryEntryWithResourceType = RegistryEntry & {
+  resourceType: string;
+};
+
 const countMarkerPattern = /<!-- GENERATED:RESOURCE_COUNT -->([\s\S]*?)<!-- \/GENERATED:RESOURCE_COUNT -->/;
 const matrixMarkerPattern = /<!-- BEGIN GENERATED SUPPORTED RESOURCE MATRIX -->([\s\S]*?)<!-- END GENERATED SUPPORTED RESOURCE MATRIX -->/;
 
 function parseRegistryEntries(content) {
-  const entries = [];
+  const entries: RegistryEntry[] = [];
   let currentGroup = 'Ungrouped';
 
   for (const line of content.split(/\r?\n/)) {
@@ -91,10 +100,12 @@ function buildGeneratedMatrix(entries) {
 async function main() {
   const registryContent = await readFile(registryPath, 'utf8');
   const entries = parseRegistryEntries(registryContent);
-
-  for (const entry of entries) {
-    entry.resourceType = await readResourceType(entry.mapperClass);
-  }
+  const entriesWithResourceTypes: RegistryEntryWithResourceType[] = await Promise.all(
+    entries.map(async entry => ({
+      ...entry,
+      resourceType: await readResourceType(entry.mapperClass),
+    }))
+  );
 
   const docContent = await readFile(docPath, 'utf8');
 
@@ -106,15 +117,15 @@ async function main() {
     throw new Error('Supported resources doc is missing the generated matrix markers.');
   }
 
-  const updatedCount = `<!-- GENERATED:RESOURCE_COUNT -->${entries.length}<!-- /GENERATED:RESOURCE_COUNT -->`;
-  const updatedMatrix = `<!-- BEGIN GENERATED SUPPORTED RESOURCE MATRIX -->\n${buildGeneratedMatrix(entries)}<!-- END GENERATED SUPPORTED RESOURCE MATRIX -->`;
+  const updatedCount = `<!-- GENERATED:RESOURCE_COUNT -->${entriesWithResourceTypes.length}<!-- /GENERATED:RESOURCE_COUNT -->`;
+  const updatedMatrix = `<!-- BEGIN GENERATED SUPPORTED RESOURCE MATRIX -->\n${buildGeneratedMatrix(entriesWithResourceTypes)}<!-- END GENERATED SUPPORTED RESOURCE MATRIX -->`;
 
   const updatedDoc = docContent
     .replace(countMarkerPattern, updatedCount)
     .replace(matrixMarkerPattern, updatedMatrix);
 
   await writeFile(docPath, updatedDoc, 'utf8');
-  console.log(`Updated supported resources doc with ${entries.length} registry entries.`);
+  console.log(`Updated supported resources doc with ${entriesWithResourceTypes.length} registry entries.`);
 }
 
 await main();

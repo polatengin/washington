@@ -61,11 +61,13 @@ async function cleanupContributingDoc() {
   console.log('Removed docs/50-guides/contributing.md');
 }
 
-function fg([red, green, blue]) {
+function fg(color) {
+  const [red, green, blue] = color;
   return `\x1b[38;2;${red};${green};${blue}m`;
 }
 
-function bg([red, green, blue]) {
+function bg(color) {
+  const [red, green, blue] = color;
   return `\x1b[48;2;${red};${green};${blue}m`;
 }
 

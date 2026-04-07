@@ -20,6 +20,7 @@ const bceBinaryPath = process.env.BCE_BINARY_PATH
   || join(repoRoot, 'src', 'cli', 'bin', 'Release', 'net10.0', 'bce');
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const nodeCommand = process.execPath;
+const tsxImportArgs = ['--import', 'tsx'];
 
 if (publicPort === docsPort) {
   throw new Error('PORT and DOCUSAURUS_DEV_PORT must be different values.');
@@ -45,6 +46,10 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function createTsScriptArgs(fileName, ...extraArgs) {
+  return [...tsxImportArgs, join(__dirname, fileName), ...extraArgs];
+}
+
 async function hasCliBinary() {
   try {
     await access(bceBinaryPath, constants.X_OK);
@@ -65,7 +70,7 @@ function runProcess(command, args, env = {}) {
 async function runCommand(description, command, args) {
   log(description);
 
-  await new Promise((resolve, reject) => {
+  await new Promise<void>((resolve, reject) => {
     const child = runProcess(command, args);
 
     child.once('error', reject);
@@ -114,7 +119,7 @@ async function stopChild(child, signal = 'SIGTERM') {
     return;
   }
 
-  await new Promise(resolve => {
+  await new Promise<void>(resolve => {
     const timeout = setTimeout(() => {
       child.kill('SIGKILL');
     }, 5000);
@@ -179,28 +184,28 @@ function debounce(key, description, work, delayMs = 200) {
 }
 
 async function generateSupportedResources() {
-  await runCommand('Updating supported resources documentation...', nodeCommand, [join(__dirname, 'generate-supported-resources.mjs')]);
+  await runCommand('Updating supported resources documentation...', nodeCommand, createTsScriptArgs('generate-supported-resources.mts'));
 }
 
 async function generateReleaseNotes() {
-  await runCommand('Updating release notes documentation...', nodeCommand, [join(__dirname, 'generate-release-notes.mjs')]);
+  await runCommand('Updating release notes documentation...', nodeCommand, createTsScriptArgs('generate-release-notes.mts'));
 }
 
 async function generatePlaygroundFixtures() {
-  await runCommand('Generating playground fixtures...', nodeCommand, [join(__dirname, 'generate-playground-fixtures.mjs')]);
+  await runCommand('Generating playground fixtures...', nodeCommand, createTsScriptArgs('generate-playground-fixtures.mts'));
 }
 
 async function generatePlainText() {
-  await runCommand('Generating plain-text documentation...', nodeCommand, [join(__dirname, 'generate-plain-text.mjs')]);
+  await runCommand('Generating plain-text documentation...', nodeCommand, createTsScriptArgs('generate-plain-text.mts'));
 }
 
 async function generateSearchIndex() {
-  await runCommand('Generating website search index...', nodeCommand, [join(__dirname, 'generate-search-index.mjs')]);
+  await runCommand('Generating website search index...', nodeCommand, createTsScriptArgs('generate-search-index.mts'));
 }
 
 async function cleanupGeneratedFiles() {
-  await runCommand('Cleaning up generated documentation...', nodeCommand, [join(__dirname, 'generate-plain-text.mjs'), '--cleanup']);
-  await runCommand('Cleaning up website search index...', nodeCommand, [join(__dirname, 'generate-search-index.mjs'), '--cleanup']);
+  await runCommand('Cleaning up generated documentation...', nodeCommand, createTsScriptArgs('generate-plain-text.mts', '--cleanup'));
+  await runCommand('Cleaning up website search index...', nodeCommand, createTsScriptArgs('generate-search-index.mts', '--cleanup'));
 }
 
 async function startDocusaurus() {
@@ -240,7 +245,7 @@ async function restartExpress() {
   startExpress();
 }
 
-function watchFiles(paths, onChange, ignored) {
+function watchFiles(paths, onChange, ignored = undefined) {
   const watcher = chokidar.watch(paths, {
     ignoreInitial: true,
     ignored,
@@ -316,7 +321,7 @@ startExpress();
 watchFiles(
   [
     join(repoRoot, 'tests', 'fixtures', '**', '*.bicep'),
-    join(__dirname, 'generate-playground-fixtures.mjs'),
+    join(__dirname, 'generate-playground-fixtures.mts'),
   ],
   (eventName, filePath) => {
     debounce(
@@ -331,7 +336,7 @@ watchFiles(
   [
     join(repoRoot, 'docs', '**', '*.md'),
     join(repoRoot, 'CONTRIBUTING.md'),
-    join(__dirname, 'generate-plain-text.mjs'),
+    join(__dirname, 'generate-plain-text.mts'),
   ],
   (eventName, filePath) => {
     debounce(
@@ -349,7 +354,7 @@ watchFiles(
 watchFiles(
   [
     join(repoRoot, 'src', 'cli', 'Mappers', '**', '*.cs'),
-    join(__dirname, 'generate-supported-resources.mjs'),
+    join(__dirname, 'generate-supported-resources.mts'),
   ],
   (eventName, filePath) => {
     debounce(
@@ -361,7 +366,7 @@ watchFiles(
 );
 
 watchFiles(
-  [join(__dirname, 'generate-release-notes.mjs')],
+  [join(__dirname, 'generate-release-notes.mts')],
   (eventName, filePath) => {
     debounce(
       'release-notes',
