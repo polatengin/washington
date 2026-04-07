@@ -646,13 +646,50 @@ public class MapperTests
     {
         var mapper = new SqlManagedInstanceMapper();
         var resource = CreateResource("Microsoft.Sql/managedInstances",
-            sku: new { name = "GP_Gen5", capacity = 8 });
+            sku: new { name = "GP_Gen5", tier = "GeneralPurpose", family = "Gen5", capacity = 8 });
 
         var queries = mapper.BuildQueries(resource);
 
-        Assert.Single(queries);
+        Assert.Equal(2, queries.Count);
         Assert.Equal("SQL Managed Instance", queries[0].ServiceName);
-        Assert.Equal("GP_Gen5", queries[0].SkuName);
+        Assert.Equal("SQLMI_GP_Compute_Gen5", queries[0].ArmSkuName);
+        Assert.Equal("General Purpose Data Stored", queries[1].MeterName);
+    }
+
+    [Fact]
+    public void SqlManagedInstanceMapper_CalculateCost_UsesGenericComputeAndStoragePrices()
+    {
+        var mapper = new SqlManagedInstanceMapper();
+        var resource = CreateResource("Microsoft.Sql/managedInstances",
+            properties: new { vCores = 4, storageSizeInGB = 32 },
+            sku: new { name = "GP_Gen5", tier = "GeneralPurpose", family = "Gen5", capacity = 4 });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                ArmSkuName = "SQLMI_GP_Compute_Gen5",
+                ProductName = "SQL Managed Instance General Purpose - Compute Gen5",
+                MeterName = "vCore",
+                SkuName = "vCore",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.152218
+            },
+            new PriceRecord
+            {
+                ProductName = "SQL Managed Instance General Purpose - Storage",
+                MeterName = "General Purpose Data Stored",
+                SkuName = "General Purpose",
+                UnitOfMeasure = "1 GB/Month",
+                UnitPrice = 0.115
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(448.16m, decimal.Round(cost.Amount, 2));
+        Assert.Contains("$0.1522/vCore/hr", cost.Details);
+        Assert.Contains("32 GB storage", cost.Details);
     }
 
     [Fact]
