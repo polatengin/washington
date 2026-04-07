@@ -137,7 +137,7 @@ public class BicepCompiler
     private static string GetCompilationOutput(
         bool success,
         string? contents,
-        IEnumerable<DiagnosticDefinition> diagnostics,
+        IEnumerable<DiagnosticDefinition>? diagnostics,
         string sourcePath,
         string operationName)
     {
@@ -146,18 +146,31 @@ public class BicepCompiler
             return contents;
         }
 
-        var errorDiagnostics = diagnostics
+        throw CreateCompilationException(success, diagnostics, sourcePath, operationName);
+    }
+
+    private static BicepCompilationException CreateCompilationException(
+        bool success,
+        IEnumerable<DiagnosticDefinition>? diagnostics,
+        string sourcePath,
+        string operationName)
+    {
+        var diagnosticList = diagnostics?.ToList() ?? [];
+
+        var errorDiagnostics = diagnosticList
             .Where(diagnostic => diagnostic.Level.Equals("Error", StringComparison.OrdinalIgnoreCase))
             .ToList();
-        var relevantDiagnostics = errorDiagnostics.Count > 0 ? errorDiagnostics : diagnostics.ToList();
+        var relevantDiagnostics = errorDiagnostics.Count > 0 ? errorDiagnostics : diagnosticList;
 
         var message = new StringBuilder();
         message.Append($"Bicep {operationName} failed for '{sourcePath}'.");
 
         if (relevantDiagnostics.Count == 0)
         {
-            message.Append(" No diagnostics were returned.");
-            return message.ToString();
+            message.Append(success
+                ? " The compiler did not return any template contents."
+                : " No diagnostics were returned.");
+            return new BicepCompilationException(message.ToString());
         }
 
         foreach (var diagnostic in relevantDiagnostics)
@@ -167,7 +180,7 @@ public class BicepCompiler
             message.Append($"- {diagnostic.Level} {diagnostic.Code} ({start.Line + 1},{start.Char + 1}): {diagnostic.Message}");
         }
 
-        return message.ToString();
+        return new BicepCompilationException(message.ToString());
     }
 
     private static string? GetConfiguredValue(params string[] variableNames)
