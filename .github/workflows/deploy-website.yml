@@ -74,7 +74,7 @@ jobs:
           az acr login --name "$AZURE_ACR_NAME"
 
       - name: Build and push website image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: src/website/Dockerfile
