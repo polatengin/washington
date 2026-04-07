@@ -33,15 +33,22 @@ public class RedisCacheMapper : IResourceCostMapper
         var skuName = GetSkuName(resource);
         var family = GetFamily(resource);
         var capacity = GetCapacity(resource);
+        var cacheCode = $"{family}{capacity}";
 
         var price = prices
-            .Where(p => p.MeterName != null && p.MeterName.Contains("Cache") &&
-                p.UnitOfMeasure == "1 Hour")
+            .Where(p => IsHourlyPrice(p)
+                && MatchesTier(p, skuName)
+                && MatchesCacheCode(p, cacheCode))
             .OrderBy(p => p.UnitPrice)
             .FirstOrDefault();
 
         price ??= prices
-            .Where(p => p.UnitOfMeasure == "1 Hour" && p.UnitPrice > 0)
+            .Where(p => IsHourlyPrice(p) && MatchesCacheCode(p, cacheCode))
+            .OrderBy(p => p.UnitPrice)
+            .FirstOrDefault();
+
+        price ??= prices
+            .Where(p => IsHourlyPrice(p) && MatchesTier(p, skuName))
             .OrderBy(p => p.UnitPrice)
             .FirstOrDefault();
 
@@ -87,4 +94,25 @@ public class RedisCacheMapper : IResourceCostMapper
             return capacity.GetInt32();
         return 0;
     }
+
+    private static bool IsHourlyPrice(PriceRecord price) =>
+        string.Equals(price.UnitOfMeasure, "1 Hour", StringComparison.OrdinalIgnoreCase)
+        && price.UnitPrice > 0;
+
+    private static bool MatchesTier(PriceRecord price, string skuName) =>
+        string.Equals(price.SkuName, skuName, StringComparison.OrdinalIgnoreCase)
+        || price.ProductName?.Contains(skuName, StringComparison.OrdinalIgnoreCase) == true;
+
+    private static bool MatchesCacheCode(PriceRecord price, string cacheCode)
+    {
+        var normalizedCode = Normalize(price.MeterName);
+        var expected = Normalize(cacheCode);
+
+        return normalizedCode == expected
+            || normalizedCode == $"{expected}CACHE"
+            || normalizedCode.Contains(expected, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string Normalize(string? value) =>
+        string.Concat((value ?? string.Empty).Where(char.IsLetterOrDigit)).ToUpperInvariant();
 }
