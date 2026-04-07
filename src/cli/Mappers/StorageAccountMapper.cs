@@ -5,6 +5,8 @@ namespace Washington.Mappers;
 
 public class StorageAccountMapper : IResourceCostMapper
 {
+    private const decimal EstimatedStorageGb = 1000m;
+
     public string ResourceType => "Microsoft.Storage/storageAccounts";
 
     public bool CanMap(ResourceDescriptor resource) =>
@@ -19,8 +21,7 @@ public class StorageAccountMapper : IResourceCostMapper
             new PricingQuery(
                 ServiceName: "Storage",
                 ArmRegionName: region,
-                ProductName: GetProductName(resource),
-                MeterName: "Hot LRS Data Stored",
+                MeterName: GetMeterName(resource),
                 PriceType: "Consumption"
             )
         };
@@ -29,39 +30,107 @@ public class StorageAccountMapper : IResourceCostMapper
     public MonthlyCost CalculateCost(ResourceDescriptor resource, List<PriceRecord> prices)
     {
         var sku = GetSkuDescription(resource);
+        var meterName = GetMeterName(resource);
+        var preferredProducts = GetPreferredProductNames(resource);
 
-        // Look for data stored pricing (per GB/month)
-        var price = prices
-            .Where(p => p.MeterName != null && p.MeterName.Contains("Data Stored"))
+        var price = preferredProducts
+            .Select(productName => prices
+                .Where(p => string.Equals(p.MeterName, meterName, StringComparison.OrdinalIgnoreCase)
+                    && string.Equals(p.ProductName, productName, StringComparison.OrdinalIgnoreCase))
+                .OrderBy(p => p.TierMinimumUnits)
+                .FirstOrDefault())
+            .FirstOrDefault(p => p != null);
+
+        price ??= prices
+            .Where(p => string.Equals(p.MeterName, meterName, StringComparison.OrdinalIgnoreCase)
+                && p.ProductName != null
+                && p.ProductName.Contains("Blob", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(p => p.TierMinimumUnits)
+            .FirstOrDefault();
+
+        price ??= prices
+            .Where(p => p.MeterName != null && p.MeterName.Contains("Data Stored", StringComparison.OrdinalIgnoreCase))
             .OrderBy(p => p.TierMinimumUnits)
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"{sku} - base cost + usage");
+            return new MonthlyCost(0, $"{sku} - no storage pricing found");
 
-        // Estimate 100 GB as a baseline
-        var estimatedGb = 100m;
-        var monthlyCost = (decimal)price.UnitPrice * estimatedGb;
-        return new MonthlyCost(monthlyCost, $"{sku} ~{estimatedGb} GB @ ${price.UnitPrice:F4}/GB + usage");
+        var monthlyCost = (decimal)price.UnitPrice * EstimatedStorageGb;
+        return new MonthlyCost(monthlyCost, $"{sku} ~{EstimatedStorageGb:F0} GB @ ${price.UnitPrice:F4}/GB");
     }
 
-    private static string GetProductName(ResourceDescriptor resource)
+    private static IReadOnlyList<string> GetPreferredProductNames(ResourceDescriptor resource)
     {
-        var redundancy = GetRedundancy(resource);
         var kind = GetKind(resource);
 
-        if (kind.Contains("BlobStorage", StringComparison.OrdinalIgnoreCase))
-            return $"Blob Storage";
-
-        return redundancy switch
+        if (IsHierarchicalNamespaceEnabled(resource))
         {
-            "Standard_LRS" => "Tables",
-            "Standard_GRS" => "Tables",
-            "Standard_RAGRS" => "Tables",
-            "Standard_ZRS" => "Tables",
-            _ => "General Block Blob"
+            return new[]
+            {
+                "General Block Blob v2 Hierarchical Namespace",
+                "Azure Data Lake Storage Gen2 Hierarchical Namespace",
+                "Azure Data Lake Storage Gen2 Flat Namespace",
+                "General Block Blob v2"
+            };
+        }
+
+        if (kind.Contains("BlobStorage", StringComparison.OrdinalIgnoreCase))
+        {
+            return new[]
+            {
+                "Blob Storage",
+                "General Block Blob"
+            };
+        }
+
+        return new[]
+        {
+            "General Block Blob v2",
+            "Blob Storage",
+            "General Block Blob"
         };
     }
+
+    private static bool IsHierarchicalNamespaceEnabled(ResourceDescriptor resource)
+    {
+        if (resource.Properties.TryGetValue("isHnsEnabled", out var isHnsEnabled))
+        {
+            if (isHnsEnabled.ValueKind == JsonValueKind.True)
+                return true;
+            if (isHnsEnabled.ValueKind == JsonValueKind.False)
+                return false;
+            if (isHnsEnabled.ValueKind == JsonValueKind.String &&
+                bool.TryParse(isHnsEnabled.GetString(), out var parsed))
+                return parsed;
+        }
+
+        return false;
+    }
+
+    private static string GetMeterName(ResourceDescriptor resource) =>
+        $"{GetAccessTier(resource)} {GetRedundancyLabel(resource)} Data Stored";
+
+    private static string GetAccessTier(ResourceDescriptor resource)
+    {
+        if (resource.Properties.TryGetValue("accessTier", out var tier) && tier.ValueKind == JsonValueKind.String)
+            return tier.GetString() ?? "Hot";
+
+        return "Hot";
+    }
+
+    private static string GetRedundancyLabel(ResourceDescriptor resource) =>
+        GetRedundancy(resource) switch
+        {
+            "Standard_LRS" => "LRS",
+            "Premium_LRS" => "LRS",
+            "Standard_GRS" => "GRS",
+            "Standard_RAGRS" => "RA-GRS",
+            "Standard_ZRS" => "ZRS",
+            "Standard_GZRS" => "GZRS",
+            "Standard_RAGZRS" => "RA-GZRS",
+            var other => other.Replace("Standard_", "").Replace("Premium_", "").Replace('_', '-')
+        };
 
     private static string GetRedundancy(ResourceDescriptor resource)
     {
@@ -81,9 +150,7 @@ public class StorageAccountMapper : IResourceCostMapper
     {
         var redundancy = GetRedundancy(resource);
         var kind = GetKind(resource);
-        var accessTier = "Hot";
-        if (resource.Properties.TryGetValue("accessTier", out var tier) && tier.ValueKind == JsonValueKind.String)
-            accessTier = tier.GetString() ?? "Hot";
+        var accessTier = GetAccessTier(resource);
         return $"{kind} {redundancy} {accessTier}";
     }
 }
