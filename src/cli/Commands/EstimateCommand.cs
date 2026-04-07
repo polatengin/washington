@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.Text.Json;
 using Washington.Cache;
 using Washington.Mappers;
 using Washington.Models;
@@ -46,20 +47,42 @@ public class EstimateCommand
             var outputFormat = parseResult.GetValue(outputFormatOption) ?? "table";
             var paramOverrides = parseResult.GetValue(paramOption) ?? Array.Empty<string>();
 
-            await RunAsync(file, paramsFile, outputFormat, paramOverrides);
+            return await ExecuteAsync(
+                () => RunAsync(file, paramsFile, outputFormat, paramOverrides),
+                Console.Error);
         });
 
         return command;
     }
 
-    private static async Task RunAsync(
+    internal static async Task<int> ExecuteAsync(Func<Task<int>> commandAction, TextWriter? errorWriter = null)
+    {
+        var effectiveErrorWriter = errorWriter ?? Console.Error;
+
+        try
+        {
+            return await commandAction();
+        }
+        catch (BicepCompilationException ex)
+        {
+            await effectiveErrorWriter.WriteLineAsync($"Error: {ex.Message}");
+            return 1;
+        }
+        catch (JsonException ex)
+        {
+            await effectiveErrorWriter.WriteLineAsync($"Error: Failed to parse template JSON. {ex.Message}");
+            return 1;
+        }
+    }
+
+    private static async Task<int> RunAsync(
         FileInfo file, FileInfo? paramsFile,
         string outputFormat, string[] paramOverrides)
     {
         if (!file.Exists)
         {
             Console.Error.WriteLine($"Error: File not found: {file.FullName}");
-            return;
+            return 1;
         }
 
         var cache = new FilePricingCache();
@@ -97,5 +120,6 @@ public class EstimateCommand
 
         var output = OutputFormatter.Format(report, outputFormat, file.FullName);
         Console.Write(output);
+        return 0;
     }
 }
