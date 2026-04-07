@@ -30,10 +30,17 @@ public class CosmosDbAccountMapper : IResourceCostMapper
     public MonthlyCost CalculateCost(ResourceDescriptor resource, List<PriceRecord> prices)
     {
         var throughput = GetProvisionedThroughput(resource);
+        var freeTierEnabled = IsFreeTierEnabled(resource);
 
-        // Look for RU/s pricing
-        var price = prices
-            .Where(p => p.MeterName != null && p.MeterName.Contains("RU"))
+        var matchingPrices = prices
+            .Where(IsProvisionedThroughputPrice)
+            .ToList();
+
+        var preferredPrices = matchingPrices
+            .Where(p => IsFreeTierPrice(p) == freeTierEnabled)
+            .ToList();
+
+        var price = (preferredPrices.Count != 0 ? preferredPrices : matchingPrices)
             .OrderBy(p => p.UnitPrice)
             .FirstOrDefault();
 
@@ -57,4 +64,16 @@ public class CosmosDbAccountMapper : IResourceCostMapper
         // Default provisioned throughput (400 RU/s minimum)
         return 400;
     }
+
+    private static bool IsFreeTierEnabled(ResourceDescriptor resource) =>
+        resource.Properties.TryGetValue("enableFreeTier", out var enableFreeTier)
+        && enableFreeTier.ValueKind == JsonValueKind.True;
+
+    private static bool IsProvisionedThroughputPrice(PriceRecord price) =>
+        price.MeterName != null
+        && price.MeterName.Equals("100 RU/s", StringComparison.OrdinalIgnoreCase)
+        && (price.UnitOfMeasure == "1/Hour" || price.UnitOfMeasure == "1 Hour");
+
+    private static bool IsFreeTierPrice(PriceRecord price) =>
+        price.SkuName?.Contains("Free Tier", StringComparison.OrdinalIgnoreCase) == true;
 }
