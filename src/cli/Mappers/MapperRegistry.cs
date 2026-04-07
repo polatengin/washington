@@ -13,6 +13,7 @@ public class MapperRegistry
         Register(new StorageAccountMapper());
         Register(new StorageBlobServiceMapper());
         Register(new StorageBlobContainerMapper());
+        Register(new SqlServerMapper());
         Register(new SqlDatabaseMapper());
         Register(new AppServicePlanMapper());
 
@@ -30,6 +31,7 @@ public class MapperRegistry
         // P3: Extended resource types
         Register(new ManagedDiskMapper());
         Register(new FunctionAppMapper());
+        Register(new WebAppMapper());
         Register(new SqlManagedInstanceMapper());
         Register(new VirtualNetworkGatewayMapper());
         Register(new AzureFirewallMapper());
