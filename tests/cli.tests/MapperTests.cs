@@ -1483,8 +1483,48 @@ public class MapperTests
         var queries = mapper.BuildQueries(resource);
 
         Assert.Single(queries);
-        Assert.Equal("Azure AI Search", queries[0].ServiceName);
-        Assert.Equal("standard", queries[0].SkuName);
+        Assert.Equal("Azure Cognitive Search", queries[0].ServiceName);
+        Assert.Equal("Standard S1", queries[0].SkuName);
+    }
+
+    [Fact]
+    public void SearchServiceMapper_CalculateCost_UsesBasicUnitPrice()
+    {
+        var mapper = new SearchServiceMapper();
+        var resource = CreateResource("Microsoft.Search/searchServices",
+            properties: new { replicaCount = 1, partitionCount = 1 },
+            sku: new { name = "basic" });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                SkuName = "Semantic Ranker",
+                MeterName = "Semantic Ranker Unit",
+                UnitOfMeasure = "1/Day",
+                UnitPrice = 16.12
+            },
+            new PriceRecord
+            {
+                SkuName = "Basic",
+                MeterName = "Basic Unit",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.101
+            },
+            new PriceRecord
+            {
+                SkuName = "Basic CC",
+                MeterName = "Basic CC Unit",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.1111
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(73.73m, cost.Amount);
+        Assert.Contains("AI Search basic", cost.Details);
+        Assert.Contains("$0.1010/hr", cost.Details);
     }
 
     // ===== P4: Storage & Messaging mappers =====
