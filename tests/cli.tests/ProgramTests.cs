@@ -34,4 +34,18 @@ public class EstimateCommandTests
             $"Error: Failed to parse template JSON. Bad JSON.{Environment.NewLine}",
             errorWriter.ToString());
     }
+
+    [Fact]
+    public async Task ExecuteAsync_WhenUnexpectedErrorOccurs_ReturnsNonZeroAndWritesError()
+    {
+        using var errorWriter = new StringWriter();
+        Func<Task<int>> commandAction = () => throw new IOException("Disk is unavailable.");
+
+        var exitCode = await EstimateCommand.ExecuteAsync(commandAction, errorWriter);
+
+        Assert.Equal(1, exitCode);
+        Assert.Equal(
+            $"Error: Disk is unavailable.{Environment.NewLine}",
+            errorWriter.ToString());
+    }
 }
