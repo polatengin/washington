@@ -7,7 +7,7 @@ jobs:
   estimate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - id: cost-json
         name: Estimate cost with output in json format
