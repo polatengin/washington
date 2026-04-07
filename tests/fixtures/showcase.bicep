@@ -312,7 +312,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
           name: 'app'
           image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
           resources: {
-            cpu: 0.5
+            cpu: json('0.5')
             memory: '1Gi'
           }
         }
@@ -339,7 +339,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
           resources: {
             requests: {
               cpu: 1
-              memoryInGB: 1.5
+              memoryInGB: json('1.5')
             }
           }
         }
