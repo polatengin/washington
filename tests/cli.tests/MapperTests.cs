@@ -69,6 +69,57 @@ public class MapperTests
     }
 
     [Fact]
+    public void StorageAccountMapper_BuildQueries_UsesModeledStorageMeter()
+    {
+        var mapper = new StorageAccountMapper();
+        var resource = CreateResource(
+            "Microsoft.Storage/storageAccounts",
+            properties: new { _kind = "StorageV2", accessTier = "Hot" },
+            sku: new { name = "Standard_LRS" });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Storage", queries[0].ServiceName);
+        Assert.Equal("Hot LRS Data Stored", queries[0].MeterName);
+        Assert.Null(queries[0].ProductName);
+    }
+
+    [Fact]
+    public void StorageAccountMapper_CalculateCost_PrefersBlobPricingAndUses1000GbBaseline()
+    {
+        var mapper = new StorageAccountMapper();
+        var resource = CreateResource(
+            "Microsoft.Storage/storageAccounts",
+            properties: new { _kind = "StorageV2", accessTier = "Hot" },
+            sku: new { name = "Standard_LRS" });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                MeterName = "Hot LRS Data Stored",
+                ProductName = "Files v2",
+                UnitPrice = 0.0287,
+                TierMinimumUnits = 0
+            },
+            new PriceRecord
+            {
+                MeterName = "Hot LRS Data Stored",
+                ProductName = "General Block Blob v2",
+                UnitPrice = 0.0208,
+                TierMinimumUnits = 0
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(20.80m, cost.Amount);
+        Assert.Contains("1000 GB", cost.Details);
+        Assert.Contains("$0.0208/GB", cost.Details);
+    }
+
+    [Fact]
     public void SqlDatabaseMapper_BuildQueries_CorrectServiceName()
     {
         var mapper = new SqlDatabaseMapper();
