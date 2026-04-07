@@ -418,6 +418,68 @@ public class MapperTests
     }
 
     [Fact]
+    public void CosmosDbAccountMapper_CalculateCost_IgnoresFreeTierPrice_WhenDisabled()
+    {
+        var mapper = new CosmosDbAccountMapper();
+        var resource = CreateResource("Microsoft.DocumentDB/databaseAccounts",
+            properties: new { databaseAccountOfferType = "Standard", enableFreeTier = false });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                MeterName = "100 RU/s",
+                SkuName = "Free Tier",
+                UnitOfMeasure = "1/Hour",
+                UnitPrice = 0.0
+            },
+            new PriceRecord
+            {
+                MeterName = "100 RU/s",
+                SkuName = "RUs",
+                UnitOfMeasure = "1/Hour",
+                UnitPrice = 0.008
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(23.36m, cost.Amount);
+        Assert.Contains("$0.0080/100 RU/hr", cost.Details);
+    }
+
+    [Fact]
+    public void CosmosDbAccountMapper_CalculateCost_UsesFreeTierPrice_WhenEnabled()
+    {
+        var mapper = new CosmosDbAccountMapper();
+        var resource = CreateResource("Microsoft.DocumentDB/databaseAccounts",
+            properties: new { databaseAccountOfferType = "Standard", enableFreeTier = true });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                MeterName = "100 RU/s",
+                SkuName = "RUs",
+                UnitOfMeasure = "1/Hour",
+                UnitPrice = 0.008
+            },
+            new PriceRecord
+            {
+                MeterName = "100 RU/s",
+                SkuName = "Free Tier",
+                UnitOfMeasure = "1/Hour",
+                UnitPrice = 0.0
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(0m, cost.Amount);
+        Assert.Contains("$0.0000/100 RU/hr", cost.Details);
+    }
+
+    [Fact]
     public void KeyVaultMapper_BuildQueries_CorrectServiceName()
     {
         var mapper = new KeyVaultMapper();
