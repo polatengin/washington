@@ -1,4 +1,5 @@
 import express from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
@@ -6,12 +7,22 @@ import { tmpdir } from 'node:os';
 import { dirname, isAbsolute, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+type HttpError = Error & {
+  details?: string;
+  status: number;
+};
+
+type ApiErrorResponse = {
+  details?: string;
+  error: string;
+};
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const buildDir = join(__dirname, 'build');
 const bceBinaryPath = process.env.BCE_BINARY_PATH || join(__dirname, 'bin', 'bce');
 const docsProxyTarget = process.env.DOCS_PROXY_TARGET?.trim();
 
-function resolveRuntimePath(value) {
+function resolveRuntimePath(value?: string) {
   if (!value) {
     return null;
   }
@@ -26,7 +37,7 @@ const PORT = process.env.PORT || 3000;
 const ESTIMATE_TIMEOUT_MS = Number(process.env.BCE_ESTIMATE_TIMEOUT_MS || 60000);
 const MAX_SOURCE_LENGTH = Number(process.env.BCE_PLAYGROUND_MAX_SOURCE_LENGTH || 200000);
 const app = express();
-let docsProxy;
+let docsProxy: any;
 
 if (docsProxyTarget) {
   const proxyModule = await import('http-proxy-middleware');
@@ -58,29 +69,31 @@ const CLI_UA_PATTERNS = [
   /^PowerShell\//i,
 ];
 
-function isCLIClient(req) {
+function isCLIClient(req: Request) {
   const ua = req.get('user-agent') || '';
   if (CLI_UA_PATTERNS.some(pattern => pattern.test(ua))) {
     return true;
   }
+
   const accept = req.get('accept') || '';
   if (accept && !accept.includes('text/html')) {
     return true;
   }
+
   return false;
 }
 
 // File extensions that should be served as-is (not routed through text/)
 const STATIC_EXTENSIONS = /\.(sh|js|css|json|xml|svg|png|jpg|jpeg|gif|ico|woff2?|ttf|eot|map|txt|wasm)$/i;
 
-function createHttpError(status, message, details) {
-  const error = new Error(message);
+function createHttpError(status: number, message: string, details?: string) {
+  const error = new Error(message) as HttpError;
   error.status = status;
   error.details = details;
   return error;
 }
 
-function extractCliError(stderr) {
+function extractCliError(stderr: string) {
   return stderr
     .split(/\r?\n/)
     .map(line => line.trim())
@@ -88,7 +101,7 @@ function extractCliError(stderr) {
     .at(-1);
 }
 
-async function estimateSource(source) {
+async function estimateSource(source: string) {
   if (!existsSync(bceBinaryPath)) {
     throw createHttpError(500, 'The estimator binary is not available in this container.');
   }
@@ -99,9 +112,9 @@ async function estimateSource(source) {
   try {
     await writeFile(templatePath, source, 'utf8');
 
-    return await new Promise((resolve, reject) => {
-      const stdout = [];
-      const stderr = [];
+    return await new Promise<unknown>((resolve, reject) => {
+      const stdout: Buffer[] = [];
+      const stderr: Buffer[] = [];
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), ESTIMATE_TIMEOUT_MS);
       let settled = false;
@@ -116,10 +129,10 @@ async function estimateSource(source) {
         }
       );
 
-      child.stdout.on('data', chunk => stdout.push(chunk));
-      child.stderr.on('data', chunk => stderr.push(chunk));
+      child.stdout.on('data', (chunk: Buffer) => stdout.push(chunk));
+      child.stderr.on('data', (chunk: Buffer) => stderr.push(chunk));
 
-      child.on('error', error => {
+      child.on('error', (error: Error) => {
         if (settled) {
           return;
         }
@@ -169,7 +182,7 @@ async function estimateSource(source) {
   }
 }
 
-function resolveTextFile(reqPath) {
+function resolveTextFile(reqPath: string) {
   const clean = reqPath.replace(/^\/+|\/+$/g, '');
 
   if (!clean || clean === '/') {
@@ -187,10 +200,11 @@ function resolveTextFile(reqPath) {
       return candidate;
     }
   }
+
   return null;
 }
 
-app.post('/api/estimate', async (req, res) => {
+app.post('/api/estimate', async (req: Request, res: Response) => {
   const source = typeof req.body?.source === 'string' ? req.body.source.trim() : '';
 
   if (!source) {
@@ -207,11 +221,14 @@ app.post('/api/estimate', async (req, res) => {
     const report = await estimateSource(source);
     return res.json(report);
   } catch (error) {
-    const status = error?.status || 500;
-    const payload = { error: error?.message || 'The estimate request failed.' };
+    const httpError = error as Partial<HttpError>;
+    const status = httpError.status || 500;
+    const payload: ApiErrorResponse = {
+      error: httpError.message || 'The estimate request failed.',
+    };
 
-    if (error?.details) {
-      payload.details = error.details;
+    if (httpError.details) {
+      payload.details = httpError.details;
     }
 
     if (status >= 500) {
@@ -223,7 +240,7 @@ app.post('/api/estimate', async (req, res) => {
 });
 
 // CLI client middleware - skip for static file extensions
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   if (req.path.startsWith('/api/')) {
     return next();
   }
@@ -243,7 +260,7 @@ app.use((req, res, next) => {
 });
 
 if (docsProxy) {
-  app.use((req, res, next) => {
+  app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.path.startsWith('/api/')) {
       return next();
     }
@@ -253,16 +270,17 @@ if (docsProxy) {
 } else {
   app.use(express.static(buildDir, { index: ['index.html'] }));
 
-  app.get('/{*splat}', (req, res) => {
+  app.get('/{*splat}', (_req: Request, res: Response) => {
     const indexHtml = join(buildDir, 'index.html');
     if (existsSync(indexHtml)) {
       return res.sendFile(indexHtml);
     }
+
     res.status(404).send('Not found');
   });
 }
 
-app.use((error, req, res, next) => {
+app.use((error: unknown, req: Request, res: Response, next: NextFunction) => {
   if (!req.path.startsWith('/api/')) {
     return next(error);
   }

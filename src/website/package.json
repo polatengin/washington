@@ -14,7 +14,7 @@
     "build": "docusaurus build",
     "postbuild": "node --import tsx scripts/generate-search-index.mts --cleanup && node --import tsx scripts/generate-plain-text.mts --cleanup",
     "dev": "node --import tsx scripts/dev.mts",
-    "preview": "npm run build && node server.mjs",
+    "preview": "npm run build && node --import tsx server.mts",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
     "clear": "docusaurus clear",

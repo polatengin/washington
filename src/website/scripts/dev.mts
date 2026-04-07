@@ -226,7 +226,7 @@ function startExpress() {
 
   expressProcess = monitorChild(
     'Express docs server',
-    runProcess(nodeCommand, [join(websiteRoot, 'server.mjs')], {
+    runProcess(nodeCommand, [...tsxImportArgs, join(websiteRoot, 'server.mts')], {
       PORT: String(publicPort),
       DOCS_PROXY_TARGET: docsProxyTarget,
       TEXT_DIR: textDir,
@@ -377,7 +377,7 @@ watchFiles(
 );
 
 watchFiles(
-  [join(websiteRoot, 'server.mjs')],
+  [join(websiteRoot, 'server.mts')],
   (eventName, filePath) => {
     debounce(
       'express-restart',

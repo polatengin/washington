@@ -45,7 +45,7 @@ WORKDIR /app
 COPY --from=website-build /app/src/website/build ./build
 
 # Copy the Express server
-COPY src/website/server.mjs ./server.mjs
+COPY src/website/server.mts ./server.mts
 COPY --from=cli-build /out/bce ./bin/bce
 
 # Install only production dependency (express)
@@ -54,7 +54,7 @@ RUN apt-get update \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& chmod +x ./bin/bce \
 	&& npm init -y > /dev/null 2>&1 \
-	&& npm install express --save --production
+	&& npm install express tsx --save --production
 
 EXPOSE 3000
 
@@ -62,4 +62,4 @@ ENV PORT=3000
 ENV NODE_ENV=production
 ENV BCE_BINARY_PATH=/app/bin/bce
 
-CMD ["node", "server.mjs"]
+CMD ["node", "--import", "tsx", "server.mts"]
