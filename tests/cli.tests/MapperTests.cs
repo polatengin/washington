@@ -134,6 +134,17 @@ public class MapperTests
     }
 
     [Fact]
+    public void SqlServerMapper_CanMap_CorrectType()
+    {
+        var mapper = new SqlServerMapper();
+        var resource = CreateResource("Microsoft.Sql/servers");
+
+        Assert.True(mapper.CanMap(resource));
+        Assert.Empty(mapper.BuildQueries(resource));
+        Assert.Equal(0m, mapper.CalculateCost(resource, new List<PriceRecord>()).Amount);
+    }
+
+    [Fact]
     public void AppServicePlanMapper_BuildQueries_CorrectServiceName()
     {
         var mapper = new AppServicePlanMapper();
@@ -183,6 +194,8 @@ public class MapperTests
         // P3 resource types
         var diskResource = CreateResource("Microsoft.Compute/disks");
         var funcResource = CreateResource("Microsoft.Web/sites", properties: new { _kind = "functionapp" });
+        var webAppResource = CreateResource("Microsoft.Web/sites", properties: new { _kind = "app" });
+        var sqlServerResource = CreateResource("Microsoft.Sql/servers");
         var sqlMiResource = CreateResource("Microsoft.Sql/managedInstances");
         var vpnGwResource = CreateResource("Microsoft.Network/virtualNetworkGateways");
         var firewallResource = CreateResource("Microsoft.Network/azureFirewalls");
@@ -199,8 +212,14 @@ public class MapperTests
         var swaResource = CreateResource("Microsoft.Web/staticSites");
         var signalrResource = CreateResource("Microsoft.SignalRService/signalR");
 
+        var functionAppMapper = registry.GetMapper(funcResource);
+        var webAppMapper = registry.GetMapper(webAppResource);
+        var sqlServerMapper = registry.GetMapper(sqlServerResource);
+
         Assert.NotNull(registry.GetMapper(diskResource));
-        Assert.NotNull(registry.GetMapper(funcResource));
+        Assert.NotNull(functionAppMapper);
+        Assert.NotNull(webAppMapper);
+        Assert.NotNull(sqlServerMapper);
         Assert.NotNull(registry.GetMapper(sqlMiResource));
         Assert.NotNull(registry.GetMapper(vpnGwResource));
         Assert.NotNull(registry.GetMapper(firewallResource));
@@ -216,6 +235,9 @@ public class MapperTests
         Assert.NotNull(registry.GetMapper(apimResource));
         Assert.NotNull(registry.GetMapper(swaResource));
         Assert.NotNull(registry.GetMapper(signalrResource));
+        Assert.IsType<FunctionAppMapper>(functionAppMapper);
+        Assert.IsType<WebAppMapper>(webAppMapper);
+        Assert.IsType<SqlServerMapper>(sqlServerMapper);
     }
 
     [Fact]
@@ -469,6 +491,28 @@ public class MapperTests
 
         Assert.Single(queries);
         Assert.Equal("Functions", queries[0].ServiceName);
+    }
+
+    [Fact]
+    public void WebAppMapper_CanMap_RegularWebApp()
+    {
+        var mapper = new WebAppMapper();
+        var resource = CreateResource("Microsoft.Web/sites",
+            properties: new { _kind = "app", serverFarmId = "/subscriptions/test/serverfarms/plan" });
+
+        Assert.True(mapper.CanMap(resource));
+        Assert.Empty(mapper.BuildQueries(resource));
+        Assert.Equal(0m, mapper.CalculateCost(resource, new List<PriceRecord>()).Amount);
+    }
+
+    [Fact]
+    public void WebAppMapper_CannotMap_FunctionApp()
+    {
+        var mapper = new WebAppMapper();
+        var resource = CreateResource("Microsoft.Web/sites",
+            properties: new { _kind = "functionapp" });
+
+        Assert.False(mapper.CanMap(resource));
     }
 
     [Fact]

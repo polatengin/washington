@@ -150,6 +150,28 @@ public class CostAggregatorTests
     }
 
     [Fact]
+    public async Task GenerateReport_SqlServerAndWebApp_DoNotWarn()
+    {
+        var mockPricingClient = new MockPricingApiClient(new List<PriceRecord>());
+        var registry = new MapperRegistry();
+        var aggregator = new CostAggregator(registry, mockPricingClient);
+        var resources = new List<ResourceDescriptor>
+        {
+            CreateResource("Microsoft.Sql/servers", "sql-server"),
+            CreateResource("Microsoft.Web/sites", "web-app",
+                properties: new { _kind = "app", serverFarmId = "/subscriptions/test/serverfarms/plan" })
+        };
+
+        var report = await aggregator.GenerateReportAsync(resources);
+
+        Assert.Equal(2, report.Lines.Count);
+        Assert.Empty(report.Warnings);
+        Assert.All(report.Lines, line => Assert.Equal(0m, line.MonthlyCost));
+        Assert.Contains("SQL logical server", report.Lines.Single(line => line.ResourceType == "Microsoft.Sql/servers").PricingDetails);
+        Assert.Contains("App Service Plan", report.Lines.Single(line => line.ResourceType == "Microsoft.Web/sites").PricingDetails);
+    }
+
+    [Fact]
     public async Task GenerateReport_EmptyResources_ReturnsEmptyReport()
     {
         var mockPricingClient = new MockPricingApiClient(new List<PriceRecord>());
