@@ -102,9 +102,10 @@ const config: Config = {
         docs: {
           path: '../../docs',
           routeBasePath: '/',
+          showLastUpdateAuthor: true,
+          showLastUpdateTime: true,
           sidebarItemsGenerator: () => docsSidebar,
-          editUrl:
-            'https://github.com/polatengin/washington/tree/main/',
+          editUrl: 'https://github.com/polatengin/washington/tree/main/',
         },
         blog: false,
         theme: {
