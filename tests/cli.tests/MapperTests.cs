@@ -876,6 +876,105 @@ public class MapperTests
 
         Assert.Single(queries);
         Assert.Equal("Azure Container Apps", queries[0].ServiceName);
+        Assert.Equal("Standard", queries[0].SkuName);
+    }
+
+    [Fact]
+    public void ContainerAppMapper_CalculateCost_UsesIdleBaselineForMinimumReplicas()
+    {
+        var mapper = new ContainerAppMapper();
+        var resource = CreateResource("Microsoft.App/containerApps",
+            properties: new
+            {
+                template = new
+                {
+                    containers = new[] { new { name = "app", resources = new { cpu = 0.5, memory = "1Gi" } } },
+                    scale = new { minReplicas = 1, maxReplicas = 1 }
+                }
+            });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                SkuName = "Standard",
+                MeterName = "Standard vCPU Active Usage",
+                UnitOfMeasure = "1 Second",
+                UnitPrice = 0.000024
+            },
+            new PriceRecord
+            {
+                SkuName = "Standard",
+                MeterName = "Standard vCPU Idle Usage",
+                UnitOfMeasure = "1 Second",
+                UnitPrice = 0.000003
+            },
+            new PriceRecord
+            {
+                SkuName = "Standard",
+                MeterName = "Standard Memory Active Usage",
+                UnitOfMeasure = "1 GiB Second",
+                UnitPrice = 0.000003
+            },
+            new PriceRecord
+            {
+                SkuName = "Standard",
+                MeterName = "Standard Memory Idle Usage",
+                UnitOfMeasure = "1 GiB Second",
+                UnitPrice = 0.000003
+            },
+            new PriceRecord
+            {
+                SkuName = "Standard",
+                MeterName = "Standard Requests",
+                UnitOfMeasure = "1M",
+                UnitPrice = 0.4
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(11.826m, cost.Amount);
+        Assert.Contains("idle min replica", cost.Details);
+        Assert.Contains("active usage/requests", cost.Details);
+    }
+
+    [Fact]
+    public void ContainerAppMapper_CalculateCost_ScaleToZeroHasNoBaselineCost()
+    {
+        var mapper = new ContainerAppMapper();
+        var resource = CreateResource("Microsoft.App/containerApps",
+            properties: new
+            {
+                template = new
+                {
+                    containers = new[] { new { name = "app", resources = new { cpu = 0.5, memory = "1Gi" } } },
+                    scale = new { minReplicas = 0, maxReplicas = 5 }
+                }
+            });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                SkuName = "Standard",
+                MeterName = "Standard vCPU Idle Usage",
+                UnitOfMeasure = "1 Second",
+                UnitPrice = 0.000003
+            },
+            new PriceRecord
+            {
+                SkuName = "Standard",
+                MeterName = "Standard Memory Idle Usage",
+                UnitOfMeasure = "1 GiB Second",
+                UnitPrice = 0.000003
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(0m, cost.Amount);
+        Assert.Contains("scale-to-zero", cost.Details);
     }
 
     [Fact]
