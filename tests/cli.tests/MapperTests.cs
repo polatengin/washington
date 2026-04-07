@@ -541,6 +541,38 @@ public class MapperTests
     }
 
     [Fact]
+    public void ServiceBusMapper_CalculateCost_StandardFallback_Uses100MOperations()
+    {
+        var mapper = new ServiceBusMapper();
+        var resource = CreateResource("Microsoft.ServiceBus/namespaces",
+            sku: new { name = "Standard", capacity = 1 });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                MeterName = "Standard Messaging Operations",
+                UnitOfMeasure = "1M",
+                TierMinimumUnits = 13,
+                UnitPrice = 0.8
+            },
+            new PriceRecord
+            {
+                MeterName = "Standard Messaging Operations",
+                UnitOfMeasure = "1M",
+                TierMinimumUnits = 100,
+                UnitPrice = 0.5
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(50.0m, cost.Amount);
+        Assert.Contains("100M ops", cost.Details);
+        Assert.Contains("$0.5000/M ops", cost.Details);
+    }
+
+    [Fact]
     public void FrontDoorMapper_BuildQueries_CorrectServiceName()
     {
         var mapper = new FrontDoorMapper();

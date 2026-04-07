@@ -8,6 +8,8 @@ public class ServiceBusMapper : IResourceCostMapper
     public string ResourceType => "Microsoft.ServiceBus/namespaces";
 
     private const decimal HoursPerMonth = 730m;
+    private const decimal BasicEstimatedOperationMillions = 1m;
+    private const decimal FallbackEstimatedOperationMillions = 100m;
 
     public bool CanMap(ResourceDescriptor resource) =>
         resource.ResourceType.Equals(ResourceType, StringComparison.OrdinalIgnoreCase);
@@ -34,18 +36,12 @@ public class ServiceBusMapper : IResourceCostMapper
 
         if (tier.Equals("Basic", StringComparison.OrdinalIgnoreCase))
         {
-            var opPrice = prices
-                .Where(p => p.MeterName != null && p.MeterName.Contains("Messaging"))
-                .OrderBy(p => p.UnitPrice)
-                .FirstOrDefault();
+            var opPrice = GetMessagingOperationsPrice(prices, BasicEstimatedOperationMillions);
 
             if (opPrice == null)
                 return new MonthlyCost(0, $"Service Bus {tier} - pay per operation");
 
-            // Estimate 1M operations/month
-            var estimatedOps = 1_000_000m;
-            var monthlyCost = (decimal)opPrice.UnitPrice * (estimatedOps / 1_000_000m);
-            return new MonthlyCost(monthlyCost, $"Service Bus {tier} ~{estimatedOps:N0} ops");
+            return CreateMessagingOperationsCost(tier, opPrice, BasicEstimatedOperationMillions);
         }
 
         // Standard/Premium: base charge
@@ -62,11 +58,40 @@ public class ServiceBusMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
+        {
+            var opPrice = GetMessagingOperationsPrice(prices, FallbackEstimatedOperationMillions);
+            if (opPrice != null)
+                return CreateMessagingOperationsCost(tier, opPrice, FallbackEstimatedOperationMillions);
+
             return new MonthlyCost(0, $"Service Bus {tier} - no pricing found");
+        }
 
         var mu = GetMessagingUnits(resource);
         var cost = (decimal)price.UnitPrice * HoursPerMonth * mu;
         return new MonthlyCost(cost, $"Service Bus {tier} {mu} unit(s) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");
+    }
+
+    private static PriceRecord? GetMessagingOperationsPrice(List<PriceRecord> prices, decimal estimatedOperationMillions)
+    {
+        var operationPrices = prices
+            .Where(p => p.MeterName != null &&
+                p.MeterName.Contains("Messaging Operations", StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(p.UnitOfMeasure, "1M", StringComparison.OrdinalIgnoreCase) &&
+                p.UnitPrice > 0)
+            .OrderBy(p => p.TierMinimumUnits)
+            .ToList();
+
+        return operationPrices
+            .Where(p => (decimal)p.TierMinimumUnits <= estimatedOperationMillions)
+            .OrderByDescending(p => p.TierMinimumUnits)
+            .FirstOrDefault()
+            ?? operationPrices.FirstOrDefault();
+    }
+
+    private static MonthlyCost CreateMessagingOperationsCost(string tier, PriceRecord price, decimal estimatedOperationMillions)
+    {
+        var monthlyCost = (decimal)price.UnitPrice * estimatedOperationMillions;
+        return new MonthlyCost(monthlyCost, $"Service Bus {tier} ~{estimatedOperationMillions:F0}M ops @ ${price.UnitPrice:F4}/M ops");
     }
 
     private static string GetSkuTier(ResourceDescriptor resource)
