@@ -124,7 +124,7 @@ public class BicepCompiler
                 var destinationPath = Path.Combine(tempDir, Path.GetFileName(file));
                 if (!File.Exists(destinationPath))
                 {
-                    File.Copy(file, destinationPath);
+                    TryCopySupportingFile(file, destinationPath);
                 }
             }
         }
@@ -132,6 +132,20 @@ public class BicepCompiler
         var tempSourcePath = Path.Combine(tempDir, Path.GetFileName(sourcePath));
         File.Copy(sourcePath, tempSourcePath, overwrite: true);
         return tempSourcePath;
+    }
+
+    private static void TryCopySupportingFile(string sourcePath, string destinationPath)
+    {
+        try
+        {
+            File.Copy(sourcePath, destinationPath);
+        }
+        catch (IOException)
+        {
+        }
+        catch (UnauthorizedAccessException)
+        {
+        }
     }
 
     private static string GetCompilationOutput(
