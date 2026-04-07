@@ -19,7 +19,7 @@ public class PricingApiClient
     {
         var cacheKey = query.ToCacheKey();
         var cached = _cache.Get(cacheKey);
-        if (cached != null)
+        if (cached != null && (cached.Count > 0 || !RedisPricingPageParser.CanParse(query)))
             return cached;
 
         var allItems = new List<PriceRecord>();
@@ -54,6 +54,11 @@ public class PricingApiClient
                 && !p.SkuName.Contains("Low Priority", StringComparison.OrdinalIgnoreCase)))
             .Where(p => p.Type != "DevTestConsumption")
             .ToList();
+
+        if (allItems.Count == 0)
+        {
+            allItems = await RedisPricingPageParser.FetchPricesAsync(_httpClient, query);
+        }
 
         _cache.Set(cacheKey, allItems);
         return allItems;
