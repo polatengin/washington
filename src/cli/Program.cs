@@ -1,10 +1,34 @@
 using System.CommandLine;
+using System.Text.Json;
 using Washington.Commands;
 using Washington.Lsp;
+using Washington.Services;
 
 public class Program
 {
-    public static async Task<int> Main(string[] args)
+    public static Task<int> Main(string[] args) => InvokeAsync(CreateRootCommand(), args);
+
+    internal static async Task<int> InvokeAsync(Command command, string[] args, TextWriter? errorWriter = null)
+    {
+        var effectiveErrorWriter = errorWriter ?? Console.Error;
+
+        try
+        {
+            return await command.Parse(args).InvokeAsync();
+        }
+        catch (BicepCompilationException ex)
+        {
+            await effectiveErrorWriter.WriteLineAsync($"Error: {ex.Message}");
+            return 1;
+        }
+        catch (JsonException ex)
+        {
+            await effectiveErrorWriter.WriteLineAsync($"Error: Failed to parse template JSON. {ex.Message}");
+            return 1;
+        }
+    }
+
+    private static RootCommand CreateRootCommand()
     {
         var rootCommand = new RootCommand("BCE (Bicep Cost Estimator) - estimate monthly Azure costs from Bicep and ARM files");
 
@@ -28,6 +52,6 @@ public class Program
         });
         rootCommand.Subcommands.Add(lspCommand);
 
-        return await rootCommand.Parse(args).InvokeAsync();
+        return rootCommand;
     }
 }
