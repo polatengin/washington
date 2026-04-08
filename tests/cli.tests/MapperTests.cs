@@ -927,12 +927,63 @@ public class MapperTests
     {
         var mapper = new FrontDoorMapper();
         var resource = CreateResource("Microsoft.Cdn/profiles",
-            sku: new { name = "Standard_AzureFrontDoor" });
+            sku: new { name = "Standard_AzureFrontDoor" },
+            location: "global");
 
         var queries = mapper.BuildQueries(resource);
 
         Assert.Single(queries);
         Assert.Equal("Azure Front Door Service", queries[0].ServiceName);
+        Assert.Equal("Standard", queries[0].SkuName);
+        Assert.Equal(string.Empty, queries[0].ArmRegionName);
+    }
+
+    [Fact]
+    public void FrontDoorMapper_BuildQueries_OmitsRegionFilter_ForRegionalLocation()
+    {
+        var mapper = new FrontDoorMapper();
+        var resource = CreateResource("Microsoft.Cdn/profiles",
+            sku: new { name = "Standard_AzureFrontDoor" },
+            location: "eastus");
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal(string.Empty, queries[0].ArmRegionName);
+    }
+
+    [Fact]
+    public void FrontDoorMapper_CalculateCost_UsesRequestPricingForStandardProfile()
+    {
+        var mapper = new FrontDoorMapper();
+        var resource = CreateResource("Microsoft.Cdn/profiles",
+            sku: new { name = "Standard_AzureFrontDoor" },
+            location: "global");
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                MeterName = "Standard Requests",
+                UnitOfMeasure = "1M/Month",
+                UnitPrice = 0.6,
+                ArmRegionName = string.Empty,
+            },
+            new PriceRecord
+            {
+                MeterName = "Standard Overage Routing Rules",
+                UnitOfMeasure = "1/Hour",
+                UnitPrice = 0.012,
+                ArmRegionName = string.Empty,
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(0.6m, cost.Amount);
+        Assert.Contains("1M requests", cost.Details);
+        Assert.Contains("$0.6000/M requests", cost.Details);
+        Assert.Contains("data transfer/rules", cost.Details, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
