@@ -322,24 +322,100 @@ jobs:
             --query properties.customDomainVerificationId \
             --output tsv)"
 
-          mapfile -t hostname_a_records < <(getent ahostsv4 "${WEBSITE_HOSTNAME}" 2>/dev/null | awk '{print $1}' | sort -u || true)
+          dns_zone_resource_group="$(az network dns zone list \
+            --query "[?name=='${WEBSITE_HOSTNAME}'] | [0].resourceGroup" \
+            --output tsv)"
 
-          has_matching_a_record=false
-          for record in "${hostname_a_records[@]}"; do
-            if [[ "${record}" == "${environment_static_ip}" ]]; then
-              has_matching_a_record=true
-              break
+          if [[ -n "${dns_zone_resource_group}" ]]; then
+            echo "Azure DNS zone ${WEBSITE_HOSTNAME} found in resource group ${dns_zone_resource_group}; syncing apex records"
+
+            mapfile -t current_zone_a_records < <(az network dns record-set a show \
+              --resource-group "${dns_zone_resource_group}" \
+              --zone-name "${WEBSITE_HOSTNAME}" \
+              --name @ \
+              --query "ARecords[].ipv4Address" \
+              --output tsv 2>/dev/null || true)
+
+            has_environment_ip=false
+            for record in "${current_zone_a_records[@]}"; do
+              if [[ "${record}" == "${environment_static_ip}" ]]; then
+                has_environment_ip=true
+              elif [[ -n "${record}" ]]; then
+                az network dns record-set a remove-record \
+                  --resource-group "${dns_zone_resource_group}" \
+                  --zone-name "${WEBSITE_HOSTNAME}" \
+                  --name @ \
+                  --ipv4-address "${record}" \
+                  --keep-empty-record-set
+              fi
+            done
+
+            if [[ "${has_environment_ip}" != "true" ]]; then
+              az network dns record-set a add-record \
+                --resource-group "${dns_zone_resource_group}" \
+                --zone-name "${WEBSITE_HOSTNAME}" \
+                --name @ \
+                --ipv4-address "${environment_static_ip}" \
+                --ttl 60
             fi
-          done
 
-          current_a_records_display="(none)"
-          if [[ "${#hostname_a_records[@]}" -gt 0 ]]; then
-            current_a_records_display="${hostname_a_records[*]}"
-          fi
+            current_zone_txt_value="$(az network dns record-set txt show \
+              --resource-group "${dns_zone_resource_group}" \
+              --zone-name "${WEBSITE_HOSTNAME}" \
+              --name asuid \
+              --query "TXTRecords[0].value[0]" \
+              --output tsv 2>/dev/null || true)"
 
-          if [[ "${has_matching_a_record}" != "true" ]]; then
-            echo "::error::A record mismatch for ${WEBSITE_HOSTNAME}. Update the apex A record to ${environment_static_ip}. Current A records: ${current_a_records_display}. Ensure TXT record asuid=${custom_domain_verification_id} also exists before rerunning the workflow."
-            exit 1
+            if [[ "${current_zone_txt_value}" != "${custom_domain_verification_id}" ]]; then
+              az network dns record-set txt delete \
+                --resource-group "${dns_zone_resource_group}" \
+                --zone-name "${WEBSITE_HOSTNAME}" \
+                --name asuid \
+                --yes 2>/dev/null || true
+
+              az network dns record-set txt add-record \
+                --resource-group "${dns_zone_resource_group}" \
+                --zone-name "${WEBSITE_HOSTNAME}" \
+                --name asuid \
+                --value "${custom_domain_verification_id}"
+            fi
+
+            synced_zone_a_record="$(az network dns record-set a show \
+              --resource-group "${dns_zone_resource_group}" \
+              --zone-name "${WEBSITE_HOSTNAME}" \
+              --name @ \
+              --query "ARecords[0].ipv4Address" \
+              --output tsv)"
+
+            synced_zone_txt_value="$(az network dns record-set txt show \
+              --resource-group "${dns_zone_resource_group}" \
+              --zone-name "${WEBSITE_HOSTNAME}" \
+              --name asuid \
+              --query "TXTRecords[0].value[0]" \
+              --output tsv)"
+
+            echo "Azure DNS apex A record: ${synced_zone_a_record}"
+            echo "Azure DNS asuid TXT record: ${synced_zone_txt_value}"
+          else
+            mapfile -t hostname_a_records < <(getent ahostsv4 "${WEBSITE_HOSTNAME}" 2>/dev/null | awk '{print $1}' | sort -u || true)
+
+            has_matching_a_record=false
+            for record in "${hostname_a_records[@]}"; do
+              if [[ "${record}" == "${environment_static_ip}" ]]; then
+                has_matching_a_record=true
+                break
+              fi
+            done
+
+            current_a_records_display="(none)"
+            if [[ "${#hostname_a_records[@]}" -gt 0 ]]; then
+              current_a_records_display="${hostname_a_records[*]}"
+            fi
+
+            if [[ "${has_matching_a_record}" != "true" ]]; then
+              echo "::error::A record mismatch for ${WEBSITE_HOSTNAME}. Update the apex A record to ${environment_static_ip}. Current A records: ${current_a_records_display}. Ensure TXT record asuid=${custom_domain_verification_id} also exists before rerunning the workflow."
+              exit 1
+            fi
           fi
 
           existing_binding_name="$(az containerapp hostname list \
