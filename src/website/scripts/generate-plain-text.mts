@@ -48,11 +48,11 @@ const ansiPattern = /\x1b\[[0-?]*[ -/]*[@-~]/g;
 const terminalLogoWidth = 16;
 const terminalLogoHeight = 8;
 
-function toHex(color) {
-  return `#${color.map(value => value.toString(16).padStart(2, '0')).join('')}`;
+function toHex(color: any[]) {
+  return `#${color.map((value: { toString: (arg0: number) => string; }) => value.toString(16).padStart(2, '0')).join('')}`;
 }
 
-function createTerminalLogoSvg(source) {
+function createTerminalLogoSvg(source: string) {
   return source
     .replace(/\sshape-rendering="[^"]*"/, '')
     .replace(/<svg([^>]*)>/, `<svg$1>\n  <rect width="100%" height="100%" fill="${toHex(palette.ink)}"/>`)
@@ -75,33 +75,33 @@ async function cleanupContributingDoc() {
   console.log('Removed docs/50-guides/contributing.md');
 }
 
-function fg(color) {
+function fg(color: number[] | [any, any, any]) {
   const [red, green, blue] = color;
   return `\x1b[38;2;${red};${green};${blue}m`;
 }
 
-function bg(color) {
+function bg(color: number[] | [any, any, any]) {
   const [red, green, blue] = color;
   return `\x1b[48;2;${red};${green};${blue}m`;
 }
 
-function paint(text, ...codes) {
+function paint(text: string, ...codes: string[]) {
   return `${codes.join('')}${text}${ansi.reset}`;
 }
 
-function stripAnsi(text) {
+function stripAnsi(text: string) {
   return text.replace(ansiPattern, '');
 }
 
-function visibleLength(text) {
+function visibleLength(text: any) {
   return stripAnsi(text).length;
 }
 
-function padRight(text, width) {
+function padRight(text: any, width: number) {
   return `${text}${' '.repeat(Math.max(0, width - visibleLength(text)))}`;
 }
 
-function renderColumns(left, right, gap = 3, leftWidthOverride) {
+function renderColumns(left: string, right: string | string[], gap = 3, leftWidthOverride: number) {
   const leftLines = Array.isArray(left) ? left : left.split('\n');
   const rightLines = Array.isArray(right) ? right : right.split('\n');
   const leftWidth = leftWidthOverride ?? Math.max(0, ...leftLines.map(visibleLength));
@@ -115,67 +115,67 @@ function renderColumns(left, right, gap = 3, leftWidthOverride) {
   }).join('\n');
 }
 
-function storeToken(tokens, value) {
+function storeToken(tokens: any[], value: string) {
   const token = `\u0000${tokens.length}\u0000`;
   tokens.push(value);
   return token;
 }
 
-function toAbsoluteUrl(href) {
+function toAbsoluteUrl(href: string) {
   return href.startsWith('/') ? `${siteUrl}${href}` : href;
 }
 
-function stripMarkdown(text) {
+function stripMarkdown(text: string) {
   return text
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '$1')
     .replace(/[`*_]/g, '');
 }
 
-function formatInline(text) {
-  const tokens = [];
+function formatInline(text: string) {
+  const tokens: any[] = [];
   let formatted = text;
 
-  formatted = formatted.replace(/`([^`]+)`/g, (_, code) =>
+  formatted = formatted.replace(/`([^`]+)`/g, (_: any, code: any) =>
     storeToken(tokens, paint(` ${code} `, ansi.bold, fg(palette.mint), bg(palette.ink))));
 
-  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, href) =>
+  formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_: any, label: any, href: any) =>
     storeToken(
       tokens,
       `${paint(label, ansi.bold, fg(palette.leaf))} ${paint(toAbsoluteUrl(href), fg(palette.sky), ansi.underline)}`
     ));
 
-  formatted = formatted.replace(/\*\*([^*]+)\*\*/g, (_, value) =>
+  formatted = formatted.replace(/\*\*([^*]+)\*\*/g, (_: any, value: any) =>
     storeToken(tokens, paint(value, ansi.bold, fg(palette.mint))));
 
-  formatted = formatted.replace(/_([^_]+)_/g, (_, value) =>
+  formatted = formatted.replace(/_([^_]+)_/g, (_: any, value: any) =>
     storeToken(tokens, paint(value, ansi.italic, fg(palette.sage))));
 
-  formatted = formatted.replace(/\bhttps?:\/\/\S+/g, match =>
+  formatted = formatted.replace(/\bhttps?:\/\/\S+/g, (match: any) =>
     storeToken(tokens, paint(match, fg(palette.sky), ansi.underline)));
 
-  return formatted.replace(/\u0000(\d+)\u0000/g, (_, index) => tokens[Number(index)]);
+  return formatted.replace(/\u0000(\d+)\u0000/g, (_: any, index: any) => tokens[Number(index)]);
 }
 
-function renderBox(title, lines, minWidth = 0) {
+function renderBox(title: string, lines: any[], minWidth = 0) {
   const innerWidth = Math.max(
     minWidth,
     0,
-    ...lines.map(line => visibleLength(line)),
+    ...lines.map((line: any) => visibleLength(line)),
     title ? visibleLength(title) + 3 : 0,
   );
-  const border = value => paint(value, fg(palette.pine));
+  const border = (value: string) => paint(value, fg(palette.pine));
   const topBorder = title
     ? `${border('┌─')}${paint(` ${title} `, ansi.bold, fg(palette.mint))}${border(`${'─'.repeat(Math.max(0, innerWidth - visibleLength(title) - 3))}┐`)}`
     : border(`┌${'─'.repeat(innerWidth)}┐`);
 
   return [
     topBorder,
-    ...lines.map(line => `${border('│')}${padRight(line, innerWidth)}${border('│')}`),
+    ...lines.map((line: any) => `${border('│')}${padRight(line, innerWidth)}${border('│')}`),
     border(`└${'─'.repeat(innerWidth)}┘`),
   ].join('\n');
 }
 
-async function renderTerminalAsset(filePath, options) {
+async function renderTerminalAsset(filePath: string, options: Readonly<{ width?: string | number; height?: string | number; preserveAspectRatio?: boolean; preferNativeRender?: boolean; }> | undefined) {
   const source = await readFile(filePath);
   const terminalSource = extname(filePath).toLowerCase() === '.svg' && filePath === logoPath
     ? createTerminalLogoSvg(source.toString('utf8'))
@@ -187,7 +187,7 @@ async function renderTerminalAsset(filePath, options) {
   return terminalImage.buffer(imageBuffer, options);
 }
 
-async function renderHero(title, pageUrl) {
+async function renderHero(title: string, pageUrl: string) {
   return renderColumns(await renderTerminalAsset(logoPath, {
     width: terminalLogoWidth,
     height: terminalLogoHeight,
@@ -203,7 +203,7 @@ async function renderHero(title, pageUrl) {
   ], 3, terminalLogoWidth);
 }
 
-function formatCodeLine(line, language) {
+function formatCodeLine(line: string, language: string) {
   if (!line.trim()) {
     return '';
   }
@@ -223,30 +223,30 @@ function formatCodeLine(line, language) {
   return paint(line, fg(palette.leaf));
 }
 
-function renderCodeBlock(lines, language) {
-  const rendered = lines.map(line => formatCodeLine(line, language));
+function renderCodeBlock(lines: any[], language: any) {
+  const rendered = lines.map((line: any) => formatCodeLine(line, language));
   const width = Math.max(52, 0, ...rendered.map(visibleLength));
   return renderBox(language ? `${language} example` : 'code', rendered, width).split('\n');
 }
 
-function isTableSeparator(line) {
+function isTableSeparator(line: string) {
   return /^\s*\|?[-\s:|]+\|?\s*$/.test(line);
 }
 
-function isTableStart(lines, index) {
+function isTableStart(lines: any[], index: number) {
   return /^\s*\|.*\|\s*$/.test(lines[index] ?? '') && isTableSeparator(lines[index + 1] ?? '');
 }
 
-function parseTableRow(line) {
+function parseTableRow(line: string) {
   return line
     .trim()
     .replace(/^\|/, '')
     .replace(/\|$/, '')
     .split('|')
-    .map(cell => cell.trim());
+    .map((cell: string) => cell.trim());
 }
 
-function collectTable(lines, startIndex) {
+function collectTable(lines: string | any[], startIndex: number) {
   const headers = parseTableRow(lines[startIndex]);
   const rows = [];
   let index = startIndex + 2;
@@ -259,11 +259,11 @@ function collectTable(lines, startIndex) {
   return { headers, rows, nextIndex: index };
 }
 
-function renderTable(headers, rows) {
+function renderTable(headers: string | any[], rows: any[]) {
   const output = [];
 
   for (const row of rows) {
-    if (!row.some(cell => cell)) {
+    if (!row.some((cell: any) => cell)) {
       continue;
     }
 
@@ -288,7 +288,7 @@ function renderTable(headers, rows) {
   return output;
 }
 
-function renderSection(line) {
+function renderSection(line: string) {
   const title = line.replace(/^##\s+/, '').trim();
   return [
     `${paint(formatInline(title), ansi.bold, fg(palette.leaf))}`,
@@ -296,12 +296,12 @@ function renderSection(line) {
   ];
 }
 
-function renderSubsection(line) {
+function renderSubsection(line: string) {
   const title = line.replace(/^#{3,6}\s+/, '').trim();
   return [`${paint('>', ansi.bold, fg(palette.sage))} ${formatInline(title)}`];
 }
 
-function isSpecialLine(line, nextLine = '') {
+function isSpecialLine(line: string, nextLine = '') {
   return /^#{1,6}\s+/.test(line)
     || /^```/.test(line)
     || isTableStart([line, nextLine], 0)
@@ -311,7 +311,7 @@ function isSpecialLine(line, nextLine = '') {
     || /^>\s+/.test(line);
 }
 
-async function renderMarkdownPage(markdown, route) {
+async function renderMarkdownPage(markdown: string, route: string) {
   const lines = markdown.replace(/\r/g, '').split('\n');
   const output = [""];
   let index = 0;
@@ -422,18 +422,18 @@ async function renderMarkdownPage(markdown, route) {
   return `${output.join('\n')}\n`;
 }
 
-function stripNumberPrefix(name) {
+function stripNumberPrefix(name: string) {
   return name.replace(/^\d+-/, '');
 }
 
-function stripFrontmatter(content) {
+function stripFrontmatter(content: string) {
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
   return match ? content.slice(match[0].length) : content;
 }
 
-async function walk(dir) {
+async function walk(dir: string): Promise<string[]> {
   const entries = await readdir(dir, { withFileTypes: true });
-  const files = [];
+  const files: string[] = [];
   for (const entry of entries) {
     const fullPath = join(dir, entry.name);
     if (entry.isDirectory()) {
@@ -445,7 +445,7 @@ async function walk(dir) {
   return files;
 }
 
-function toOutputPath(filePath) {
+function toOutputPath(filePath: string) {
   const rel = relative(docsDir, filePath);
   const parts = rel.split('/').map((part, i, arr) => {
     if (i < arr.length - 1) {
@@ -459,16 +459,16 @@ function toOutputPath(filePath) {
   return join(outputDir, ...parts);
 }
 
-function toRoutePath(outPath) {
+function toRoutePath(outPath: string) {
   const rel = relative(outputDir, outPath);
   const route = '/' + rel.replace(/\.txt$/, '').replace(/\/index$/, '');
   return route === '/index' ? '/' : route;
 }
 
-async function buildIndex(files) {
+async function buildIndex(files: any[]) {
   const paths = files
-    .map(filePath => toRoutePath(filePath))
-    .filter(path => path !== '/')
+    .map((filePath: any) => toRoutePath(filePath))
+    .filter((path: string) => path !== '/')
     .sort();
 
   return [
@@ -481,7 +481,7 @@ async function buildIndex(files) {
     renderBox('Install Bicep Cost Estimator', [
       `${paint('$ curl', fg(palette.leaf))} ${paint("-sL", ansi.bold, fg(palette.gold))} ${paint("https://bicepcostestimator.net/install.sh", ansi.bold, fg(palette.sky), ansi.underline)} ${paint("| bash", fg(palette.dim))}`,
     ], 80),
-    renderBox('Pages', paths.map(path => `${paint('$ curl ', fg(palette.leaf))}${paint("https://bicepcostestimator.net" + path, fg(palette.sky), ansi.underline)}`), 80),
+    renderBox('Pages', paths.map((path: string) => `${paint('$ curl ', fg(palette.leaf))}${paint("https://bicepcostestimator.net" + path, fg(palette.sky), ansi.underline)}`), 80),
     '',
   ].join('\n');
 }
