@@ -3,7 +3,7 @@ SHELL := bash
 
 .DEFAULT_GOAL := help
 
-.PHONY: help info setup-cli setup-extension setup-website clean build-cli build-extension build-website dev-website test-cli test-extension package-cli
+.PHONY: help info setup-cli setup-extension setup-website clean build-cli build-extension build-website dev-website dev-website-ssh test-cli test-extension package-cli
 
 help:
 	@echo "Washington development targets"
@@ -59,6 +59,10 @@ build-website: clean ## Build the documentation website
 
 dev-website: ## Run the documentation website locally with live reload and curl support
 	npm --prefix src/website run dev
+
+dev-website-ssh: ## Run the website server locally with SSH docs enabled on port 2222
+	npm --prefix src/website run prebuild
+	cd src/website && PORT="$${PORT:-3000}" SSH_PORT="$${SSH_PORT:-2222}" node --import tsx server.mts
 
 test-cli: build-cli ## Run the CLI test suite
 	dotnet test tests/cli.tests/washington.tests.csproj --configuration Release
