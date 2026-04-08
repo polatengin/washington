@@ -22,7 +22,7 @@ public class ApplicationGatewayMapper : IResourceCostMapper
             new PricingQuery(
                 ServiceName: "Application Gateway",
                 ArmRegionName: region,
-                ProductName: $"Application Gateway {tier}",
+                ProductName: GetProductName(tier),
                 PriceType: "Consumption"
             )
         };
@@ -31,27 +31,27 @@ public class ApplicationGatewayMapper : IResourceCostMapper
     public MonthlyCost CalculateCost(ResourceDescriptor resource, List<PriceRecord> prices)
     {
         var tier = GetTier(resource);
-        var capacity = GetCapacity(resource);
-
-        // Look for gateway hour pricing
-        var price = prices
-            .Where(p => p.MeterName != null &&
-                (p.MeterName.Contains("Gateway") || p.MeterName.Contains("Fixed Cost")) &&
-                p.UnitOfMeasure == "1 Hour")
+        var fixedCostPrice = prices
+            .Where(IsFixedHourlyPrice)
             .OrderBy(p => p.UnitPrice)
             .FirstOrDefault();
 
-        // Fallback: any hourly price
-        price ??= prices
-            .Where(p => p.UnitOfMeasure == "1 Hour")
+        var capacityUnitPrice = prices
+            .Where(IsCapacityUnitHourlyPrice)
             .OrderBy(p => p.UnitPrice)
             .FirstOrDefault();
 
-        if (price == null)
-            return new MonthlyCost(0, $"App Gateway {tier} - no pricing found");
+        if (fixedCostPrice == null)
+            return new MonthlyCost(0, $"App Gateway {FormatTier(tier)} - no pricing found");
 
-        var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * capacity;
-        return new MonthlyCost(monthlyCost, $"App Gateway {tier} {capacity} instance(s) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");
+        var monthlyCost = (decimal)fixedCostPrice.UnitPrice * HoursPerMonth;
+        var details = $"App Gateway {FormatTier(tier)} fixed cost @ ${fixedCostPrice.UnitPrice:F4}/hr × {HoursPerMonth:F0} hrs";
+
+        details += capacityUnitPrice == null
+            ? " + capacity units (usage-based)"
+            : $" + capacity units @ ${capacityUnitPrice.UnitPrice:F4}/hr (usage-based)";
+
+        return new MonthlyCost(monthlyCost, details);
     }
 
     private static string GetTier(ResourceDescriptor resource)
@@ -63,10 +63,25 @@ public class ApplicationGatewayMapper : IResourceCostMapper
         return "Standard_v2";
     }
 
-    private static int GetCapacity(ResourceDescriptor resource)
+    private static string GetProductName(string tier) => tier switch
     {
-        if (resource.Sku.TryGetValue("capacity", out var cap) && cap.ValueKind == JsonValueKind.Number)
-            return cap.GetInt32();
-        return 1;
-    }
+        "Standard_v2" => "Application Gateway Standard v2",
+        "WAF_v2" => "Application Gateway WAF v2",
+        "Basic_v2" => "Application Gateway Basic v2",
+        _ => $"Application Gateway {FormatTier(tier)}"
+    };
+
+    private static string FormatTier(string tier) => tier.Replace("_", " ", StringComparison.Ordinal);
+
+    private static bool IsFixedHourlyPrice(PriceRecord price) =>
+        IsHourlyPrice(price)
+        && price.MeterName?.Contains("Fixed Cost", StringComparison.OrdinalIgnoreCase) == true;
+
+    private static bool IsCapacityUnitHourlyPrice(PriceRecord price) =>
+        IsHourlyPrice(price)
+        && price.MeterName?.Contains("Capacity Units", StringComparison.OrdinalIgnoreCase) == true;
+
+    private static bool IsHourlyPrice(PriceRecord price) =>
+        string.Equals(price.UnitOfMeasure, "1 Hour", StringComparison.OrdinalIgnoreCase)
+        || string.Equals(price.UnitOfMeasure, "1/Hour", StringComparison.OrdinalIgnoreCase);
 }
