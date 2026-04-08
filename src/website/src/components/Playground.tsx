@@ -115,7 +115,6 @@ export default function Playground() {
   }
 
   const resourceCount = report?.lines.length ?? 0;
-  const warningCount = report?.warnings.length ?? 0;
 
   return (
     <section className="playground">
@@ -171,10 +170,6 @@ export default function Playground() {
           <article className="playground__summaryCard">
             <span>Resources priced</span>
             <strong>{resourceCount}</strong>
-          </article>
-          <article className="playground__summaryCard">
-            <span>Warnings</span>
-            <strong>{warningCount}</strong>
           </article>
         </div>
 
