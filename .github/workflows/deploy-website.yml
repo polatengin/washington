@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      RESOURCE_GROUP: ${{ secrets.AZURE_CONTAINER_APP_RESOURCE_GROUP }}
+      RESOURCE_GROUP: ${{ secrets.PROJECT_NAME }}-prod-rg
       ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
       ACA_APP: "${{ secrets.PROJECT_NAME }}-website"
 
