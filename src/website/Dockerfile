@@ -46,6 +46,8 @@ COPY --from=website-build /app/src/website/build ./build
 
 # Copy the Express server
 COPY src/website/server.mts ./server.mts
+COPY src/website/docsRuntime.mts ./docsRuntime.mts
+COPY src/website/sshDocsServer.mts ./sshDocsServer.mts
 COPY --from=cli-build /out/bce ./bin/bce
 
 # Install only production dependency (express)
