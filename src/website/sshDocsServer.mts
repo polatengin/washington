@@ -64,20 +64,78 @@ function visibleLength(text: string) {
   return stripAnsi(text).length;
 }
 
+const ansiSequencePattern = /(\x1b\][\s\S]*?(?:\x07|\x1b\\)|\x1b\[[0-?]*[ -/]*[@-~])/g;
+
+function clipVisibleText(text: string, width: number) {
+  if (width <= 0) {
+    return '';
+  }
+
+  let visible = 0;
+  let result = '';
+  let lastIndex = 0;
+  let sawAnsi = false;
+  let clipped = false;
+
+  for (const match of text.matchAll(ansiSequencePattern)) {
+    const matchIndex = match.index ?? 0;
+    const plainChunk = text.slice(lastIndex, matchIndex);
+
+    for (const char of plainChunk) {
+      if (visible >= width) {
+        clipped = true;
+        break;
+      }
+
+      result += char;
+      visible += 1;
+    }
+
+    if (clipped) {
+      break;
+    }
+
+    result += match[0];
+    sawAnsi = true;
+    lastIndex = matchIndex + match[0].length;
+  }
+
+  if (!clipped) {
+    const plainChunk = text.slice(lastIndex);
+    for (const char of plainChunk) {
+      if (visible >= width) {
+        clipped = true;
+        break;
+      }
+
+      result += char;
+      visible += 1;
+    }
+  }
+
+  if (clipped && sawAnsi && !result.endsWith(ansi.reset)) {
+    result += ansi.reset;
+  }
+
+  return result;
+}
+
 function padOrClip(text: string, width: number) {
   if (width <= 0) {
     return '';
   }
 
-  if (text.length <= width) {
-    return text.padEnd(width, ' ');
+  const length = visibleLength(text);
+
+  if (length <= width) {
+    return `${text}${' '.repeat(width - length)}`;
   }
 
   if (width === 1) {
-    return text.slice(0, 1);
+    return clipVisibleText(text, 1);
   }
 
-  return `${text.slice(0, width - 1)}…`;
+  return `${clipVisibleText(text, width - 1)}…`;
 }
 
 function wrapPlainText(text: string, width: number) {
@@ -137,6 +195,10 @@ function wrapPageLine(line: string, width: number) {
     return [''];
   }
 
+  if (normalized.includes('\x1b')) {
+    return [padOrClip(normalized, width)];
+  }
+
   if (/[┌┐└┘│─]/.test(normalized)) {
     return [padOrClip(normalized, width)];
   }
@@ -151,7 +213,7 @@ function renderSegments(width: number, labels: string[]) {
 
   let line = segments.join(paint(' ', palette.lineForeground));
   if (visibleLength(line) > width) {
-    line = padOrClip(stripAnsi(line), width);
+    line = padOrClip(line, width);
   }
 
   return padOrClip(line, width);
@@ -386,7 +448,7 @@ async function renderPage(route: string, textDir: string, width: number) {
   }
 
   const lines: string[] = [];
-  for (const line of stripAnsi(rawPage).split(/\r?\n/)) {
+  for (const line of rawPage.split(/\r?\n/)) {
     lines.push(...wrapPageLine(line, width));
   }
 
