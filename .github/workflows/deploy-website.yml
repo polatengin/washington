@@ -301,7 +301,8 @@ jobs:
           az containerapp hostname bind \
             --name "${ACA_APP}" \
             --resource-group "${RESOURCE_GROUP}" \
-            --hostname "${WEBSITE_HOSTNAME}"
+            --hostname "${WEBSITE_HOSTNAME}" \
+            --environment "${ACA_ENV}"
 
       - name: Show deployed revision
         run: |
