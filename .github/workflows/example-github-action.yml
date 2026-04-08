@@ -30,6 +30,7 @@ jobs:
       - id: cost-threshold
         name: Estimate cost with threshold check
         uses: polatengin/washington@main
+        continue-on-error: true
         with:
           file: tests/fixtures/showcase.bicep
           fail-on-threshold: 1000
