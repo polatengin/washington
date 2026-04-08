@@ -295,14 +295,25 @@ jobs:
             --resource-group "${RESOURCE_GROUP}" \
             --type external \
             --target-port 3000 \
-            --transport http \
+            --transport "http" \
             --allow-insecure true
 
-          az containerapp hostname bind \
+          existing_binding_name="$(az containerapp hostname list \
             --name "${ACA_APP}" \
             --resource-group "${RESOURCE_GROUP}" \
-            --hostname "${WEBSITE_HOSTNAME}" \
-            --environment "${ACA_ENV}"
+            --query "[?name=='${WEBSITE_HOSTNAME}' && bindingType=='SniEnabled' && certificateId!=null] | [0].name" \
+            --output tsv)"
+
+          if [[ "${existing_binding_name}" == "${WEBSITE_HOSTNAME}" ]]; then
+            echo "Hostname ${WEBSITE_HOSTNAME} is already bound with a certificate; skipping bind"
+          else
+            az containerapp hostname bind \
+              --name "${ACA_APP}" \
+              --resource-group "${RESOURCE_GROUP}" \
+              --hostname "${WEBSITE_HOSTNAME}" \
+              --environment "${ACA_ENV}" \
+              --validation-method "http"
+          fi
 
       - name: Show deployed revision
         run: |
