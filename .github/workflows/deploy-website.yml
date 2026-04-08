@@ -25,11 +25,18 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      AZURE_ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
-      AZURE_CONTAINER_APP_NAME: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
-      AZURE_RESOURCE_GROUP_NAME: ${{ secrets.AZURE_CONTAINER_APP_RESOURCE_GROUP }}
       LOCATION: westus2
+      SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
+      RESOURCE_GROUP: ${{ secrets.AZURE_CONTAINER_APP_RESOURCE_GROUP }}
+      VNET_NAME: ${{ secrets.PROJECT_NAME }}-aca-vnet
+      VNET_CIDR: "10.50.0.0/16"
+      SUBNET_NAME: ${{ secrets.PROJECT_NAME }}-aca-subnet
+      SUBNET_CIDR: "10.50.0.0/23"
+      LOG_ANALYTICS_WORKSPACE: "law-${{ secrets.PROJECT_NAME }}-web-westus2"
+      ACA_ENV: "${{ secrets.PROJECT_NAME }}-web-env"
+      ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
+      ACA_APP: "${{ secrets.PROJECT_NAME }}-website"
       WEBSITE_IMAGE_REPOSITORY: washington-website
       WEBSITE_IMAGE_TAG_RETENTION_COUNT: 10
 
@@ -52,17 +59,147 @@ jobs:
         run: |
           set -euo pipefail
 
-          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+          az account set --subscription "${SUBSCRIPTION_ID}"
 
-          acr_login_server="$(az acr show --name "$AZURE_ACR_NAME" --query loginServer --output tsv)"
-          image_sha="$acr_login_server/$WEBSITE_IMAGE_REPOSITORY:$GITHUB_SHA"
-          image_latest="$acr_login_server/$WEBSITE_IMAGE_REPOSITORY:latest"
+          az group create \
+            --name "${RESOURCE_GROUP}" \
+            --location "${LOCATION}"
 
-          echo "ACR_LOGIN_SERVER=$acr_login_server" >> "$GITHUB_ENV"
-          echo "IMAGE_SHA=$image_sha" >> "$GITHUB_ENV"
-          echo "IMAGE_LATEST=$image_latest" >> "$GITHUB_ENV"
-          echo "image_sha=$image_sha" >> "$GITHUB_OUTPUT"
-          echo "image_latest=$image_latest" >> "$GITHUB_OUTPUT"
+          az network vnet create \
+            --resource-group "${RESOURCE_GROUP}" \
+            --name "${VNET_NAME}" \
+            --location "${LOCATION}" \
+            --address-prefix "${VNET_CIDR}"
+
+          az network vnet subnet create \
+            --resource-group "${RESOURCE_GROUP}" \
+            --vnet-name "${VNET_NAME}" \
+            --name "${SUBNET_NAME}" \
+            --address-prefixes "${SUBNET_CIDR}"
+
+          az network vnet subnet update \
+            --resource-group "${RESOURCE_GROUP}" \
+            --vnet-name "${VNET_NAME}" \
+            --name "${SUBNET_NAME}" \
+            --delegations Microsoft.App/environments
+
+          INFRA_SUBNET_ID="$(az network vnet subnet show \
+            --resource-group "${RESOURCE_GROUP}" \
+            --vnet-name "${VNET_NAME}" \
+            --name "${SUBNET_NAME}" \
+            --query id \
+            --output tsv)"
+
+          az monitor log-analytics workspace create \
+            --resource-group "${RESOURCE_GROUP}" \
+            --workspace-name "${LOG_ANALYTICS_WORKSPACE}" \
+            --location "${LOCATION}" \
+            --sku PerGB2018
+
+          LOG_ANALYTICS_WORKSPACE_ID="$(az monitor log-analytics workspace show \
+            --resource-group "${RESOURCE_GROUP}" \
+            --workspace-name "${LOG_ANALYTICS_WORKSPACE}" \
+            --query customerId \
+            --output tsv)"
+
+          LOG_ANALYTICS_WORKSPACE_KEY="$(az monitor log-analytics workspace get-shared-keys \
+            --resource-group "${RESOURCE_GROUP}" \
+            --workspace-name "${LOG_ANALYTICS_WORKSPACE}" \
+            --query primarySharedKey \
+            --output tsv)"
+
+          az containerapp env create \
+            --name "${ACA_ENV}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --location "${LOCATION}" \
+            --infrastructure-subnet-resource-id "${INFRA_SUBNET_ID}" \
+            --logs-destination log-analytics \
+            --logs-workspace-id "${LOG_ANALYTICS_WORKSPACE_ID}" \
+            --logs-workspace-key "${LOG_ANALYTICS_WORKSPACE_KEY}"
+
+          ENV_ID="$(az containerapp env show \
+            --name "${ACA_ENV}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --query id \
+            --output tsv)"
+
+          az acr update \
+            --name "${ACR_NAME}" \
+            --admin-enabled true
+
+          ACR_LOGIN_SERVER="$(az acr show \
+            --name "${ACR_NAME}" \
+            --query loginServer \
+            --output tsv)"
+
+          ACR_USERNAME="$(az acr credential show \
+            --name "${ACR_NAME}" \
+            --query username \
+            --output tsv)"
+
+          ACR_PASSWORD="$(az acr credential show \
+            --name "${ACR_NAME}" \
+            --query passwords[0].value \
+            --output tsv)"
+
+          IMAGE="${ACR_LOGIN_SERVER}/${IMAGE_REPO}:${IMAGE_TAG}"
+
+          cat > containerapp.yaml <<EOF
+          location: ${LOCATION}
+          name: ${ACA_APP}
+          type: Microsoft.App/containerApps
+          properties:
+            environmentId: ${ENV_ID}
+            configuration:
+              activeRevisionsMode: Single
+              ingress:
+                external: true
+                targetPort: 3000
+                transport: http
+                allowInsecure: false
+                additionalPortMappings:
+                  - exposedPort: 22
+                    external: true
+                    targetPort: 2222
+                traffic:
+                  - latestRevision: true
+                    weight: 100
+              registries:
+                - server: ${ACR_LOGIN_SERVER}
+                  username: ${ACR_USERNAME}
+                  passwordSecretRef: acr-password
+              secrets:
+                - name: acr-password
+                  value: |-
+                    ${ACR_PASSWORD}
+            template:
+              containers:
+                - name: website
+                  image: ${IMAGE}
+                  env:
+                    - name: SSH_PORT
+                      value: "2222"
+                  resources:
+                    cpu: 0.5
+                    memory: 1.0Gi
+              scale:
+                minReplicas: 1
+                maxReplicas: 1
+          EOF
+
+          az containerapp create \
+            --name "${ACA_APP}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --yaml containerapp.yaml
+
+          image_sha="${ACR_LOGIN_SERVER}/${WEBSITE_IMAGE_REPOSITORY}:${GITHUB_SHA}"
+          image_latest="${ACR_LOGIN_SERVER}/${WEBSITE_IMAGE_REPOSITORY}:latest"
+
+          echo "ACR_LOGIN_SERVER=${ACR_LOGIN_SERVER}" >> "$GITHUB_ENV"
+          echo "IMAGE_SHA=${image_sha}" >> "$GITHUB_ENV"
+          echo "IMAGE_LATEST=${image_latest}" >> "$GITHUB_ENV"
+          echo "image_sha=${image_sha}" >> "$GITHUB_OUTPUT"
+          echo "image_latest=${image_latest}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -71,8 +208,8 @@ jobs:
         run: |
           set -euo pipefail
 
-          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
-          az acr login --name "$AZURE_ACR_NAME"
+          az account set --subscription "${SUBSCRIPTION_ID}"
+          az acr login --name "${ACR_NAME}"
 
       - name: Build and push website image
         uses: docker/build-push-action@v7
@@ -90,28 +227,28 @@ jobs:
         run: |
           set -euo pipefail
 
-          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+          az account set --subscription "${SUBSCRIPTION_ID}"
 
           az containerapp update \
-            --name "$AZURE_CONTAINER_APP_NAME" \
-            --resource-group "$AZURE_RESOURCE_GROUP_NAME" \
-            --image "$IMAGE_SHA"
+            --name "${ACA_APP}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --image "${IMAGE_SHA}"
 
       - name: Show deployed revision
         run: |
           set -euo pipefail
 
-          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+          az account set --subscription "${SUBSCRIPTION_ID}"
 
           fqdn="$(az containerapp show \
-            --name "$AZURE_CONTAINER_APP_NAME" \
-            --resource-group "$AZURE_RESOURCE_GROUP_NAME" \
+            --name "${ACA_APP}" \
+            --resource-group "${RESOURCE_GROUP}" \
             --query properties.configuration.ingress.fqdn \
             --output tsv)"
 
           revision="$(az containerapp show \
-            --name "$AZURE_CONTAINER_APP_NAME" \
-            --resource-group "$AZURE_RESOURCE_GROUP_NAME" \
+          --name "${ACA_APP}" \
+          --resource-group "${RESOURCE_GROUP}" \
             --query properties.latestReadyRevisionName \
             --output tsv)"
 
@@ -122,21 +259,21 @@ jobs:
         run: |
           set -euo pipefail
 
-          az account set --subscription "$AZURE_SUBSCRIPTION_ID"
+          az account set --subscription "${SUBSCRIPTION_ID}"
 
           mapfile -t old_tags < <(
             az acr repository show-tags \
-              --name "$AZURE_ACR_NAME" \
-              --repository "$WEBSITE_IMAGE_REPOSITORY" \
+              --name "${ACR_NAME}" \
+              --repository "${WEBSITE_IMAGE_REPOSITORY}" \
               --orderby time_desc \
               --output tsv | \
               awk -v keep="$WEBSITE_IMAGE_TAG_RETENTION_COUNT" '/^[0-9a-f]{40}$/ { count++; if (count > keep) print }'
           )
 
           for tag in "${old_tags[@]}"; do
-            echo "Deleting $WEBSITE_IMAGE_REPOSITORY:$tag"
+            echo "Deleting ${WEBSITE_IMAGE_REPOSITORY}:$tag"
             az acr repository delete \
-              --name "$AZURE_ACR_NAME" \
-              --image "$WEBSITE_IMAGE_REPOSITORY:$tag" \
+              --name "${ACR_NAME}" \
+              --image "${WEBSITE_IMAGE_REPOSITORY}:$tag" \
               --yes
           done
