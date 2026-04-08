@@ -343,15 +343,37 @@ function maybeAccept<T>(value: unknown): T | null {
   return typeof value === 'function' ? (value as () => T)() : null;
 }
 
+function normalizeHostKey(rawValue: string) {
+  const normalized = rawValue.trim().replace(/\\n/g, '\n');
+  if (!normalized) {
+    return normalized;
+  }
+
+  if (normalized.includes('BEGIN') && normalized.includes('PRIVATE KEY')) {
+    return normalized;
+  }
+
+  try {
+    const decoded = Buffer.from(normalized, 'base64').toString('utf8').trim();
+    if (decoded.includes('BEGIN') && decoded.includes('PRIVATE KEY')) {
+      return decoded;
+    }
+  } catch {
+    // Fall through to the normalized original value.
+  }
+
+  return normalized;
+}
+
 async function resolveHostKey(rootDir: string) {
   const hostKey = process.env.SSH_HOST_KEY?.trim();
   if (hostKey) {
-    return hostKey.replace(/\\n/g, '\n');
+    return normalizeHostKey(hostKey);
   }
 
   const hostKeyPath = resolveRuntimePath(rootDir, process.env.SSH_HOST_KEY_PATH);
   if (hostKeyPath) {
-    return readFile(hostKeyPath, 'utf8');
+    return normalizeHostKey(await readFile(hostKeyPath, 'utf8'));
   }
 
   return createEphemeralHostKey();
