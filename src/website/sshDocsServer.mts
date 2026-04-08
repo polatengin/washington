@@ -209,7 +209,7 @@ function renderBrowseScreen(state: ShellState, documents: SearchDocument[]) {
 
   const lines = [
     renderSegments(columns, ['washington', 'ssh docs', 'read-only']),
-    padOrClip(paint('Arrow keys or j/k to browse, Enter to open, q to quit.', palette.dimForeground), columns),
+    padOrClip(paint('Arrow keys to browse, Enter to open, q to quit.', palette.dimForeground), columns),
     paint('─'.repeat(columns), palette.lineForeground),
     '',
   ];
@@ -234,7 +234,7 @@ function renderBrowseScreen(state: ShellState, documents: SearchDocument[]) {
   }
 
   lines.push('');
-  lines.push(padOrClip(paint('j/k move  enter open  esc back  q quit', palette.dimForeground), columns));
+  lines.push(padOrClip(paint('↑/↓ move  enter open  esc back  q quit', palette.dimForeground), columns));
 
   return lines.join('\r\n');
 }
@@ -320,7 +320,13 @@ function parseKeyInputs(chunk: Buffer) {
       continue;
     }
 
-    if (char === 'j' || char === 'k' || char === 'q' || char === 'g' || char === 'G') {
+    if (char === 'q' || char === 'Q') {
+      keys.push('quit');
+      index += 1;
+      continue;
+    }
+
+    if (char === 'g' || char === 'G') {
       keys.push(char);
       index += 1;
       continue;
@@ -489,9 +495,9 @@ async function startShell(channel: any, documents: SearchDocument[], textDir: st
       }
 
       if (state.view === 'browse') {
-        if (key === 'down' || key === 'j') {
+        if (key === 'down') {
           moveSelection(1);
-        } else if (key === 'up' || key === 'k') {
+        } else if (key === 'up') {
           moveSelection(-1);
         } else if (key === 'g') {
           state.selectedRoute = documents[0]?.href || null;
@@ -515,9 +521,9 @@ async function startShell(channel: any, documents: SearchDocument[], textDir: st
       }
 
       const visibleRows = Math.max(1, state.rows - 6);
-      if (key === 'down' || key === 'j') {
+      if (key === 'down') {
         state.pageScroll = Math.min(Math.max(0, state.currentPageLines.length - visibleRows), state.pageScroll + 1);
-      } else if (key === 'up' || key === 'k') {
+      } else if (key === 'up') {
         state.pageScroll = Math.max(0, state.pageScroll - 1);
       } else if (key === 'pageup') {
         state.pageScroll = Math.max(0, state.pageScroll - visibleRows);
