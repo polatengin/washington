@@ -37,6 +37,8 @@ jobs:
       ACA_ENV: "${{ secrets.PROJECT_NAME }}-web-env"
       ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
       ACA_APP: "${{ secrets.PROJECT_NAME }}-website"
+      IMAGE_TAG: latest
+      WEBSITE_HOSTNAME: bicepcostestimator.net
 
     steps:
       - name: Checkout code
@@ -189,6 +191,11 @@ jobs:
             --name "${ACA_APP}" \
             --resource-group "${RESOURCE_GROUP}" \
             --yaml containerapp.yaml
+
+          az containerapp hostname bind \
+            --name "${ACA_APP}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --hostname "${WEBSITE_HOSTNAME}"
 
           image_sha="${ACR_LOGIN_SERVER}/${ACA_APP}:${GITHUB_SHA}"
           image_latest="${ACR_LOGIN_SERVER}/${ACA_APP}:latest"
