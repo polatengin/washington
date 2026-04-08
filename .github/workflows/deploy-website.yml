@@ -28,7 +28,8 @@ jobs:
       AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       AZURE_ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
       AZURE_CONTAINER_APP_NAME: ${{ secrets.AZURE_CONTAINER_APP_NAME }}
-      AZURE_CONTAINER_APP_RESOURCE_GROUP: ${{ secrets.AZURE_CONTAINER_APP_RESOURCE_GROUP }}
+      AZURE_RESOURCE_GROUP_NAME: ${{ secrets.AZURE_CONTAINER_APP_RESOURCE_GROUP }}
+      LOCATION: westus2
       WEBSITE_IMAGE_REPOSITORY: washington-website
       WEBSITE_IMAGE_TAG_RETENTION_COUNT: 10
 
@@ -93,7 +94,7 @@ jobs:
 
           az containerapp update \
             --name "$AZURE_CONTAINER_APP_NAME" \
-            --resource-group "$AZURE_CONTAINER_APP_RESOURCE_GROUP" \
+            --resource-group "$AZURE_RESOURCE_GROUP_NAME" \
             --image "$IMAGE_SHA"
 
       - name: Show deployed revision
@@ -104,13 +105,13 @@ jobs:
 
           fqdn="$(az containerapp show \
             --name "$AZURE_CONTAINER_APP_NAME" \
-            --resource-group "$AZURE_CONTAINER_APP_RESOURCE_GROUP" \
+            --resource-group "$AZURE_RESOURCE_GROUP_NAME" \
             --query properties.configuration.ingress.fqdn \
             --output tsv)"
 
           revision="$(az containerapp show \
             --name "$AZURE_CONTAINER_APP_NAME" \
-            --resource-group "$AZURE_CONTAINER_APP_RESOURCE_GROUP" \
+            --resource-group "$AZURE_RESOURCE_GROUP_NAME" \
             --query properties.latestReadyRevisionName \
             --output tsv)"
 
