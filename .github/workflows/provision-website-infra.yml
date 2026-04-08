@@ -1,0 +1,371 @@
+name: Provision Website Infra
+
+"on":
+  workflow_dispatch:
+
+concurrency:
+  group: website-infra-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  provision:
+    runs-on: ubuntu-latest
+    env:
+      LOCATION: westus2
+      SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
+      RESOURCE_GROUP: ${{ secrets.AZURE_CONTAINER_APP_RESOURCE_GROUP }}
+      VNET_NAME: ${{ secrets.PROJECT_NAME }}-aca-vnet
+      SUBNET_NAME: ${{ secrets.PROJECT_NAME }}-aca-subnet
+      LOG_ANALYTICS_WORKSPACE: "law-${{ secrets.PROJECT_NAME }}-web-westus2"
+      ACA_ENV: "${{ secrets.PROJECT_NAME }}-web-env"
+      ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
+      ACA_APP: "${{ secrets.PROJECT_NAME }}-website"
+      WEBSITE_HOSTNAME: bicepcostestimator.net
+
+    steps:
+      - name: Azure login
+        uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43 # v3.0.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Enable Azure CLI extension auto-install
+        run: az config set extension.use_dynamic_install=yes_without_prompt
+
+      - name: Provision container app environment
+        run: |
+          set -euo pipefail
+
+          az account set --subscription "${SUBSCRIPTION_ID}"
+
+          az group create \
+            --name "${RESOURCE_GROUP}" \
+            --location "${LOCATION}"
+
+          if ! az network vnet show \
+            --resource-group "${RESOURCE_GROUP}" \
+            --name "${VNET_NAME}" >/dev/null 2>&1; then
+            az network vnet create \
+              --resource-group "${RESOURCE_GROUP}" \
+              --name "${VNET_NAME}" \
+              --location "${LOCATION}" \
+              --address-prefix "10.50.0.0/16"
+          else
+            echo "VNet ${VNET_NAME} already exists; skipping create"
+          fi
+
+          if ! az network vnet subnet show \
+            --resource-group "${RESOURCE_GROUP}" \
+            --vnet-name "${VNET_NAME}" \
+            --name "${SUBNET_NAME}" >/dev/null 2>&1; then
+            az network vnet subnet create \
+              --resource-group "${RESOURCE_GROUP}" \
+              --vnet-name "${VNET_NAME}" \
+              --name "${SUBNET_NAME}" \
+              --address-prefixes "10.50.0.0/23"
+          else
+            echo "Subnet ${SUBNET_NAME} already exists; skipping create"
+          fi
+
+          subnet_delegated="$(az network vnet subnet show \
+            --resource-group "${RESOURCE_GROUP}" \
+            --vnet-name "${VNET_NAME}" \
+            --name "${SUBNET_NAME}" \
+            --query "length(delegations[?serviceName=='Microsoft.App/environments'])" \
+            --output tsv)"
+
+          if [[ "${subnet_delegated}" == "0" ]]; then
+            az network vnet subnet update \
+              --resource-group "${RESOURCE_GROUP}" \
+              --vnet-name "${VNET_NAME}" \
+              --name "${SUBNET_NAME}" \
+              --delegations Microsoft.App/environments
+          else
+            echo "Subnet ${SUBNET_NAME} already delegated to Microsoft.App/environments; skipping update"
+          fi
+
+          infra_subnet_id="$(az network vnet subnet show \
+            --resource-group "${RESOURCE_GROUP}" \
+            --vnet-name "${VNET_NAME}" \
+            --name "${SUBNET_NAME}" \
+            --query id \
+            --output tsv)"
+
+          if ! az monitor log-analytics workspace show \
+            --resource-group "${RESOURCE_GROUP}" \
+            --workspace-name "${LOG_ANALYTICS_WORKSPACE}" >/dev/null 2>&1; then
+            az monitor log-analytics workspace create \
+              --resource-group "${RESOURCE_GROUP}" \
+              --workspace-name "${LOG_ANALYTICS_WORKSPACE}" \
+              --location "${LOCATION}" \
+              --sku PerGB2018
+          else
+            echo "Log Analytics workspace ${LOG_ANALYTICS_WORKSPACE} already exists; skipping create"
+          fi
+
+          log_analytics_workspace_id="$(az monitor log-analytics workspace show \
+            --resource-group "${RESOURCE_GROUP}" \
+            --workspace-name "${LOG_ANALYTICS_WORKSPACE}" \
+            --query customerId \
+            --output tsv)"
+
+          log_analytics_workspace_key="$(az monitor log-analytics workspace get-shared-keys \
+            --resource-group "${RESOURCE_GROUP}" \
+            --workspace-name "${LOG_ANALYTICS_WORKSPACE}" \
+            --query primarySharedKey \
+            --output tsv)"
+
+          env_id="$(az containerapp env show \
+            --name "${ACA_ENV}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --query id \
+            --output tsv 2>/dev/null || true)"
+
+          if [[ -z "${env_id}" ]]; then
+            az containerapp env create \
+              --name "${ACA_ENV}" \
+              --resource-group "${RESOURCE_GROUP}" \
+              --location "${LOCATION}" \
+              --infrastructure-subnet-resource-id "${infra_subnet_id}" \
+              --logs-destination log-analytics \
+              --logs-workspace-id "${log_analytics_workspace_id}" \
+              --logs-workspace-key "${log_analytics_workspace_key}"
+          else
+            echo "Container Apps environment ${ACA_ENV} already exists; skipping create"
+          fi
+
+      - name: Ensure website container app
+        run: |
+          set -euo pipefail
+
+          az account set --subscription "${SUBSCRIPTION_ID}"
+
+          az acr update \
+            --name "${ACR_NAME}" \
+            --admin-enabled true
+
+          acr_login_server="$(az acr show \
+            --name "${ACR_NAME}" \
+            --query loginServer \
+            --output tsv)"
+
+          acr_username="$(az acr credential show \
+            --name "${ACR_NAME}" \
+            --query username \
+            --output tsv)"
+
+          acr_password="$(az acr credential show \
+            --name "${ACR_NAME}" \
+            --query passwords[0].value \
+            --output tsv)"
+
+          env_id="$(az containerapp env show \
+            --name "${ACA_ENV}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --query id \
+            --output tsv)"
+
+          image="${acr_login_server}/${ACA_APP}:latest"
+
+          if ! az containerapp show \
+            --name "${ACA_APP}" \
+            --resource-group "${RESOURCE_GROUP}" >/dev/null 2>&1; then
+            cat > containerapp.yaml <<EOF
+          location: ${LOCATION}
+          name: ${ACA_APP}
+          type: Microsoft.App/containerApps
+          properties:
+            environmentId: ${env_id}
+            configuration:
+              activeRevisionsMode: Single
+              ingress:
+                external: true
+                targetPort: 3000
+                transport: http
+                allowInsecure: true
+                additionalPortMappings:
+                  - exposedPort: 22
+                    external: true
+                    targetPort: 2222
+                traffic:
+                  - latestRevision: true
+                    weight: 100
+              registries:
+                - server: ${acr_login_server}
+                  username: ${acr_username}
+                  passwordSecretRef: acr-password
+              secrets:
+                - name: acr-password
+                  value: |-
+                    ${acr_password}
+            template:
+              containers:
+                - name: website
+                  image: ${image}
+                  env:
+                    - name: SSH_PORT
+                      value: "2222"
+                  resources:
+                    cpu: 0.5
+                    memory: 1.0Gi
+              scale:
+                minReplicas: 1
+                maxReplicas: 1
+          EOF
+
+            az containerapp create \
+              --name "${ACA_APP}" \
+              --resource-group "${RESOURCE_GROUP}" \
+              --yaml containerapp.yaml
+          else
+            echo "Container App ${ACA_APP} already exists; skipping create"
+          fi
+
+          az containerapp ingress update \
+            --name "${ACA_APP}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --type external \
+            --target-port 3000 \
+            --transport "http" \
+            --allow-insecure true
+
+      - name: Configure website domain
+        run: |
+          set -euo pipefail
+
+          az account set --subscription "${SUBSCRIPTION_ID}"
+
+          environment_static_ip="$(az containerapp env show \
+            --name "${ACA_ENV}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --query properties.staticIp \
+            --output tsv)"
+
+          custom_domain_verification_id="$(az containerapp show \
+            --name "${ACA_APP}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --query properties.customDomainVerificationId \
+            --output tsv)"
+
+          dns_zone_resource_group="$(az network dns zone list \
+            --query "[?name=='${WEBSITE_HOSTNAME}'] | [0].resourceGroup" \
+            --output tsv)"
+
+          dns_updated=false
+
+          if [[ -n "${dns_zone_resource_group}" ]]; then
+            echo "Azure DNS zone ${WEBSITE_HOSTNAME} found in resource group ${dns_zone_resource_group}; syncing apex records"
+
+            mapfile -t current_zone_a_records < <(az network dns record-set a show \
+              --resource-group "${dns_zone_resource_group}" \
+              --zone-name "${WEBSITE_HOSTNAME}" \
+              --name @ \
+              --query "ARecords[].ipv4Address" \
+              --output tsv 2>/dev/null || true)
+
+            has_environment_ip=false
+            for record in "${current_zone_a_records[@]}"; do
+              if [[ "${record}" == "${environment_static_ip}" ]]; then
+                has_environment_ip=true
+              elif [[ -n "${record}" ]]; then
+                az network dns record-set a remove-record \
+                  --resource-group "${dns_zone_resource_group}" \
+                  --zone-name "${WEBSITE_HOSTNAME}" \
+                  --name @ \
+                  --ipv4-address "${record}" \
+                  --keep-empty-record-set
+                dns_updated=true
+              fi
+            done
+
+            if [[ "${has_environment_ip}" != "true" ]]; then
+              az network dns record-set a add-record \
+                --resource-group "${dns_zone_resource_group}" \
+                --zone-name "${WEBSITE_HOSTNAME}" \
+                --name @ \
+                --ipv4-address "${environment_static_ip}" \
+                --ttl 60
+              dns_updated=true
+            fi
+
+            current_zone_txt_value="$(az network dns record-set txt show \
+              --resource-group "${dns_zone_resource_group}" \
+              --zone-name "${WEBSITE_HOSTNAME}" \
+              --name asuid \
+              --query "TXTRecords[0].value[0]" \
+              --output tsv 2>/dev/null || true)"
+
+            if [[ "${current_zone_txt_value}" != "${custom_domain_verification_id}" ]]; then
+              az network dns record-set txt delete \
+                --resource-group "${dns_zone_resource_group}" \
+                --zone-name "${WEBSITE_HOSTNAME}" \
+                --name asuid \
+                --yes 2>/dev/null || true
+
+              az network dns record-set txt add-record \
+                --resource-group "${dns_zone_resource_group}" \
+                --zone-name "${WEBSITE_HOSTNAME}" \
+                --name asuid \
+                --value "${custom_domain_verification_id}"
+              dns_updated=true
+            fi
+
+            echo "Azure DNS apex A record: $(az network dns record-set a show \
+              --resource-group "${dns_zone_resource_group}" \
+              --zone-name "${WEBSITE_HOSTNAME}" \
+              --name @ \
+              --query "ARecords[0].ipv4Address" \
+              --output tsv)"
+
+            echo "Azure DNS asuid TXT record: $(az network dns record-set txt show \
+              --resource-group "${dns_zone_resource_group}" \
+              --zone-name "${WEBSITE_HOSTNAME}" \
+              --name asuid \
+              --query "TXTRecords[0].value[0]" \
+              --output tsv)"
+          else
+            echo "Azure DNS zone ${WEBSITE_HOSTNAME} not found in the current subscription; skipping DNS sync"
+          fi
+
+          if [[ "${dns_updated}" == "true" ]]; then
+            echo "DNS records were updated. Rerun this workflow after propagation to bind the managed certificate."
+            exit 0
+          fi
+
+          existing_hostname_name="$(az containerapp hostname list \
+            --name "${ACA_APP}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --query "[?name=='${WEBSITE_HOSTNAME}'] | [0].name" \
+            --output tsv)"
+
+          if [[ "${existing_hostname_name}" == "${WEBSITE_HOSTNAME}" ]]; then
+            echo "Hostname ${WEBSITE_HOSTNAME} is already added; skipping hostname add"
+          else
+            az containerapp hostname add \
+              --name "${ACA_APP}" \
+              --resource-group "${RESOURCE_GROUP}" \
+              --hostname "${WEBSITE_HOSTNAME}"
+          fi
+
+          existing_binding_name="$(az containerapp hostname list \
+            --name "${ACA_APP}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --query "[?name=='${WEBSITE_HOSTNAME}' && bindingType=='SniEnabled' && certificateId!=null] | [0].name" \
+            --output tsv)"
+
+          if [[ "${existing_binding_name}" == "${WEBSITE_HOSTNAME}" ]]; then
+            echo "Hostname ${WEBSITE_HOSTNAME} is already bound with a certificate; skipping bind"
+          else
+            az containerapp hostname bind \
+              --name "${ACA_APP}" \
+              --resource-group "${RESOURCE_GROUP}" \
+              --hostname "${WEBSITE_HOSTNAME}" \
+              --environment "${ACA_ENV}" \
+              --validation-method "HTTP"
+          fi
