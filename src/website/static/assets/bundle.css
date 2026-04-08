@@ -51,7 +51,6 @@
   align-items: flex-end;
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
   justify-content: space-between;
   margin-bottom: 1rem;
 
@@ -151,9 +150,8 @@
 }
 
 .playground__summaryGrid {
-  display: grid;
-  gap: 0.9rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  justify-content: space-between;
   margin-block: 1rem;
 }
 
