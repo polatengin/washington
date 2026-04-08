@@ -30,14 +30,11 @@ jobs:
       PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
       RESOURCE_GROUP: ${{ secrets.AZURE_CONTAINER_APP_RESOURCE_GROUP }}
       VNET_NAME: ${{ secrets.PROJECT_NAME }}-aca-vnet
-      VNET_CIDR: "10.50.0.0/16"
       SUBNET_NAME: ${{ secrets.PROJECT_NAME }}-aca-subnet
-      SUBNET_CIDR: "10.50.0.0/23"
       LOG_ANALYTICS_WORKSPACE: "law-${{ secrets.PROJECT_NAME }}-web-westus2"
       ACA_ENV: "${{ secrets.PROJECT_NAME }}-web-env"
       ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
       ACA_APP: "${{ secrets.PROJECT_NAME }}-website"
-      IMAGE_TAG: latest
       WEBSITE_HOSTNAME: bicepcostestimator.net
 
     steps:
@@ -81,7 +78,7 @@ jobs:
                 --resource-group "${RESOURCE_GROUP}" \
                 --name "${VNET_NAME}" \
                 --location "${LOCATION}" \
-                --address-prefix "${VNET_CIDR}"
+                --address-prefix "10.50.0.0/16"
             else
               echo "VNet ${VNET_NAME} already exists; skipping create"
             fi
@@ -94,7 +91,7 @@ jobs:
                 --resource-group "${RESOURCE_GROUP}" \
                 --vnet-name "${VNET_NAME}" \
                 --name "${SUBNET_NAME}" \
-                --address-prefixes "${SUBNET_CIDR}"
+                --address-prefixes "10.50.0.0/23"
             else
               echo "Subnet ${SUBNET_NAME} already exists; skipping create"
             fi
@@ -184,7 +181,7 @@ jobs:
             --query passwords[0].value \
             --output tsv)"
 
-          IMAGE="${ACR_LOGIN_SERVER}/${ACA_APP}:${IMAGE_TAG}"
+          IMAGE="${ACR_LOGIN_SERVER}/${ACA_APP}:latest"
 
           if ! az containerapp show \
             --name "${ACA_APP}" \
