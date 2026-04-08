@@ -98,27 +98,6 @@ jobs:
             --resource-group "${RESOURCE_GROUP}" \
             --image "${IMAGE_SHA}"
 
-      - name: Show deployed revision
-        run: |
-          set -euo pipefail
-
-          az account set --subscription "${SUBSCRIPTION_ID}"
-
-          fqdn="$(az containerapp show \
-            --name "${ACA_APP}" \
-            --resource-group "${RESOURCE_GROUP}" \
-            --query properties.configuration.ingress.fqdn \
-            --output tsv)"
-
-          revision="$(az containerapp show \
-          --name "${ACA_APP}" \
-          --resource-group "${RESOURCE_GROUP}" \
-            --query properties.latestReadyRevisionName \
-            --output tsv)"
-
-          echo "Deployed revision: $revision"
-          echo "Website URL: https://$fqdn"
-
       - name: Purge old website images from Azure Container Registry
         run: |
           set -euo pipefail
