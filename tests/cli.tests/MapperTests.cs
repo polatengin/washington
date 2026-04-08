@@ -1599,6 +1599,53 @@ public class MapperTests
     }
 
     [Fact]
+    public void PurviewAccountMapper_BuildQueries_UsesAzurePurviewCapacityUnitMeter()
+    {
+        var mapper = new PurviewAccountMapper();
+        var resource = CreateResource("Microsoft.Purview/accounts",
+            sku: new { name = "Standard", capacity = 1 });
+
+        var queries = mapper.BuildQueries(resource);
+
+        Assert.Single(queries);
+        Assert.Equal("Azure Purview", queries[0].ServiceName);
+        Assert.Equal("Standard", queries[0].SkuName);
+        Assert.Equal("Standard Capacity Unit", queries[0].MeterName);
+    }
+
+    [Fact]
+    public void PurviewAccountMapper_CalculateCost_UsesCapacityUnitHourlyPrice()
+    {
+        var mapper = new PurviewAccountMapper();
+        var resource = CreateResource("Microsoft.Purview/accounts",
+            sku: new { name = "Standard", capacity = 1 });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                SkuName = "Standard",
+                MeterName = "Standard vCore",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.63
+            },
+            new PriceRecord
+            {
+                SkuName = "Standard",
+                MeterName = "Standard Capacity Unit",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.411
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(300.03m, cost.Amount);
+        Assert.Contains("Microsoft Purview Standard 1 CU", cost.Details);
+        Assert.Contains("$0.4110/hr", cost.Details);
+    }
+
+    [Fact]
     public void NotificationHubMapper_CanMap_CorrectType()
     {
         var mapper = new NotificationHubMapper();
