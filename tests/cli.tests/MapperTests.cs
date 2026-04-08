@@ -402,6 +402,39 @@ public class MapperTests
 
         Assert.Single(queries);
         Assert.Equal("Application Gateway", queries[0].ServiceName);
+        Assert.Equal("Application Gateway Standard v2", queries[0].ProductName);
+    }
+
+    [Fact]
+    public void ApplicationGatewayMapper_CalculateCost_UsesFixedHourlyPrice_AndNotesCapacityUnits()
+    {
+        var mapper = new ApplicationGatewayMapper();
+        var resource = CreateResource("Microsoft.Network/applicationGateways",
+            sku: new { name = "Standard_v2", tier = "Standard_v2", capacity = 2 });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                ProductName = "Application Gateway Standard v2",
+                MeterName = "Standard Fixed Cost",
+                UnitOfMeasure = "1/Hour",
+                UnitPrice = 0.20,
+            },
+            new PriceRecord
+            {
+                ProductName = "Application Gateway Standard v2",
+                MeterName = "Standard Capacity Units",
+                UnitOfMeasure = "1/Hour",
+                UnitPrice = 0.008,
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(146.0m, cost.Amount);
+        Assert.Contains("fixed cost", cost.Details, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("capacity units", cost.Details, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
