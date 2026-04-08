@@ -1103,13 +1103,98 @@ public class MapperTests
     {
         var mapper = new PostgreSqlFlexibleServerMapper();
         var resource = CreateResource("Microsoft.DBforPostgreSQL/flexibleServers",
-            sku: new { name = "Standard_D2s_v3" });
+            sku: new { name = "Standard_D2s_v3", tier = "GeneralPurpose" });
 
         var queries = mapper.BuildQueries(resource);
 
         Assert.Single(queries);
         Assert.Equal("Azure Database for PostgreSQL", queries[0].ServiceName);
-        Assert.Equal("Standard_D2s_v3", queries[0].ArmSkuName);
+        Assert.Equal("eastus", queries[0].ArmRegionName);
+        Assert.Null(queries[0].ArmSkuName);
+    }
+
+    [Fact]
+    public void PostgreSqlFlexibleServerMapper_CalculateCost_UsesPerVCoreFallbackAndStorage()
+    {
+        var mapper = new PostgreSqlFlexibleServerMapper();
+        var resource = CreateResource("Microsoft.DBforPostgreSQL/flexibleServers",
+            sku: new { name = "Standard_D2s_v3", tier = "GeneralPurpose" },
+            properties: new { storage = new { storageSizeGB = 128 } });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                ProductName = "Azure Database for PostgreSQL Flexible Server General Purpose Dsv3 Series Compute",
+                SkuName = "1 vCore",
+                ArmSkuName = "AzureDB_PostgreSQL_Flexible_Server_General_Purpose_Dsv3Series_Compute",
+                MeterName = "vCore",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.0855,
+            },
+            new PriceRecord
+            {
+                ProductName = "Az DB for PostgreSQL Flexible Server Storage",
+                SkuName = "Storage",
+                ArmSkuName = "Storage",
+                MeterName = "Storage Data Stored",
+                UnitOfMeasure = "1 GB/Month",
+                UnitPrice = 0.115,
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(139.55m, cost.Amount);
+        Assert.Contains("2 vCores", cost.Details);
+        Assert.Contains("$0.0855/vCore/hr", cost.Details);
+        Assert.Contains("128 GB storage", cost.Details);
+    }
+
+    [Fact]
+    public void PostgreSqlFlexibleServerMapper_CalculateCost_UsesExactSkuPrice_WhenAvailable()
+    {
+        var mapper = new PostgreSqlFlexibleServerMapper();
+        var resource = CreateResource("Microsoft.DBforPostgreSQL/flexibleServers",
+            sku: new { name = "Standard_D2ds_v5", tier = "GeneralPurpose" },
+            properties: new { storage = new { storageSizeGB = 128 } });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                ProductName = "Azure Database for PostgreSQL Flexible Server General Purpose - Ddsv5 Series Compute",
+                SkuName = "2 vCore",
+                ArmSkuName = "Standard_D2ds_v5",
+                MeterName = "vCore",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.178,
+            },
+            new PriceRecord
+            {
+                ProductName = "Azure Database for PostgreSQL Flexible Server General Purpose - Ddsv5 Series Compute",
+                SkuName = "1 vCore",
+                ArmSkuName = "1 vCore",
+                MeterName = "vCore",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.089,
+            },
+            new PriceRecord
+            {
+                ProductName = "Az DB for PostgreSQL Flexible Server Storage",
+                SkuName = "Storage",
+                ArmSkuName = "Storage",
+                MeterName = "Storage Data Stored",
+                UnitOfMeasure = "1 GB/Month",
+                UnitPrice = 0.115,
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(144.66m, cost.Amount);
+        Assert.Contains("$0.1780/hr", cost.Details);
+        Assert.DoesNotContain("/vCore/hr", cost.Details, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
