@@ -45,6 +45,20 @@ const palette = {
 };
 
 const ansiPattern = /\x1b\[[0-?]*[ -/]*[@-~]/g;
+const terminalLogoWidth = 16;
+const terminalLogoHeight = 8;
+
+function toHex(color) {
+  return `#${color.map(value => value.toString(16).padStart(2, '0')).join('')}`;
+}
+
+function createTerminalLogoSvg(source) {
+  return source
+    .replace(/\sshape-rendering="[^"]*"/, '')
+    .replace(/<svg([^>]*)>/, `<svg$1>\n  <rect width="100%" height="100%" fill="${toHex(palette.ink)}"/>`)
+    .replace(/\sstroke="[^"]*"/g, '')
+    .replace(/\sstroke-width="[^"]*"/g, '');
+}
 
 async function copyContributingDoc() {
   const content = await readFile(contributingSource, 'utf8');
@@ -87,10 +101,10 @@ function padRight(text, width) {
   return `${text}${' '.repeat(Math.max(0, width - visibleLength(text)))}`;
 }
 
-function renderColumns(left, right, gap = 3) {
+function renderColumns(left, right, gap = 3, leftWidthOverride) {
   const leftLines = Array.isArray(left) ? left : left.split('\n');
   const rightLines = Array.isArray(right) ? right : right.split('\n');
-  const leftWidth = Math.max(0, ...leftLines.map(visibleLength));
+  const leftWidth = leftWidthOverride ?? Math.max(0, ...leftLines.map(visibleLength));
   const rows = Math.max(leftLines.length, rightLines.length);
 
   return Array.from({ length: rows }, (_, index) => {
@@ -163,24 +177,30 @@ function renderBox(title, lines, minWidth = 0) {
 
 async function renderTerminalAsset(filePath, options) {
   const source = await readFile(filePath);
+  const terminalSource = extname(filePath).toLowerCase() === '.svg' && filePath === logoPath
+    ? createTerminalLogoSvg(source.toString('utf8'))
+    : source;
   const imageBuffer = extname(filePath).toLowerCase() === '.svg'
-    ? new Resvg(source).render().asPng()
+    ? new Resvg(terminalSource).render().asPng()
     : source;
 
   return terminalImage.buffer(imageBuffer, options);
 }
 
 async function renderHero(title, pageUrl) {
-  return renderColumns(await renderTerminalAsset(logoPath, {width: 20}), [
-    '',
+  return renderColumns(await renderTerminalAsset(logoPath, {
+    width: terminalLogoWidth,
+    height: terminalLogoHeight,
+    preferNativeRender: false,
+  }), [
     '',
     paint('Bicep Cost Estimator', ansi.bold, fg(palette.mint)),
     paint('Estimate Azure costs directly from Bicep and ARM templates.', ansi.italic, fg(palette.sage)),
-    "",
+    '',
     `${paint('title :', ansi.bold, fg(palette.leaf))} ${paint(title, fg(palette.sky))}`,
     `${paint('page  :', ansi.bold, fg(palette.leaf))} ${paint(pageUrl, fg(palette.sky), ansi.underline)}`,
     `${paint('repo  :', ansi.bold, fg(palette.leaf))} ${paint('https://github.com/polatengin/washington', fg(palette.sky), ansi.underline)}`,
-  ]);
+  ], 3, terminalLogoWidth);
 }
 
 function formatCodeLine(line, language) {
