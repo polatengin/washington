@@ -34,6 +34,7 @@ const docsSidebar = [
     'guides/supported-resources',
     'guides/troubleshooting',
   ]),
+  doc('roadmap'),
   doc('release-notes'),
 ] satisfies Awaited<ReturnType<PluginOptions['sidebarItemsGenerator']>>;
 
