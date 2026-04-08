@@ -154,7 +154,7 @@ jobs:
                 external: true
                 targetPort: 3000
                 transport: http
-                allowInsecure: false
+                allowInsecure: true
                 additionalPortMappings:
                   - exposedPort: 22
                     external: true
