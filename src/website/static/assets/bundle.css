@@ -95,7 +95,6 @@
 }
 
 .playground__select {
-  appearance: none;
   background: rgba(20, 119, 94, 0.08);
   border: 1px solid var(--playground-border);
   border-radius: 0;
