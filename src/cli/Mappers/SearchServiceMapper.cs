@@ -58,11 +58,11 @@ public class SearchServiceMapper : IResourceCostMapper
             .FirstOrDefault();
 
         if (price == null)
-            return new MonthlyCost(0, $"AI Search {displaySkuName} ({replicaCount}R x {partitionCount}P) - no pricing found");
+            return new MonthlyCost(0, $"AI Search {displaySkuName} ({replicaCount}R × {partitionCount}P) - no pricing found");
 
         var units = replicaCount * partitionCount;
         var monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * units;
-        return new MonthlyCost(monthlyCost, $"AI Search {displaySkuName} ({replicaCount}R x {partitionCount}P = {units} SU) @ ${price.UnitPrice:F4}/hr x {HoursPerMonth} hrs");
+        return new MonthlyCost(monthlyCost, $"AI Search {displaySkuName} ({replicaCount}R × {partitionCount}P = {units} SU) @ ${price.UnitPrice:F4}/hr × {HoursPerMonth} hrs");
     }
 
     private static string GetSkuName(ResourceDescriptor resource)

@@ -50,7 +50,7 @@ public class PurviewAccountMapper : IResourceCostMapper
         if (price.UnitOfMeasure == "1 Hour")
         {
             monthlyCost = (decimal)price.UnitPrice * HoursPerMonth * capacityUnits;
-            details = $"Microsoft Purview {skuName} {capacityUnits} CU @ ${price.UnitPrice:F4}/hr x {HoursPerMonth:F0} hrs + scanning";
+            details = $"Microsoft Purview {skuName} {capacityUnits} CU @ ${price.UnitPrice:F4}/hr × {HoursPerMonth:F0} hrs + scanning";
         }
         else
         {

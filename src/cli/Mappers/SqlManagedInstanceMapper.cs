@@ -71,7 +71,7 @@ public class SqlManagedInstanceMapper : IResourceCostMapper
         if (computePrice != null)
         {
             monthlyCost += (decimal)computePrice.UnitPrice * HoursPerMonth * vCores;
-            detailParts.Add($"SQL MI {skuName} {vCores} vCores @ ${computePrice.UnitPrice:F4}/vCore/hr x {HoursPerMonth:F0} hrs");
+            detailParts.Add($"SQL MI {skuName} {vCores} vCores @ ${computePrice.UnitPrice:F4}/vCore/hr × {HoursPerMonth:F0} hrs");
         }
 
         if (storagePrice != null && storageSizeGb > 0)
