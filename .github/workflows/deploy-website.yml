@@ -310,6 +310,38 @@ jobs:
               --hostname "${WEBSITE_HOSTNAME}"
           fi
 
+          environment_static_ip="$(az containerapp env show \
+            --name "${ACA_ENV}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --query properties.staticIp \
+            --output tsv)"
+
+          custom_domain_verification_id="$(az containerapp show \
+            --name "${ACA_APP}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --query properties.customDomainVerificationId \
+            --output tsv)"
+
+          mapfile -t hostname_a_records < <(getent ahostsv4 "${WEBSITE_HOSTNAME}" 2>/dev/null | awk '{print $1}' | sort -u || true)
+
+          has_matching_a_record=false
+          for record in "${hostname_a_records[@]}"; do
+            if [[ "${record}" == "${environment_static_ip}" ]]; then
+              has_matching_a_record=true
+              break
+            fi
+          done
+
+          current_a_records_display="(none)"
+          if [[ "${#hostname_a_records[@]}" -gt 0 ]]; then
+            current_a_records_display="${hostname_a_records[*]}"
+          fi
+
+          if [[ "${has_matching_a_record}" != "true" ]]; then
+            echo "::error::A record mismatch for ${WEBSITE_HOSTNAME}. Update the apex A record to ${environment_static_ip}. Current A records: ${current_a_records_display}. Ensure TXT record asuid=${custom_domain_verification_id} also exists before rerunning the workflow."
+            exit 1
+          fi
+
           existing_binding_name="$(az containerapp hostname list \
             --name "${ACA_APP}" \
             --resource-group "${RESOURCE_GROUP}" \
