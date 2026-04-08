@@ -65,6 +65,11 @@ function visibleLength(text: string) {
 }
 
 const ansiSequencePattern = /(\x1b\][\s\S]*?(?:\x07|\x1b\\)|\x1b\[[0-?]*[ -/]*[@-~])/g;
+const oscSequencePattern = /\x1b\][\s\S]*?(?:\x07|\x1b\\)/g;
+
+function stripUnsupportedTerminalSequences(text: string) {
+  return text.replace(oscSequencePattern, '');
+}
 
 function clipVisibleText(text: string, width: number) {
   if (width <= 0) {
@@ -190,8 +195,10 @@ function wrapPageLine(line: string, width: number) {
     return [''];
   }
 
-  const normalized = line.replace(/\t/g, '  ').trimEnd();
-  if (!normalized) {
+  const sanitized = stripUnsupportedTerminalSequences(line).replace(/\t/g, '  ').trimEnd();
+  const leadingSpaces = sanitized.match(/^ +/)?.[0].length ?? 0;
+  const normalized = leadingSpaces >= width ? sanitized.trimStart() : sanitized;
+  if (!stripAnsi(normalized).trim()) {
     return [''];
   }
 
@@ -447,6 +454,10 @@ async function renderPage(route: string, textDir: string, width: number) {
   const lines: string[] = [];
   for (const line of rawPage.split(/\r?\n/)) {
     lines.push(...wrapPageLine(line, width));
+  }
+
+  while (lines[0] === '') {
+    lines.shift();
   }
 
   return lines;
