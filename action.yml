@@ -110,6 +110,6 @@ runs:
         TOTAL="${{ steps.cost-estimator.outputs.total-cost }}"
         THRESHOLD="${{ inputs.fail-on-threshold }}"
         if [ "$(echo "${TOTAL:-0} > ${THRESHOLD}" | bc -l 2>/dev/null)" = "1" ]; then
-          echo "::error::Estimated monthly cost ($${TOTAL}) exceeds threshold ($${THRESHOLD})"
+          printf '::error::Estimated monthly cost ($%s) exceeds threshold ($%s)\n' "${TOTAL:-0}" "${THRESHOLD}"
           exit 1
         fi
