@@ -481,8 +481,10 @@ resource apiManagementService 'Microsoft.ApiManagement/service@2022-08-01' = {
   }
 }
 
+var applicationGatewayName = 'washingtonappgw01'
+
 resource applicationGateway 'Microsoft.Network/applicationGateways@2023-09-01' = {
-  name: 'washingtonappgw01'
+  name: applicationGatewayName
   location: location
   sku: {
     name: 'Standard_v2'
@@ -546,10 +548,10 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2023-09-01' =
         name: 'listener'
         properties: {
           frontendIPConfiguration: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', applicationGateway.name, 'appGatewayFrontendIp')
+            id: resourceId('Microsoft.Network/applicationGateways/frontendIPConfigurations', applicationGatewayName, 'appGatewayFrontendIp')
           }
           frontendPort: {
-            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', applicationGateway.name, 'port80')
+            id: resourceId('Microsoft.Network/applicationGateways/frontendPorts', applicationGatewayName, 'port80')
           }
           protocol: 'Http'
         }
@@ -562,13 +564,13 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2023-09-01' =
           ruleType: 'Basic'
           priority: 100
           httpListener: {
-            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', applicationGateway.name, 'listener')
+            id: resourceId('Microsoft.Network/applicationGateways/httpListeners', applicationGatewayName, 'listener')
           }
           backendAddressPool: {
-            id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', applicationGateway.name, 'backendPool')
+            id: resourceId('Microsoft.Network/applicationGateways/backendAddressPools', applicationGatewayName, 'backendPool')
           }
           backendHttpSettings: {
-            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', applicationGateway.name, 'httpSettings')
+            id: resourceId('Microsoft.Network/applicationGateways/backendHttpSettingsCollection', applicationGatewayName, 'httpSettings')
           }
         }
       }
