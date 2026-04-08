@@ -245,7 +245,7 @@ function getSelectedDocument(documents: SearchDocument[], selectedRoute: string 
   return documents.find(document => document.href === selectedRoute) || documents[0];
 }
 
-function renderBrowseScreen(state: ShellState, documents: SearchDocument[]) {
+function getBrowseLayout(state: ShellState) {
   const columns = Math.max(state.columns, 60);
   const rows = Math.max(state.rows, 18);
   const sidebarWidth = Math.max(24, Math.min(34, Math.floor(columns * 0.28)));
@@ -253,18 +253,17 @@ function renderBrowseScreen(state: ShellState, documents: SearchDocument[]) {
   const headerLines = 4;
   const footerLines = 2;
   const bodyHeight = Math.max(4, rows - headerLines - footerLines);
+
+  return { bodyHeight, columns, contentWidth, sidebarWidth };
+}
+
+function renderBrowseScreen(state: ShellState, documents: SearchDocument[], previewLines: string[]) {
+  const { bodyHeight, columns, contentWidth, sidebarWidth } = getBrowseLayout(state);
   const selectedDocument = getSelectedDocument(documents, state.selectedRoute);
   const entries = groupNavigation(documents);
   const selectedFlatIndex = entries.findIndex(entry => entry.kind === 'doc' && entry.document.href === selectedDocument?.href);
   const listStart = Math.max(0, selectedFlatIndex - Math.floor(bodyHeight / 2));
   const visibleEntries = entries.slice(listStart, listStart + bodyHeight);
-  const previewLines = selectedDocument
-    ? [
-        paint(selectedDocument.title, ansi.bold, palette.titleForeground),
-        '',
-        ...wrapPlainText(selectedDocument.body || 'No summary available for this page yet.', contentWidth),
-      ]
-    : [paint('No documents found.', ansi.bold, palette.titleForeground)];
 
   const lines = [
     renderSegments(columns, ['washington', 'bicep cost estimator', 'bce', 'ssh docs', 'read-only']),
@@ -291,7 +290,7 @@ function renderBrowseScreen(state: ShellState, documents: SearchDocument[]) {
   }
 
   lines.push('');
-  lines.push(padOrClip(paint('↑/↓ move  enter open  esc back  q quit', palette.dimForeground), columns));
+  lines.push(padOrClip(paint('↑/↓ move  enter focus  q quit', palette.dimForeground), columns));
 
   return lines.join('\r\n');
 }
@@ -530,6 +529,23 @@ async function startShell(channel: any, documents: SearchDocument[], textDir: st
   };
 
   let closed = false;
+  const pageCache = new Map<string, string[]>();
+
+  const loadPageLines = async (route: string | null, width: number) => {
+    if (!route) {
+      return [paint('No documents found.', ansi.bold, palette.titleForeground)];
+    }
+
+    const cacheKey = `${route}:${width}`;
+    const cachedLines = pageCache.get(cacheKey);
+    if (cachedLines) {
+      return cachedLines;
+    }
+
+    const renderedLines = await renderPage(route, textDir, width);
+    pageCache.set(cacheKey, renderedLines);
+    return renderedLines;
+  };
 
   const render = async () => {
     if (closed) {
@@ -537,9 +553,17 @@ async function startShell(channel: any, documents: SearchDocument[], textDir: st
     }
 
     const selectedDocument = getSelectedDocument(documents, state.selectedRoute);
-    const body = state.view === 'page'
-      ? renderPageScreen(state, selectedDocument)
-      : renderBrowseScreen(state, documents);
+    let body = '';
+
+    if (state.view === 'page') {
+      state.currentPageLines = await loadPageLines(state.selectedRoute, Math.max(40, state.columns));
+      const visibleRows = Math.max(1, state.rows - 6);
+      state.pageScroll = Math.min(state.pageScroll, Math.max(0, state.currentPageLines.length - visibleRows));
+      body = renderPageScreen(state, selectedDocument);
+    } else {
+      const previewLines = await loadPageLines(state.selectedRoute, getBrowseLayout(state).contentWidth);
+      body = renderBrowseScreen(state, documents, previewLines);
+    }
 
     channel.write(`${ansi.home}${ansi.clear}${body}`);
   };
@@ -580,7 +604,6 @@ async function startShell(channel: any, documents: SearchDocument[], textDir: st
         } else if (key === 'enter' && state.selectedRoute) {
           state.view = 'page';
           state.pageScroll = 0;
-          state.currentPageLines = await renderPage(state.selectedRoute, textDir, Math.max(40, state.columns));
         }
 
         await render();
