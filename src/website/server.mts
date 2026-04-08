@@ -4,8 +4,15 @@ import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { dirname, isAbsolute, join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+import {
+  resolveDocsIndexPath,
+  resolveTextDir,
+  resolveTextFile,
+} from './docsRuntime.mts';
+import { startDocsSshServer } from './sshDocsServer.mts';
 
 type HttpError = Error & {
   details?: string;
@@ -21,21 +28,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const buildDir = join(__dirname, 'build');
 const bceBinaryPath = process.env.BCE_BINARY_PATH || join(__dirname, 'bin', 'bce');
 const docsProxyTarget = process.env.DOCS_PROXY_TARGET?.trim();
-
-function resolveRuntimePath(value?: string) {
-  if (!value) {
-    return null;
-  }
-
-  return isAbsolute(value) ? value : join(__dirname, value);
-}
-
-const textDir = resolveRuntimePath(process.env.TEXT_DIR)
-  || (existsSync(join(buildDir, 'text')) ? join(buildDir, 'text') : join(__dirname, 'static', 'text'));
+const textDir = resolveTextDir(__dirname, buildDir, process.env.TEXT_DIR);
+const docsIndexPath = resolveDocsIndexPath(__dirname, buildDir, process.env.DOCS_INDEX_PATH);
 
 const PORT = process.env.PORT || 3000;
 const ESTIMATE_TIMEOUT_MS = Number(process.env.BCE_ESTIMATE_TIMEOUT_MS || 60000);
 const MAX_SOURCE_LENGTH = Number(process.env.BCE_PLAYGROUND_MAX_SOURCE_LENGTH || 200000);
+const SSH_PORT = Number(process.env.SSH_PORT || 0);
 const app = express();
 let docsProxy: any;
 
@@ -52,7 +51,6 @@ if (docsProxyTarget) {
     target: docsProxyTarget,
     changeOrigin: true,
     ws: true,
-    logLevel: 'warn',
   });
 }
 
@@ -182,28 +180,6 @@ async function estimateSource(source: string) {
   }
 }
 
-function resolveTextFile(reqPath: string) {
-  const clean = reqPath.replace(/^\/+|\/+$/g, '');
-
-  if (!clean || clean === '/') {
-    return join(textDir, 'index.txt');
-  }
-
-  const candidates = [
-    join(textDir, clean + '.txt'),
-    join(textDir, clean, 'index.txt'),
-    join(textDir, clean + '/index.txt'),
-  ];
-
-  for (const candidate of candidates) {
-    if (existsSync(candidate)) {
-      return candidate;
-    }
-  }
-
-  return null;
-}
-
 app.post('/api/estimate', async (req: Request, res: Response) => {
   const source = typeof req.body?.source === 'string' ? req.body.source.trim() : '';
 
@@ -249,7 +225,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     return next();
   }
 
-  const textFile = resolveTextFile(req.path);
+  const textFile = resolveTextFile(textDir, req.path);
   if (textFile) {
     res.type('text/plain; charset=utf-8');
     return res.sendFile(textFile);
@@ -304,4 +280,17 @@ const server = app.listen(PORT, () => {
 
 if (docsProxy?.upgrade) {
   server.on('upgrade', docsProxy.upgrade);
+}
+
+if (SSH_PORT > 0) {
+  await startDocsSshServer({
+    buildDir,
+    docsIndexPath,
+    host: process.env.SSH_HOST || '0.0.0.0',
+    port: SSH_PORT,
+    rootDir: __dirname,
+    textDir,
+  }).catch((error: unknown) => {
+    console.error('SSH docs server failed to start:', error);
+  });
 }
