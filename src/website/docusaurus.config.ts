@@ -1,8 +1,14 @@
+import {existsSync} from 'node:fs';
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {PluginOptions} from '@docusaurus/plugin-content-docs';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import type {PrismTheme} from 'prism-react-renderer';
+
+const showLastUpdateMetadata =
+  process.env.DOCUSAURUS_ENABLE_LAST_UPDATE === undefined
+    ? existsSync(new URL('../../.git', import.meta.url))
+    : process.env.DOCUSAURUS_ENABLE_LAST_UPDATE === 'true';
 
 const doc = (id: string) => ({
   type: 'doc' as const,
@@ -102,8 +108,8 @@ const config: Config = {
         docs: {
           path: '../../docs',
           routeBasePath: '/',
-          showLastUpdateAuthor: true,
-          showLastUpdateTime: true,
+          showLastUpdateAuthor: showLastUpdateMetadata,
+          showLastUpdateTime: showLastUpdateMetadata,
           sidebarItemsGenerator: () => docsSidebar,
           editUrl: 'https://github.com/polatengin/washington/tree/main/',
         },
