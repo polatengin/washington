@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..', '..', '..');
-const docPath = join(repoRoot, 'docs', '60-release-notes.md');
+const docPath = join(repoRoot, 'docs', '90-release-notes.md');
 const releasesApiUrl = 'https://api.github.com/repos/polatengin/washington/releases?per_page=100';
 
 type GithubRelease = {
@@ -73,7 +73,7 @@ function buildDocument(releases) {
   return [
     '---',
     'title: Release Notes',
-    'sidebar_position: 60',
+    'sidebar_position: 90',
     'toc_min_heading_level: 2',
     'toc_max_heading_level: 2',
     '---',
