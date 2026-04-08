@@ -54,9 +54,10 @@ RUN apt-get update \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& chmod +x ./bin/bce \
 	&& npm init -y > /dev/null 2>&1 \
-	&& npm install express tsx --save --production
+	&& npm install express ssh2 tsx --save --production
 
 EXPOSE 3000
+EXPOSE 2222
 
 ENV PORT=3000
 ENV NODE_ENV=production
