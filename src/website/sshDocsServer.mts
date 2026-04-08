@@ -296,7 +296,6 @@ function renderBrowseScreen(state: ShellState, documents: SearchDocument[], prev
     lines.push(`${sidebarLine}${paint(' │ ', palette.lineForeground)}${padOrClip(previewLine, contentWidth)}`);
   }
 
-  lines.push('');
   lines.push(padOrClip(paint('↑/↓ move  enter focus  q quit', palette.dimForeground), columns));
 
   return lines.join('\r\n');
@@ -314,7 +313,6 @@ function renderPageScreen(state: ShellState, selectedDocument: SearchDocument | 
 
   const lines = [
     renderSegments(columns, ['washington', 'bicep cost estimator', 'bce', selectedDocument?.title || 'page', 'ssh docs']),
-    padOrClip(paint(selectedDocument?.href || '/', palette.cyanForeground), columns),
     paint('─'.repeat(columns), palette.lineForeground),
   ];
 
@@ -322,7 +320,6 @@ function renderPageScreen(state: ShellState, selectedDocument: SearchDocument | 
     lines.push(padOrClip(visibleLines[index] || '', columns));
   }
 
-  lines.push('');
   lines.push(padOrClip(
     paint(`↑/↓ scroll  PgUp/PgDn page  esc back  q quit   ${state.pageScroll + 1}-${endLine}/${totalLines}`, palette.dimForeground),
     columns,
