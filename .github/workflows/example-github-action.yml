@@ -13,14 +13,14 @@ jobs:
         name: Estimate cost with output in csv format
         uses: polatengin/washington@main
         with:
-          file: tests/fixtures/all.bicep
+          file: tests/fixtures/showcase.bicep
           output-format: csv
 
       - id: cost-json
         name: Estimate cost with output in json format
         uses: polatengin/washington@main
         with:
-          file: tests/fixtures/all.bicep
+          file: tests/fixtures/showcase.bicep
           output-format: json
 
       - name: Print estimate from json output
@@ -31,14 +31,14 @@ jobs:
         name: Estimate cost with threshold check
         uses: polatengin/washington@main
         with:
-          file: tests/fixtures/all.bicep
+          file: tests/fixtures/showcase.bicep
           fail-on-threshold: 1000
 
       - id: cost-markdown
         name: Estimate cost with output in markdown format
         uses: polatengin/washington@main
         with:
-          file: tests/fixtures/all.bicep
+          file: tests/fixtures/showcase.bicep
           output-format: markdown
 
       - name: Append summary
