@@ -1557,6 +1557,45 @@ public class MapperTests
 
         Assert.Single(queries);
         Assert.Equal("Event Grid", queries[0].ServiceName);
+        Assert.Equal("Standard Operations", queries[0].MeterName);
+    }
+
+    [Fact]
+    public void EventGridMapper_CalculateCost_UsesPaidTierAfterFreeAllowance()
+    {
+        var mapper = new EventGridMapper();
+        var resource = CreateResource("Microsoft.EventGrid/topics");
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                MeterName = "Standard Operations",
+                UnitOfMeasure = "100K",
+                TierMinimumUnits = 0,
+                UnitPrice = 0.0
+            },
+            new PriceRecord
+            {
+                MeterName = "Standard Operations",
+                UnitOfMeasure = "100K",
+                TierMinimumUnits = 1,
+                UnitPrice = 0.06
+            },
+            new PriceRecord
+            {
+                MeterName = "Standard Event Operations",
+                UnitOfMeasure = "1M",
+                TierMinimumUnits = 1,
+                UnitPrice = 0.6
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(0.54m, cost.Amount);
+        Assert.Contains("900,000 billable", cost.Details);
+        Assert.Contains("$0.0600/100K ops", cost.Details);
     }
 
     [Fact]
