@@ -298,6 +298,21 @@ jobs:
             --transport "http" \
             --allow-insecure true
 
+          existing_hostname_name="$(az containerapp hostname list \
+            --name "${ACA_APP}" \
+            --resource-group "${RESOURCE_GROUP}" \
+            --query "[?name=='${WEBSITE_HOSTNAME}'] | [0].name" \
+            --output tsv)"
+
+          if [[ "${existing_hostname_name}" == "${WEBSITE_HOSTNAME}" ]]; then
+            echo "Hostname ${WEBSITE_HOSTNAME} is already added; skipping hostname add"
+          else
+            az containerapp hostname add \
+              --name "${ACA_APP}" \
+              --resource-group "${RESOURCE_GROUP}" \
+              --hostname "${WEBSITE_HOSTNAME}"
+          fi
+
           existing_binding_name="$(az containerapp hostname list \
             --name "${ACA_APP}" \
             --resource-group "${RESOURCE_GROUP}" \
@@ -312,7 +327,7 @@ jobs:
               --resource-group "${RESOURCE_GROUP}" \
               --hostname "${WEBSITE_HOSTNAME}" \
               --environment "${ACA_ENV}" \
-              --validation-method "http"
+              --validation-method "HTTP"
           fi
 
       - name: Show deployed revision
