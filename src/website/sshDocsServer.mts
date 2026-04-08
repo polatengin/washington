@@ -200,16 +200,12 @@ function renderBrowseScreen(state: ShellState, documents: SearchDocument[]) {
     ? [
         paint(selectedDocument.title, ansi.bold, palette.titleForeground),
         '',
-        paint(selectedDocument.href, palette.cyanForeground),
-        paint(selectedDocument.category, ansi.dim, palette.dimForeground),
-        '',
         ...wrapPlainText(selectedDocument.body || 'No summary available for this page yet.', contentWidth),
       ]
     : [paint('No documents found.', ansi.bold, palette.titleForeground)];
 
   const lines = [
     renderSegments(columns, ['washington', 'ssh docs', 'read-only']),
-    padOrClip(paint('Arrow keys to browse, Enter to open, q to quit.', palette.dimForeground), columns),
     paint('─'.repeat(columns), palette.lineForeground),
     '',
   ];
@@ -499,10 +495,6 @@ async function startShell(channel: any, documents: SearchDocument[], textDir: st
           moveSelection(1);
         } else if (key === 'up') {
           moveSelection(-1);
-        } else if (key === 'g') {
-          state.selectedRoute = documents[0]?.href || null;
-        } else if (key === 'G') {
-          state.selectedRoute = documents.at(-1)?.href || null;
         } else if (key === 'enter' && state.selectedRoute) {
           state.view = 'page';
           state.pageScroll = 0;
@@ -529,10 +521,6 @@ async function startShell(channel: any, documents: SearchDocument[], textDir: st
         state.pageScroll = Math.max(0, state.pageScroll - visibleRows);
       } else if (key === 'pagedown') {
         state.pageScroll = Math.min(Math.max(0, state.currentPageLines.length - visibleRows), state.pageScroll + visibleRows);
-      } else if (key === 'g') {
-        state.pageScroll = 0;
-      } else if (key === 'G') {
-        state.pageScroll = Math.max(0, state.currentPageLines.length - visibleRows);
       }
 
       await render();
