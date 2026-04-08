@@ -101,7 +101,6 @@
   color-scheme: light;
   color: var(--playground-ink);
   min-height: 2.5rem;
-  padding: 0.7rem 0.85rem;
 
   &:focus {
     outline: 2px solid var(--ifm-color-primary-lightest);
