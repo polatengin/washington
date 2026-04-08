@@ -3,6 +3,12 @@ node_modules/
 .git/
 .github/
 src/vscode-extension/
+src/cli/bin/
+src/cli/obj/
+src/website/node_modules/
+src/website/build/
+src/website/.cache/
+src/website/.docusaurus/
 tests/*
 !tests/fixtures/
 !tests/fixtures/**

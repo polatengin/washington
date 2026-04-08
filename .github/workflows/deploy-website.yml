@@ -24,8 +24,10 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: 'bash --noprofile --norc -euo pipefail {0}'
     env:
-      SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       RESOURCE_GROUP: ${{ secrets.PROJECT_NAME }}-prod-rg
       ACA_APP: "${{ secrets.PROJECT_NAME }}-website"
       ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
@@ -34,6 +36,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
       - name: Azure login
         uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43 # v3.0.0
         with:
@@ -41,39 +46,19 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Enable Azure CLI extension auto-install
-        run: az config set extension.use_dynamic_install=yes_without_prompt
+      - name: Log in to Azure Container Registry
+        run: az acr login --name "${ACR_NAME}"
 
       - name: Resolve image tags
         id: image
         run: |
-          set -euo pipefail
-
-          az account set --subscription "${SUBSCRIPTION_ID}"
-
-          ACR_LOGIN_SERVER="$(az acr show \
+          acr_login_server="$(az acr show \
             --name "${ACR_NAME}" \
             --query loginServer \
             --output tsv)"
 
-          image_sha="${ACR_LOGIN_SERVER}/${ACA_APP}:${GITHUB_SHA}"
-          image_latest="${ACR_LOGIN_SERVER}/${ACA_APP}:latest"
-
-          echo "ACR_LOGIN_SERVER=${ACR_LOGIN_SERVER}" >> "$GITHUB_ENV"
-          echo "IMAGE_SHA=${image_sha}" >> "$GITHUB_ENV"
-          echo "IMAGE_LATEST=${image_latest}" >> "$GITHUB_ENV"
-          echo "image_sha=${image_sha}" >> "$GITHUB_OUTPUT"
-          echo "image_latest=${image_latest}" >> "$GITHUB_OUTPUT"
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
-
-      - name: Log in to Azure Container Registry
-        run: |
-          set -euo pipefail
-
-          az account set --subscription "${SUBSCRIPTION_ID}"
-          az acr login --name "${ACR_NAME}"
+          echo "image_sha=${acr_login_server}/${ACA_APP}:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
+          echo "image_latest=${acr_login_server}/${ACA_APP}:latest" >> "$GITHUB_OUTPUT"
 
       - name: Build and push website image
         uses: docker/build-push-action@v7
@@ -89,16 +74,10 @@ jobs:
 
       - name: Ensure stable SSH host key
         run: |
-          set -euo pipefail
-
-          az account set --subscription "${SUBSCRIPTION_ID}"
-
-          secret_name="ssh-host-key"
-
           if ! az containerapp secret show \
             --name "${ACA_APP}" \
             --resource-group "${RESOURCE_GROUP}" \
-            --secret-name "${secret_name}" >/dev/null 2>&1; then
+            --secret-name ssh-host-key >/dev/null 2>&1; then
             temp_dir="$(mktemp -d)"
             trap 'rm -rf "${temp_dir}"' EXIT
 
@@ -108,28 +87,20 @@ jobs:
             az containerapp secret set \
               --name "${ACA_APP}" \
               --resource-group "${RESOURCE_GROUP}" \
-              --secrets "${secret_name}=${host_key_base64}" >/dev/null
+              --secrets "ssh-host-key=${host_key_base64}" >/dev/null
           fi
 
       - name: Deploy image to Azure Container App
         run: |
-          set -euo pipefail
-
-          az account set --subscription "${SUBSCRIPTION_ID}"
-
           az containerapp update \
             --name "${ACA_APP}" \
             --resource-group "${RESOURCE_GROUP}" \
-            --image "${IMAGE_SHA}" \
+            --image "${{ steps.image.outputs.image_sha }}" \
             --secret-volume-mount "/mnt/secrets" \
             --set-env-vars SSH_PORT=2222 SSH_HOST_KEY_PATH=/mnt/secrets/ssh-host-key
 
       - name: Purge old website images from Azure Container Registry
         run: |
-          set -euo pipefail
-
-          az account set --subscription "${SUBSCRIPTION_ID}"
-
           mapfile -t old_tags < <(
             az acr repository show-tags \
               --name "${ACR_NAME}" \
