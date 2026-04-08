@@ -37,8 +37,6 @@ jobs:
       ACA_ENV: "${{ secrets.PROJECT_NAME }}-web-env"
       ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
       ACA_APP: "${{ secrets.PROJECT_NAME }}-website"
-      WEBSITE_IMAGE_REPOSITORY: washington-website
-      WEBSITE_IMAGE_TAG_RETENTION_COUNT: 10
 
     steps:
       - name: Checkout code
@@ -142,7 +140,7 @@ jobs:
             --query passwords[0].value \
             --output tsv)"
 
-          IMAGE="${ACR_LOGIN_SERVER}/${IMAGE_REPO}:${IMAGE_TAG}"
+          IMAGE="${ACR_LOGIN_SERVER}/${ACA_APP}:${IMAGE_TAG}"
 
           cat > containerapp.yaml <<EOF
           location: ${LOCATION}
@@ -192,8 +190,8 @@ jobs:
             --resource-group "${RESOURCE_GROUP}" \
             --yaml containerapp.yaml
 
-          image_sha="${ACR_LOGIN_SERVER}/${WEBSITE_IMAGE_REPOSITORY}:${GITHUB_SHA}"
-          image_latest="${ACR_LOGIN_SERVER}/${WEBSITE_IMAGE_REPOSITORY}:latest"
+          image_sha="${ACR_LOGIN_SERVER}/${ACA_APP}:${GITHUB_SHA}"
+          image_latest="${ACR_LOGIN_SERVER}/${ACA_APP}:latest"
 
           echo "ACR_LOGIN_SERVER=${ACR_LOGIN_SERVER}" >> "$GITHUB_ENV"
           echo "IMAGE_SHA=${image_sha}" >> "$GITHUB_ENV"
@@ -264,16 +262,16 @@ jobs:
           mapfile -t old_tags < <(
             az acr repository show-tags \
               --name "${ACR_NAME}" \
-              --repository "${WEBSITE_IMAGE_REPOSITORY}" \
+              --repository "${ACA_APP}" \
               --orderby time_desc \
               --output tsv | \
-              awk -v keep="$WEBSITE_IMAGE_TAG_RETENTION_COUNT" '/^[0-9a-f]{40}$/ { count++; if (count > keep) print }'
+              awk -v keep="10" '/^[0-9a-f]{40}$/ { count++; if (count > keep) print }'
           )
 
           for tag in "${old_tags[@]}"; do
-            echo "Deleting ${WEBSITE_IMAGE_REPOSITORY}:$tag"
+            echo "Deleting ${ACA_APP}:$tag"
             az acr repository delete \
               --name "${ACR_NAME}" \
-              --image "${WEBSITE_IMAGE_REPOSITORY}:$tag" \
+              --image "${ACA_APP}:$tag" \
               --yes
           done
