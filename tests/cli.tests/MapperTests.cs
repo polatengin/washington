@@ -1202,13 +1202,90 @@ public class MapperTests
     {
         var mapper = new MySqlFlexibleServerMapper();
         var resource = CreateResource("Microsoft.DBforMySQL/flexibleServers",
-            sku: new { name = "Standard_D2ds_v4" });
+            sku: new { name = "Standard_D2ds_v4", tier = "GeneralPurpose" },
+            properties: new { storage = new { storageSizeGB = 128 } });
 
         var queries = mapper.BuildQueries(resource);
 
         Assert.Single(queries);
         Assert.Equal("Azure Database for MySQL", queries[0].ServiceName);
-        Assert.Equal("Standard_D2ds_v4", queries[0].ArmSkuName);
+        Assert.Equal("eastus", queries[0].ArmRegionName);
+        Assert.Null(queries[0].ArmSkuName);
+    }
+
+    [Fact]
+    public void MySqlFlexibleServerMapper_CalculateCost_UsesPerVCoreFallbackAndStorage()
+    {
+        var mapper = new MySqlFlexibleServerMapper();
+        var resource = CreateResource("Microsoft.DBforMySQL/flexibleServers",
+            sku: new { name = "Standard_D2ds_v4", tier = "GeneralPurpose" },
+            properties: new { storage = new { storageSizeGB = 128 } });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                ProductName = "Azure Database for MySQL Flexible Server General Purpose Series Compute",
+                SkuName = "vCore",
+                ArmSkuName = "AzureDB_MySQL_Flexible_Server_General_Purpose_Ddsv4_Compute",
+                MeterName = "vCore",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.0855,
+            },
+            new PriceRecord
+            {
+                ProductName = "Azure Database for MySQL Flexible Server Storage",
+                SkuName = "Storage",
+                ArmSkuName = "Storage",
+                MeterName = "Storage Data Stored",
+                UnitOfMeasure = "1 GB/Month",
+                UnitPrice = 0.115,
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(139.55m, cost.Amount);
+        Assert.Contains("2 vCores", cost.Details);
+        Assert.Contains("$0.0855/vCore/hr", cost.Details);
+        Assert.Contains("128 GB storage", cost.Details);
+    }
+
+    [Fact]
+    public void MySqlFlexibleServerMapper_CalculateCost_UsesExactSkuPrice_WhenAvailable()
+    {
+        var mapper = new MySqlFlexibleServerMapper();
+        var resource = CreateResource("Microsoft.DBforMySQL/flexibleServers",
+            sku: new { name = "Standard_E2d_v5", tier = "BusinessCritical" },
+            properties: new { storage = new { storageSizeGB = 128 } });
+
+        var prices = new List<PriceRecord>
+        {
+            new PriceRecord
+            {
+                ProductName = "Azure Database for MySQL Flexible Server Memory Optimized Edsv5 Series Compute",
+                SkuName = "Standard_E2d_v5",
+                ArmSkuName = "AzureDB_MySQL_Flexible_Server_Memory_Optimized_Edsv5Series_Compute_2vCore",
+                MeterName = "2 vCore",
+                UnitOfMeasure = "1 Hour",
+                UnitPrice = 0.236,
+            },
+            new PriceRecord
+            {
+                ProductName = "Azure Database for MySQL Flexible Server Storage",
+                SkuName = "Storage",
+                ArmSkuName = "Storage",
+                MeterName = "Storage Data Stored",
+                UnitOfMeasure = "1 GB/Month",
+                UnitPrice = 0.115,
+            }
+        };
+
+        var cost = mapper.CalculateCost(resource, prices);
+
+        Assert.Equal(187.00m, cost.Amount);
+        Assert.Contains("$0.2360/hr", cost.Details);
+        Assert.DoesNotContain("/vCore/hr", cost.Details, StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
