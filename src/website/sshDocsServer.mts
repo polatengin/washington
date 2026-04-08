@@ -267,9 +267,8 @@ function renderBrowseScreen(state: ShellState, documents: SearchDocument[]) {
     : [paint('No documents found.', ansi.bold, palette.titleForeground)];
 
   const lines = [
-    renderSegments(columns, ['washington', 'ssh docs', 'read-only']),
+    renderSegments(columns, ['washington', 'bicep cost estimator', 'bce', 'ssh docs', 'read-only']),
     paint('─'.repeat(columns), palette.lineForeground),
-    '',
   ];
 
   for (let index = 0; index < bodyHeight; index += 1) {
@@ -308,10 +307,9 @@ function renderPageScreen(state: ShellState, selectedDocument: SearchDocument | 
   const endLine = Math.min(totalLines, state.pageScroll + bodyHeight);
 
   const lines = [
-    renderSegments(columns, ['washington', selectedDocument?.title || 'page', 'ssh docs']),
+    renderSegments(columns, ['washington', 'bicep cost estimator', 'bce', selectedDocument?.title || 'page', 'ssh docs']),
     padOrClip(paint(selectedDocument?.href || '/', palette.cyanForeground), columns),
     paint('─'.repeat(columns), palette.lineForeground),
-    '',
   ];
 
   for (let index = 0; index < bodyHeight; index += 1) {
