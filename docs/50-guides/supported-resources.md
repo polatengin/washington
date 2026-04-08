@@ -5,11 +5,11 @@ sidebar_position: 51
 
 # Supported Resources
 
-Washington currently ships with pricing mappers for <!-- GENERATED:RESOURCE_COUNT -->0<!-- /GENERATED:RESOURCE_COUNT --> Azure resource types. Support is implemented in the CLI mapper registry and shared by the CLI, VS Code extension, and GitHub Action.
+Washington currently ships with pricing mappers for {/* GENERATED:RESOURCE_COUNT */}0{/* /GENERATED:RESOURCE_COUNT */} Azure resource types. Support is implemented in the CLI mapper registry and shared by the CLI, VS Code extension, and GitHub Action.
 
 ## Generated Matrix
 
-<!-- BEGIN GENERATED SUPPORTED RESOURCE MATRIX -->
+{/* BEGIN GENERATED SUPPORTED RESOURCE MATRIX */}
 This matrix is generated from `src/cli/Mappers/MapperRegistry.cs` and each mapper's `ResourceType` property.
 The registry order is preserved so the table stays aligned with the implementation.
 
@@ -22,7 +22,7 @@ The registry order is preserved so the table stays aligned with the implementati
 
 | Registry Group | ARM Resource Type | Mapper |
 | --- | --- | --- |
-<!-- END GENERATED SUPPORTED RESOURCE MATRIX -->
+{/* END GENERATED SUPPORTED RESOURCE MATRIX */}
 
 ## What Supported Means
 

@@ -19,8 +19,25 @@ type RegistryEntryWithResourceType = RegistryEntry & {
   resourceType: string;
 };
 
-const countMarkerPattern = /<!-- GENERATED:RESOURCE_COUNT -->([\s\S]*?)<!-- \/GENERATED:RESOURCE_COUNT -->/;
-const matrixMarkerPattern = /<!-- BEGIN GENERATED SUPPORTED RESOURCE MATRIX -->([\s\S]*?)<!-- END GENERATED SUPPORTED RESOURCE MATRIX -->/;
+const countMarkerPatterns = [
+  /\{\/\* GENERATED:RESOURCE_COUNT \*\/\}([\s\S]*?)\{\/\* \/GENERATED:RESOURCE_COUNT \*\/\}/,
+  /<!-- GENERATED:RESOURCE_COUNT -->([\s\S]*?)<!-- \/GENERATED:RESOURCE_COUNT -->/,
+];
+
+const matrixMarkerPatterns = [
+  /\{\/\* BEGIN GENERATED SUPPORTED RESOURCE MATRIX \*\/\}([\s\S]*?)\{\/\* END GENERATED SUPPORTED RESOURCE MATRIX \*\/\}/,
+  /<!-- BEGIN GENERATED SUPPORTED RESOURCE MATRIX -->([\s\S]*?)<!-- END GENERATED SUPPORTED RESOURCE MATRIX -->/,
+];
+
+function replaceGeneratedSection(content, patterns, replacement, missingMarkerError) {
+  for (const pattern of patterns) {
+    if (pattern.test(content)) {
+      return content.replace(pattern, replacement);
+    }
+  }
+
+  throw new Error(missingMarkerError);
+}
 
 function parseRegistryEntries(content) {
   const entries: RegistryEntry[] = [];
@@ -109,20 +126,20 @@ async function main() {
 
   const docContent = await readFile(docPath, 'utf8');
 
-  if (!countMarkerPattern.test(docContent)) {
-    throw new Error('Supported resources doc is missing the resource count marker.');
-  }
+  const updatedCount = `{/* GENERATED:RESOURCE_COUNT */}${entriesWithResourceTypes.length}{/* /GENERATED:RESOURCE_COUNT */}`;
+  const updatedMatrix = `{/* BEGIN GENERATED SUPPORTED RESOURCE MATRIX */}\n${buildGeneratedMatrix(entriesWithResourceTypes)}{/* END GENERATED SUPPORTED RESOURCE MATRIX */}`;
 
-  if (!matrixMarkerPattern.test(docContent)) {
-    throw new Error('Supported resources doc is missing the generated matrix markers.');
-  }
-
-  const updatedCount = `<!-- GENERATED:RESOURCE_COUNT -->${entriesWithResourceTypes.length}<!-- /GENERATED:RESOURCE_COUNT -->`;
-  const updatedMatrix = `<!-- BEGIN GENERATED SUPPORTED RESOURCE MATRIX -->\n${buildGeneratedMatrix(entriesWithResourceTypes)}<!-- END GENERATED SUPPORTED RESOURCE MATRIX -->`;
-
-  const updatedDoc = docContent
-    .replace(countMarkerPattern, updatedCount)
-    .replace(matrixMarkerPattern, updatedMatrix);
+  const updatedDoc = replaceGeneratedSection(
+    replaceGeneratedSection(
+      docContent,
+      countMarkerPatterns,
+      updatedCount,
+      'Supported resources doc is missing the resource count marker.',
+    ),
+    matrixMarkerPatterns,
+    updatedMatrix,
+    'Supported resources doc is missing the generated matrix markers.',
+  );
 
   await writeFile(docPath, updatedDoc, 'utf8');
   console.log(`Updated supported resources doc with ${entriesWithResourceTypes.length} registry entries.`);
