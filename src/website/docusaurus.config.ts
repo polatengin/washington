@@ -4,39 +4,15 @@ import type {PluginOptions} from '@docusaurus/plugin-content-docs';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 import type {PrismTheme} from 'prism-react-renderer';
+import docsSidebarModule from './docsSidebar.ts';
 
+const {docsSidebar} = docsSidebarModule;
 const showLastUpdateMetadata =
   process.env.DOCUSAURUS_ENABLE_LAST_UPDATE === undefined
     ? existsSync(new URL('../../.git', import.meta.url))
     : process.env.DOCUSAURUS_ENABLE_LAST_UPDATE === 'true';
 
-const doc = (id: string) => ({
-  type: 'doc' as const,
-  id,
-});
-
-const category = (label: string, items: readonly string[]) => ({
-  type: 'category' as const,
-  label,
-  items: items.map(doc),
-});
-
-const docsSidebar = [
-  doc('introduction'),
-  doc('playground/index'),
-  doc('getting-started'),
-  category('CLI', ['cli/commands', 'cli/configuration']),
-  category('VS Code Extension', ['vscode-extension/index', 'vscode-extension/settings']),
-  category('GitHub Action', ['github-action/index', 'github-action/examples']),
-  category('Guides', [
-    'guides/contributing',
-    'guides/how-estimates-work',
-    'guides/supported-resources',
-    'guides/troubleshooting',
-  ]),
-  doc('roadmap'),
-  doc('release-notes'),
-] satisfies Awaited<ReturnType<PluginOptions['sidebarItemsGenerator']>>;
+const docsSidebarItems: Awaited<ReturnType<PluginOptions['sidebarItemsGenerator']>> = docsSidebar;
 
 const withYamlTokenStyles = (
   theme: PrismTheme,
@@ -111,7 +87,7 @@ const config: Config = {
           routeBasePath: '/',
           showLastUpdateAuthor: showLastUpdateMetadata,
           showLastUpdateTime: showLastUpdateMetadata,
-          sidebarItemsGenerator: () => docsSidebar,
+          sidebarItemsGenerator: () => docsSidebarItems,
           editUrl: 'https://github.com/polatengin/washington/tree/main/',
         },
         blog: false,

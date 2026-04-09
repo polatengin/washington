@@ -6,12 +6,15 @@ import {access, mkdir, readdir, readFile, rm, writeFile} from 'node:fs/promises'
 import {homedir} from 'node:os';
 import {basename, dirname, extname, join, relative} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import docsSidebarModule from '../docsSidebar.ts';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..', '..', '..');
 const docsDir = join(repoRoot, 'docs');
 const outputDir = join(__dirname, '..', 'static', 'docfind');
 const documentsPath = join(outputDir, 'documents.json');
+const navigationPath = join(outputDir, 'navigation.json');
+const {buildDocsNavigation} = docsSidebarModule;
 const defaultDocfindPaths = [
   join(homedir(), '.local', 'bin', 'docfind'),
   join(homedir(), '.docfind', 'bin', 'docfind.exe'),
@@ -34,11 +37,11 @@ const categoryByTopLevelPath: Record<string, string> = {
   'vscode-extension': 'VS Code Extension',
 };
 
-function stripNumberPrefix(value) {
+function stripNumberPrefix(value: string) {
   return value.replace(/^\d+-/, '');
 }
 
-function normalizeRoute(value) {
+function normalizeRoute(value: string) {
   const trimmed = value.trim();
 
   if (!trimmed) {
@@ -54,7 +57,7 @@ function normalizeRoute(value) {
   return withLeadingSlash;
 }
 
-function parseFrontmatter(content) {
+function parseFrontmatter(content: string): {body: string; frontmatter: Frontmatter} {
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
 
   if (!match) {
@@ -86,12 +89,12 @@ function parseFrontmatter(content) {
   };
 }
 
-function extractTitle(body) {
+function extractTitle(body: string): string | null {
   const match = body.match(/^#\s+(.+)$/m);
   return match ? match[1].trim() : null;
 }
 
-function toRoutePath(filePath, frontmatter) {
+function toRoutePath(filePath: string, frontmatter: Frontmatter): string {
   if (typeof frontmatter.permalink === 'string' && frontmatter.permalink.trim()) {
     return normalizeRoute(frontmatter.permalink);
   }
@@ -118,7 +121,7 @@ function toRoutePath(filePath, frontmatter) {
   return normalizeRoute(route);
 }
 
-function toCategory(filePath, frontmatter) {
+function toCategory(filePath: string, frontmatter: Frontmatter): string {
   if (typeof frontmatter.parent === 'string' && frontmatter.parent.trim()) {
     return frontmatter.parent.trim();
   }
@@ -137,7 +140,7 @@ function toCategory(filePath, frontmatter) {
   return categoryByTopLevelPath[parts[0]] || frontmatter.title || 'Documentation';
 }
 
-function stripMarkdown(markdown) {
+function stripMarkdown(markdown: string): string {
   return markdown
     .replace(/```[\s\S]*?```/g, ' ')
     .replace(/`([^`]+)`/g, '$1')
@@ -155,9 +158,9 @@ function stripMarkdown(markdown) {
     .trim();
 }
 
-async function walk(dir) {
+async function walk(dir: string): Promise<string[]> {
   const entries = await readdir(dir, {withFileTypes: true});
-  const files = [];
+  const files: string[] = [];
 
   for (const entry of entries) {
     const fullPath = join(dir, entry.name);
@@ -245,6 +248,17 @@ async function collectDocuments() {
   return documents;
 }
 
+function collectNavigation(documents: SearchDocument[]) {
+  const documentRoutes = new Set<string>(documents.map((document: SearchDocument) => document.href));
+
+  return buildDocsNavigation()
+    .filter(item => documentRoutes.has(item.href))
+    .map((item, index) => ({
+      href: item.href,
+      order: index,
+    }));
+}
+
 if (process.argv.includes('--cleanup')) {
   await rm(outputDir, {recursive: true, force: true});
   console.log('Removed static/docfind');
@@ -257,11 +271,15 @@ await rm(outputDir, {recursive: true, force: true});
 await mkdir(outputDir, {recursive: true});
 
 const documents = await collectDocuments();
+const navigation = collectNavigation(documents);
 
 await writeFile(documentsPath, JSON.stringify(documents, null, 2), 'utf8');
+await writeFile(navigationPath, JSON.stringify(navigation, null, 2), 'utf8');
 console.log(`  Indexed ${documents.length} documents`);
+console.log(`  Ordered ${navigation.length} sidebar entries`);
 
 await runDocfind();
 
 console.log(`  Wrote ${relative(repoRoot, documentsPath)}`);
+console.log(`  Wrote ${relative(repoRoot, navigationPath)}`);
 console.log('Done. Search index is ready.');
