@@ -208,16 +208,12 @@ internal sealed class DocsConsoleBrowser
 
     private async Task<string> RenderPageAsync(int columns, int rows)
     {
+        var builder = new StringBuilder();
         var selected = SelectedDocument;
         var pageLines = await GetPageLinesAsync(selected.Href, columns);
         var bodyRows = Math.Max(1, rows - 2);
         var maxScroll = Math.Max(0, pageLines.Count - bodyRows);
         _pageScroll = Math.Clamp(_pageScroll, 0, maxScroll);
-
-        var builder = new StringBuilder();
-        builder.AppendLine(DocsConsoleText.PadOrClip(
-            $"{Bold}{selected.Title}{Reset}  {selected.Href}  Esc back  q quit",
-            columns));
 
         for (var row = 0; row < bodyRows; row++)
         {
