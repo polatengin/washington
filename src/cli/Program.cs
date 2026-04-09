@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.Reflection;
 using System.Text.Json;
 using Washington.Commands;
 using Washington.Lsp;
@@ -6,24 +7,38 @@ using Washington.Services;
 
 public class Program
 {
-    public static Task<int> Main(string[] args)
+    public static async Task<int> Main(string[] args)
     {
-        if (TryHandleVersionRequest(args, Console.Out))
+        if (await TryHandleVersionRequestAsync(args, Console.Out))
         {
-            return Task.FromResult(0);
+            return 0;
         }
 
-        return InvokeAsync(CreateRootCommand(), args);
+        return await InvokeAsync(CreateRootCommand(), args);
     }
 
-    internal static bool TryHandleVersionRequest(string[] args, TextWriter outputWriter)
+    internal static async Task<bool> TryHandleVersionRequestAsync(
+        string[] args,
+        TextWriter outputWriter,
+        Func<Assembly, CancellationToken, Task<string?>>? updateNoteProvider = null,
+        CancellationToken cancellationToken = default)
     {
         if (!Array.Exists(args, static arg => string.Equals(arg, "--version", StringComparison.Ordinal)))
         {
             return false;
         }
 
-        outputWriter.WriteLine(CliVersion.GetDisplayVersion(typeof(Program).Assembly));
+        var assembly = typeof(Program).Assembly;
+
+        await outputWriter.WriteLineAsync(CliVersion.GetDisplayVersion(assembly));
+
+        updateNoteProvider ??= CliVersionUpdateChecker.TryGetUpdateNoteAsync;
+        var updateNote = await updateNoteProvider(assembly, cancellationToken);
+        if (!string.IsNullOrWhiteSpace(updateNote))
+        {
+            await outputWriter.WriteLineAsync(updateNote);
+        }
+
         return true;
     }
 

@@ -64,11 +64,14 @@ public class ProgramVersionTests
     }
 
     [Fact]
-    public void TryHandleVersionRequest_WhenVersionIsRequested_WritesDisplayVersion()
+    public async Task TryHandleVersionRequest_WhenVersionIsRequested_WritesDisplayVersion()
     {
         using var outputWriter = new StringWriter();
 
-        var handled = Program.TryHandleVersionRequest(new[] { "--version" }, outputWriter);
+        var handled = await Program.TryHandleVersionRequestAsync(
+            new[] { "--version" },
+            outputWriter,
+            (_, _) => Task.FromResult<string?>(null));
 
         Assert.True(handled);
         Assert.Equal(
@@ -77,11 +80,40 @@ public class ProgramVersionTests
     }
 
     [Fact]
-    public void TryHandleVersionRequest_WhenVersionIsNotRequested_DoesNotWriteOutput()
+    public async Task TryHandleVersionRequest_WhenUpdateIsAvailable_WritesVersionAndNote()
     {
         using var outputWriter = new StringWriter();
 
-        var handled = Program.TryHandleVersionRequest(new[] { "estimate" }, outputWriter);
+        var handled = await Program.TryHandleVersionRequestAsync(
+            new[] { "--version" },
+            outputWriter,
+            (_, _) => Task.FromResult<string?>("Update available: v9.9.9"));
+
+        Assert.True(handled);
+        Assert.Equal(
+            $"{CliVersion.GetDisplayVersion(typeof(Program).Assembly)}{Environment.NewLine}Update available: v9.9.9{Environment.NewLine}",
+            outputWriter.ToString());
+    }
+
+    [Theory]
+    [InlineData("0.1.2", false)]
+    [InlineData("0.1.3", true)]
+    [InlineData("v0.1.3", true)]
+    [InlineData("0.1.3-beta.1", true)]
+    public void TryParseComparableVersion_CanCompareReleaseTags(string rawVersion, bool isNewer)
+    {
+        Assert.True(CliVersion.TryParseComparableVersion("0.1.2+1d11c834b5112fb3626e008a7d9fb88051f7e54b", out var currentVersion));
+        Assert.True(CliVersion.TryParseComparableVersion(rawVersion, out var candidateVersion));
+
+        Assert.Equal(isNewer, candidateVersion > currentVersion);
+    }
+
+    [Fact]
+    public async Task TryHandleVersionRequest_WhenVersionIsNotRequested_DoesNotWriteOutput()
+    {
+        using var outputWriter = new StringWriter();
+
+        var handled = await Program.TryHandleVersionRequestAsync(new[] { "estimate" }, outputWriter);
 
         Assert.False(handled);
         Assert.Empty(outputWriter.ToString());
