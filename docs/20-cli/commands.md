@@ -42,6 +42,36 @@ bce estimate --file main.bicep --params-file main.bicepparam --param env=prod
 bce estimate --file main.arm.json --output markdown
 ```
 
+## `bce docs`
+
+Browse the live documentation site from your terminal.
+
+```bash
+bce docs
+```
+
+### Examples
+
+```bash
+# Open the interactive terminal browser
+bce docs
+
+# Print a single page
+bce docs /getting-started
+
+# List all published routes
+bce docs list
+
+# Search titles and summaries
+bce docs search troubleshooting
+```
+
+### Current Behavior Notes
+
+- `bce docs` reads from the deployed docs site at `https://bicepcostestimator.net`, so it always shows the latest published content.
+- When it runs in a terminal, it opens an interactive browser with arrow-key navigation.
+- When output is redirected, `bce docs` prints the introduction page and exits.
+
 ## Current Behavior Notes
 
 - Unsupported resource types are skipped and returned as warnings in the output.

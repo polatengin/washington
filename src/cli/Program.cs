@@ -14,6 +14,12 @@ public class Program
             return 0;
         }
 
+        var docsResult = await DocsCommand.TryHandleAsync(args, Console.Out, Console.Error);
+        if (docsResult.Handled)
+        {
+            return docsResult.ExitCode;
+        }
+
         return await InvokeAsync(CreateRootCommand(), args);
     }
 
@@ -62,7 +68,7 @@ public class Program
         }
     }
 
-    private static RootCommand CreateRootCommand()
+    internal static RootCommand CreateRootCommand(Command? docsCommand = null)
     {
         var rootCommand = new RootCommand("BCE (Bicep Cost Estimator) - estimate monthly Azure costs from Bicep and ARM files");
 
@@ -74,6 +80,9 @@ public class Program
         cacheCommand.Subcommands.Add(CacheClearCommand.Create());
         cacheCommand.Subcommands.Add(CacheInfoCommand.Create());
         rootCommand.Subcommands.Add(cacheCommand);
+
+        // docs command
+        rootCommand.Subcommands.Add(docsCommand ?? DocsCommand.Create());
 
         // lsp command
         var lspCommand = new Command("lsp", "Start in Language Server Protocol mode (stdin/stdout)");
