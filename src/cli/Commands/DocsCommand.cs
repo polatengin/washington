@@ -228,7 +228,7 @@ public class DocsCommand
     internal static async Task<int> ExecuteListAsync(DocsClient client, TextWriter outputWriter)
     {
         var documents = await client.GetDocumentsAsync();
-        foreach (var document in documents.OrderBy(static document => document.Href, StringComparer.OrdinalIgnoreCase))
+        foreach (var document in documents)
         {
             await outputWriter.WriteLineAsync($"{document.Href.PadRight(32)} {document.Title}");
         }
