@@ -5,11 +5,10 @@ set -euo pipefail
 # Usage: curl -sL https://bicepcostestimator.net/install.sh | bash
 
 REPO="polatengin/washington"
-INSTALL_DIR="${INSTALL_DIR:-$HOME/.bce/bin}"
+INSTALL_DIR="${INSTALL_DIR:-}"
 
 echo "Installing BCE CLI..."
 
-# Detect OS and architecture
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 ARCH="$(uname -m)"
 
@@ -32,7 +31,31 @@ case "$OS" in
     ;;
 esac
 
-# Get latest release
+if [[ -z "$INSTALL_DIR" ]]; then
+  case "$OS" in
+    linux)
+      INSTALL_DIR="$HOME/.local/bin"
+      ;;
+    darwin)
+      if [[ "$ARCH" == "arm64" ]]; then
+        INSTALL_DIR="/opt/homebrew/bin"
+      else
+        INSTALL_DIR="/usr/local/bin"
+      fi
+      ;;
+  esac
+fi
+
+if ! mkdir -p "$INSTALL_DIR" >/dev/null 2>&1 || [[ ! -w "$INSTALL_DIR" ]]; then
+  echo "Error: Install directory is not writable: ${INSTALL_DIR}"
+  echo ""
+  echo "Re-run with a writable install directory by setting INSTALL_DIR:"
+  echo ""
+  echo '  curl -sL https://bicepcostestimator.net/install.sh | INSTALL_DIR="/path/on/your/PATH" bash'
+  echo ""
+  exit 1
+fi
+
 LATEST=$(curl -fsSL "https://api.github.com/repos/${REPO}/releases/latest" | grep '"tag_name"' | sed -E 's/.*"([^"]+)".*/\1/')
 
 if [ -z "$LATEST" ]; then
@@ -47,21 +70,20 @@ echo "  Version:  ${LATEST}"
 echo "  Platform: ${PLATFORM}"
 echo "  Target:   ${INSTALL_DIR}"
 
-# Download and extract
-mkdir -p "$INSTALL_DIR"
 curl -fsSL "$DOWNLOAD_URL" -o "$TARGET_PATH"
 chmod +x "$TARGET_PATH"
 
-echo ""
-echo "BCE CLI installed to ${TARGET_PATH}"
-
-# Check if INSTALL_DIR is in PATH
-if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
-  echo ""
-  echo "Add the following to your shell profile (.bashrc, .zshrc, etc.):"
-  echo ""
-  echo "  export PATH=\"\$PATH:${INSTALL_DIR}\""
-  echo ""
-fi
+case ":$PATH:" in
+  *":${INSTALL_DIR%/}:"*)
+    ;;
+  *)
+    echo ""
+    echo "${INSTALL_DIR} is not on your PATH."
+    echo "Run the following now, or add it to your shell config:"
+    echo ""
+    echo "  export PATH=\"\$PATH:${INSTALL_DIR}\""
+    echo ""
+    ;;
+esac
 
 echo "Run 'bce --help' to get started."

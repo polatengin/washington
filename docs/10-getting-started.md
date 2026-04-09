@@ -21,7 +21,7 @@ This guide walks you through installing the Washington CLI, published as `bce`, 
 curl -sL https://bicepcostestimator.net/install.sh | bash
 ```
 
-This installs `bce` to `~/.bce/bin` by default.
+The installer uses `~/.local/bin` on Linux, `/usr/local/bin` on Intel macOS, and `/opt/homebrew/bin` on Apple Silicon by default. Set `INSTALL_DIR` to override that choice. If the install directory is not on `PATH`, the installer prints the `export PATH=...` command to run.
 
 ### From Source
 

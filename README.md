@@ -23,6 +23,8 @@ curl -sL https://bicepcostestimator.net/install.sh | bash
 bce estimate --file path/to/main.bicep
 ```
 
+The installer uses `~/.local/bin` on Linux, `/usr/local/bin` on Intel macOS, and `/opt/homebrew/bin` on Apple Silicon by default. Set `INSTALL_DIR` to override that choice. If the install directory is not on `PATH`, the installer prints the `export PATH=...` command to run.
+
 Build from source instead:
 
 ```bash
@@ -56,7 +58,6 @@ make build-cli
 
 - Unsupported resource types are skipped with a warning.
 - Spot and low-priority prices are excluded from default estimates.
-- The VS Code extension auto-refresh behavior is controlled by `bce.estimateOnSave`.
 
 ## Development
 
