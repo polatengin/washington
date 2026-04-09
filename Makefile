@@ -57,9 +57,8 @@ build-extension: clean ## Build the VS Code extension
 build-website: clean ## Build the documentation website
 	npm --prefix src/website run build
 
-dev-website: ## Run the documentation website locally with live reload and curl support
-	npm --prefix src/website run prebuild
-	cd src/website && PORT="$${PORT:-3000}" SSH_PORT="$${SSH_PORT:-2222}" node --import tsx server.mts
+dev-website: ## Run the documentation website locally with live reload and curl and ssh support
+	PORT="$${PORT:-3000}" SSH_PORT="$${SSH_PORT:-2222}" npm --prefix src/website run dev
 
 test-cli: build-cli ## Run the CLI test suite
 	dotnet test tests/cli.tests/washington.tests.csproj --configuration Release
