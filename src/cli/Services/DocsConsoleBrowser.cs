@@ -30,12 +30,7 @@ internal sealed class DocsConsoleBrowser
     {
         _client = client;
         _outputWriter = outputWriter;
-        _documents = documents
-            .OrderBy(static document => document.Href == "/" ? 0 : 1)
-            .ThenBy(static document => document.Category, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(static document => document.Title, StringComparer.OrdinalIgnoreCase)
-            .ThenBy(static document => document.Href, StringComparer.OrdinalIgnoreCase)
-            .ToArray();
+        _documents = documents.ToArray();
 
         var introductionIndex = Array.FindIndex(_documents.ToArray(), static document => document.Href == "/");
         _selectedIndex = introductionIndex >= 0 ? introductionIndex : 0;
