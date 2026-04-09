@@ -198,7 +198,7 @@ internal sealed class DocsConsoleBrowser
         builder.AppendLine();
         builder.AppendLine();
 
-        builder.AppendLine(DocsConsoleText.PadOrClip(
+        builder.Append(DocsConsoleText.PadOrClip(
             $"{Bold}Bicep Cost Estimator docs{Reset}  |  Up/Down move  |  Enter open  |  q quit",
             columns));
 

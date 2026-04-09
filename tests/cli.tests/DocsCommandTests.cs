@@ -1,4 +1,5 @@
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Washington.Commands;
@@ -230,6 +231,39 @@ public class DocsCommandTests
         Assert.Equal(1, result.ExitCode);
         Assert.Empty(outputWriter.ToString());
         Assert.Equal($"No pages matched \"does-not-exist\".{Environment.NewLine}", errorWriter.ToString());
+    }
+
+    [Fact]
+    public async Task RenderBrowse_DoesNotOverflowViewport()
+    {
+        using var outputWriter = new StringWriter();
+
+        var documents = new[]
+        {
+            new DocsDocument("Introduction", "Documentation", "/", "Home"),
+            new DocsDocument("CLI Commands", "CLI", "/cli/commands", "Command reference"),
+        };
+
+        var browser = new DocsConsoleBrowser(
+            CreateClient(
+                new Dictionary<string, string>
+                {
+                    ["/"] = "Introduction page",
+                },
+                documents,
+                HttpStatusCode.OK),
+            documents,
+            outputWriter);
+
+        var method = typeof(DocsConsoleBrowser).GetMethod("RenderBrowseAsync", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        Assert.NotNull(method);
+
+        var output = await (Task<string>)method!.Invoke(browser, new object[] { 80, 6 })!;
+        var normalized = output.Replace("\r\n", "\n", StringComparison.Ordinal);
+
+        Assert.Equal(6, normalized.Split('\n').Length);
+        Assert.False(normalized.EndsWith("\n", StringComparison.Ordinal));
     }
 
     private static System.CommandLine.Command CreateCommand(
