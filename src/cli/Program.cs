@@ -6,7 +6,26 @@ using Washington.Services;
 
 public class Program
 {
-    public static Task<int> Main(string[] args) => InvokeAsync(CreateRootCommand(), args);
+    public static Task<int> Main(string[] args)
+    {
+        if (TryHandleVersionRequest(args, Console.Out))
+        {
+            return Task.FromResult(0);
+        }
+
+        return InvokeAsync(CreateRootCommand(), args);
+    }
+
+    internal static bool TryHandleVersionRequest(string[] args, TextWriter outputWriter)
+    {
+        if (!Array.Exists(args, static arg => string.Equals(arg, "--version", StringComparison.Ordinal)))
+        {
+            return false;
+        }
+
+        outputWriter.WriteLine(CliVersion.GetDisplayVersion(typeof(Program).Assembly));
+        return true;
+    }
 
     internal static async Task<int> InvokeAsync(Command command, string[] args, TextWriter? errorWriter = null)
     {

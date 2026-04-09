@@ -3,6 +3,18 @@ SHELL := bash
 
 .DEFAULT_GOAL := help
 
+VERSION ?= $(strip $(shell git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//'))
+SOURCE_REVISION_ID ?= $(strip $(shell git rev-parse HEAD 2>/dev/null))
+INFORMATIONAL_VERSION ?= $(if $(strip $(VERSION)),$(VERSION)$(if $(strip $(SOURCE_REVISION_ID)),+$(SOURCE_REVISION_ID),))
+
+MSBUILD_VERSION_ARGS :=
+ifneq ($(strip $(VERSION)),)
+MSBUILD_VERSION_ARGS += -p:Version=$(VERSION)
+endif
+ifneq ($(strip $(INFORMATIONAL_VERSION)),)
+MSBUILD_VERSION_ARGS += -p:InformationalVersion=$(INFORMATIONAL_VERSION)
+endif
+
 .PHONY: help info setup-cli setup-extension setup-website clean build-cli build-extension build-website dev-website test-cli test-extension package-cli
 
 help:
@@ -45,7 +57,7 @@ clean: ## Remove generated outputs
 	rm -rf src/vscode-extension/bin src/vscode-extension/dist src/vscode-extension/out src/website/build src/website/.docusaurus src/website/static/docfind src/website/static/text publish
 
 build-cli: clean ## Build the BCE CLI
-	dotnet build src/cli/washington.csproj --configuration Release
+	dotnet build src/cli/washington.csproj --configuration Release $(MSBUILD_VERSION_ARGS)
 
 build-extension: clean ## Build the VS Code extension
 	rm -rf src/vscode-extension/bin
@@ -70,7 +82,7 @@ package-cli: build-cli ## Publish self-contained CLI binaries for supported runt
 	rm -rf publish
 	mkdir -p publish
 	for runtime in win-x64 linux-x64 osx-x64 osx-arm64; do \
-		dotnet publish src/cli/washington.csproj --configuration Release -p:PublishSingleFile=true --self-contained true -r "$$runtime" -o "publish/$$runtime"; \
+		dotnet publish src/cli/washington.csproj --configuration Release $(MSBUILD_VERSION_ARGS) -p:PublishSingleFile=true --self-contained true -r "$$runtime" -o "publish/$$runtime"; \
 	done
 	cp "publish/win-x64/bce.exe" "publish/bce-win-x64.exe"
 	cp "publish/linux-x64/bce" "publish/bce-linux-x64"

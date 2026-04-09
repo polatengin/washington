@@ -49,15 +49,6 @@ jobs:
             core.setOutput('version', nextVersion);
             core.setOutput('new_version_tag', `v${nextVersion}`);
 
-      - name: Update project version
-        run: |
-          sed -i 's|<Version>.*</Version>|<Version>${{ steps.version.outputs.version }}</Version>|' src/cli/washington.csproj
-          sed -i 's|<AssemblyVersion>.*</AssemblyVersion>|<AssemblyVersion>${{ steps.version.outputs.version }}</AssemblyVersion>|' src/cli/washington.csproj
-          sed -i 's|<FileVersion>.*</FileVersion>|<FileVersion>${{ steps.version.outputs.version }}</FileVersion>|' src/cli/washington.csproj
-
-      - name: Build
-        run: make build-cli
-
       - name: Generate Release Notes
         id: release_notes
         env:
@@ -110,7 +101,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Publish
-        run: make package-cli
+        run: make package-cli VERSION=${{ steps.version.outputs.version }} SOURCE_REVISION_ID=${{ github.sha }}
 
       - name: Create Release
         id: create_release

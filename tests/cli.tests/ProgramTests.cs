@@ -49,3 +49,41 @@ public class EstimateCommandTests
             errorWriter.ToString());
     }
 }
+
+public class ProgramVersionTests
+{
+    [Theory]
+    [InlineData("0.1.2", "v0.1.2")]
+    [InlineData("0.1.2+1d11c834b5112fb3626e008a7d9fb88051f7e54b", "v0.1.2 (1d11c83)")]
+    [InlineData("0.1.2-beta.1+1d11c834b5112fb3626e008a7d9fb88051f7e54b", "v0.1.2-beta.1 (1d11c83)")]
+    public void Format_WhenInformationalVersionIsProvided_ReturnsDisplayVersion(string rawVersion, string expected)
+    {
+        var displayVersion = CliVersion.Format(rawVersion);
+
+        Assert.Equal(expected, displayVersion);
+    }
+
+    [Fact]
+    public void TryHandleVersionRequest_WhenVersionIsRequested_WritesDisplayVersion()
+    {
+        using var outputWriter = new StringWriter();
+
+        var handled = Program.TryHandleVersionRequest(new[] { "--version" }, outputWriter);
+
+        Assert.True(handled);
+        Assert.Equal(
+            $"{CliVersion.GetDisplayVersion(typeof(Program).Assembly)}{Environment.NewLine}",
+            outputWriter.ToString());
+    }
+
+    [Fact]
+    public void TryHandleVersionRequest_WhenVersionIsNotRequested_DoesNotWriteOutput()
+    {
+        using var outputWriter = new StringWriter();
+
+        var handled = Program.TryHandleVersionRequest(new[] { "estimate" }, outputWriter);
+
+        Assert.False(handled);
+        Assert.Empty(outputWriter.ToString());
+    }
+}
