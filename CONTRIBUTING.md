@@ -56,4 +56,3 @@ This starts the local docs stack at `http://localhost:3000` through the Express 
 | `src/website/` | Documentation website |
 | `tests/` | Test projects |
 | `docs/` | Documentation content (Markdown) |
-| `infra/` | Azure infrastructure (Bicep) |
