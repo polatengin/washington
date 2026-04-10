@@ -34,7 +34,7 @@ bce() {
     -w /work \
     -v "$HOME/.bicep-cost-estimator:/root/.bicep-cost-estimator" \
     --entrypoint /app/bin/bce \
-    ghcr.io/polatengin/washington-website:latest \
+    ghcr.io/polatengin/washington:latest \
     "$@"
 }
 ```
