@@ -1,6 +1,6 @@
 # Contributing
 
-We welcome contributions to Washington! This guide explains how to set up a development environment and submit changes.
+We welcome contributions to Bicep Cost Estimator! This guide explains how to set up a development environment and submit changes.
 
 ## Development Setup
 
@@ -21,7 +21,7 @@ make build-cli
 make test-cli
 ```
 
-`make setup-cli` restores the .NET dependencies for the CLI and tests. When you estimate a `.bicep` file, Washington will use a configured `bicep` binary if one is available or download the pinned version it needs automatically.
+`make setup-cli` restores the .NET dependencies for the CLI and tests. When you estimate a `.bicep` file, Bicep Cost Estimator will use a configured `bicep` binary if one is available or download the pinned version it needs automatically.
 
 If you're working on the VS Code extension or documentation website, install those dependencies explicitly:
 

@@ -5,7 +5,7 @@
 [![Release BCE CLI](https://github.com/polatengin/washington/actions/workflows/release-cli.yml/badge.svg)](https://github.com/polatengin/washington/actions/workflows/release-cli.yml)
 [![BCE CLI version](https://img.shields.io/github/v/release/polatengin/washington?display_name=tag&label=bce%20cli)](https://github.com/polatengin/washington/releases/latest)
 
-Bicep Cost Estimator (_Washington_) estimates monthly Azure costs from Bicep and ARM templates before you deploy. The published CLI command is `bce`.
+`Bicep Cost Estimator` estimates monthly Azure costs from Bicep and ARM templates before you deploy. The published CLI command is `bce`.
 
 It currently ships as:
 

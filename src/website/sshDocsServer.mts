@@ -273,7 +273,7 @@ function renderBrowseScreen(state: ShellState, documents: SearchDocument[], prev
   const visibleEntries = entries.slice(listStart, listStart + bodyHeight);
 
   const lines = [
-    renderSegments(columns, ['washington', 'bicep cost estimator', 'bce', 'ssh docs', 'read-only']),
+    renderSegments(columns, ['bicep cost estimator', 'bce', 'ssh docs', 'read-only']),
     paint('─'.repeat(columns), palette.lineForeground),
   ];
 
@@ -312,7 +312,7 @@ function renderPageScreen(state: ShellState, selectedDocument: SearchDocument | 
   const endLine = Math.min(totalLines, state.pageScroll + bodyHeight);
 
   const lines = [
-    renderSegments(columns, ['washington', 'bicep cost estimator', 'bce', selectedDocument?.title || 'page', 'ssh docs']),
+    renderSegments(columns, ['bicep cost estimator', 'bce', selectedDocument?.title || 'page', 'ssh docs']),
     paint('─'.repeat(columns), palette.lineForeground),
   ];
 

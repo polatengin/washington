@@ -253,7 +253,7 @@ public class CostEstimatorLanguageServer
                     Command = new LspCommand
                     {
                         Title = costText,
-                        CommandId = "washington.showCostDetails"
+                        CommandId = "bce.showCostDetails"
                     }
                 });
             }
@@ -271,7 +271,7 @@ public class CostEstimatorLanguageServer
                     Command = new LspCommand
                     {
                         Title = $"💰 Estimated Monthly Total (all resources): ${report.GrandTotal:N2}",
-                        CommandId = "washington.showCostDetails"
+                        CommandId = "bce.showCostDetails"
                     }
                 });
             }
