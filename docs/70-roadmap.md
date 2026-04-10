@@ -11,6 +11,7 @@ The following features are planned for future releases:
 - **Multi-file / module-aware projects** - Support Bicep projects that span multiple files and use modules
 - **Website playground support for modules and params files** - Let the browser playground load local modules and separate parameter files instead of requiring a single self-contained template
 - **Website playground file uploads** - Allow users to upload Bicep, ARM, and parameter files in the browser playground and run cost estimation without pasting template contents manually
+- **Website playground compare mode** - Run two templates or two parameter sets side by side in the browser and show total and per-resource cost deltas
 - **Project configuration file** - Support a `.bce.json` or `.bce.yaml` file for shared defaults like region, output format, cache TTL, and estimation settings
 - **Cost comparison between parameter sets** - Compare costs across different parameter sets (for example, `dev` vs `prod`)
 - **Workload profiles / usage assumptions** - Let users choose or define estimation profiles for things like storage growth, transaction volume, and baseline throughput
@@ -25,7 +26,9 @@ The following features are planned for future releases:
 - **Cost optimization suggestions** - Recommend cheaper SKUs, redundant resources, or right-sizing opportunities
 - **Group-by and top views** - Add breakdowns by service, resource type, location, or module, and highlight the biggest cost drivers
 - **Tag-based cost grouping** - Group and subtotal costs by Azure resource tags (team, project, environment)
+- **Resource breakdown charts in the playground** - Add service-level and type-level visual summaries above the raw estimate table
 - **HTML report output** - Export a self-contained report with charts, subtotals, and collapsible resource sections for sharing in PR artifacts
+- **Deep links from estimates to Microsoft Learn** - Let estimate result rows open official Microsoft Learn documentation for the corresponding Azure resource type
 - **Source trace / provenance in output** - Show which file, module, or declaration produced each estimated resource so users can trace costs back to the source
 - **Spot VM pricing** - Show spot and low-priority pricing alongside pay-as-you-go
 - **Baseline snapshots** - Save an approved estimate and compare future runs against it, even when there is no live deployment to diff against
