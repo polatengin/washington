@@ -25,6 +25,28 @@ bce estimate --file path/to/main.bicep
 
 The installer uses `~/.local/bin` on Linux, `/usr/local/bin` on Intel macOS, and `/opt/homebrew/bin` on Apple Silicon by default. Set `INSTALL_DIR` to override that choice. If the install directory is not on `PATH`, the installer prints the `export PATH=...` command to run.
 
+Run via Docker instead, without installing the CLI binary locally:
+
+```bash
+bce() {
+  docker run --rm \
+    -v "$PWD:/work" \
+    -w /work \
+    -v "$HOME/.bicep-cost-estimator:/root/.bicep-cost-estimator" \
+    --entrypoint /app/bin/bce \
+    ghcr.io/polatengin/washington-website:latest \
+    "$@"
+}
+```
+
+Add that function to `~/.bashrc` or `~/.zshrc`, reload your shell, and then use `bce` like a normal command:
+
+```bash
+bce estimate --file ./main.bicep --output json
+```
+
+The wrapper works by starting the published website container, overriding the default startup command so it runs `/app/bin/bce` instead of the docs server, mounting your current working directory at `/work` so relative `--file` and `--params-file` paths keep working, and mounting `~/.bicep-cost-estimator` so the pricing cache persists across runs. Docker is the only local dependency; the image is pulled automatically on first use.
+
 Build from source instead:
 
 ```bash
