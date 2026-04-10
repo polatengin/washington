@@ -13,6 +13,7 @@ export type DocsSidebarItem = DocsSidebarDocItem | DocsSidebarCategoryItem;
 
 export type DocsNavigationItem = {
   href: string;
+  group?: string;
   order: number;
 };
 
@@ -66,17 +67,18 @@ function routeFromDocId(id: string) {
 export function buildDocsNavigation(items: readonly DocsSidebarItem[] = docsSidebar): DocsNavigationItem[] {
   const navigation: DocsNavigationItem[] = [];
 
-  const visit = (sidebarItems: readonly DocsSidebarItem[]) => {
+  const visit = (sidebarItems: readonly DocsSidebarItem[], group?: string) => {
     for (const item of sidebarItems) {
       if (item.type === 'doc') {
         navigation.push({
           href: routeFromDocId(item.id),
+          group,
           order: navigation.length,
         });
         continue;
       }
 
-      visit(item.items);
+      visit(item.items, item.label);
     }
   };
 

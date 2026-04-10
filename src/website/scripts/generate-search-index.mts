@@ -255,6 +255,7 @@ function collectNavigation(documents: SearchDocument[]) {
     .filter(item => documentRoutes.has(item.href))
     .map((item, index) => ({
       href: item.href,
+      group: item.group,
       order: index,
     }));
 }
