@@ -17,6 +17,7 @@ internal sealed class DocsConsoleBrowser
     private const string ShowCursor = "\u001b[?25h";
 
     private readonly DocsClient _client;
+    private readonly IReadOnlyList<BrowseEntry> _browseEntries;
     private readonly IReadOnlyList<DocsDocument> _documents;
     private readonly TextWriter _outputWriter;
     private readonly Dictionary<string, string> _pageCache = new(StringComparer.OrdinalIgnoreCase);
@@ -31,6 +32,7 @@ internal sealed class DocsConsoleBrowser
         _client = client;
         _outputWriter = outputWriter;
         _documents = documents.ToArray();
+        _browseEntries = BuildBrowseEntries(_documents);
 
         var introductionIndex = Array.FindIndex(_documents.ToArray(), static document => document.Href == "/");
         _selectedIndex = introductionIndex >= 0 ? introductionIndex : 0;
@@ -162,15 +164,16 @@ internal sealed class DocsConsoleBrowser
         var navWidth = Math.Clamp(columns / 3, 26, 42);
         var previewWidth = Math.Max(18, columns - navWidth - 3);
         var bodyRows = Math.Max(1, rows - 2);
-        var browseStart = Math.Clamp(_selectedIndex - (bodyRows / 2), 0, Math.Max(0, _documents.Count - bodyRows));
+        var selectedBrowseIndex = GetSelectedBrowseIndex();
+        var browseStart = Math.Clamp(selectedBrowseIndex - (bodyRows / 2), 0, Math.Max(0, _browseEntries.Count - bodyRows));
         var previewLines = (await GetPageLinesAsync(selected.Href, previewWidth)).Take(bodyRows).ToArray();
         var builder = new StringBuilder();
 
         for (var row = 0; row < bodyRows; row++)
         {
-            var docIndex = browseStart + row;
-            var left = docIndex < _documents.Count
-                ? FormatBrowseEntry(_documents[docIndex], docIndex == _selectedIndex, navWidth)
+            var browseIndex = browseStart + row;
+            var left = browseIndex < _browseEntries.Count
+                ? FormatBrowseEntry(_browseEntries[browseIndex], navWidth)
                 : new string(' ', navWidth);
             var right = row < previewLines.Length
                 ? DocsConsoleText.PadOrClip(previewLines[row], previewWidth)
@@ -263,13 +266,66 @@ internal sealed class DocsConsoleBrowser
         return result;
     }
 
-    private static string FormatBrowseEntry(DocsDocument document, bool selected, int width)
+    private IReadOnlyList<BrowseEntry> BuildBrowseEntries(IReadOnlyList<DocsDocument> documents)
     {
+        if (!documents.Any(static document => !string.IsNullOrWhiteSpace(document.SidebarGroup)))
+        {
+            return documents
+                .Select((document, index) => BrowseEntry.ForDocument(index, document))
+                .ToArray();
+        }
+
+        var entries = new List<BrowseEntry>();
+        string? currentGroup = null;
+
+        for (var index = 0; index < documents.Count; index++)
+        {
+            var document = documents[index];
+            var group = string.IsNullOrWhiteSpace(document.SidebarGroup) ? null : document.SidebarGroup;
+
+            if (!string.Equals(group, currentGroup, StringComparison.OrdinalIgnoreCase))
+            {
+                currentGroup = group;
+                if (!string.IsNullOrWhiteSpace(group))
+                {
+                    entries.Add(BrowseEntry.ForHeading(group));
+                }
+            }
+
+            entries.Add(BrowseEntry.ForDocument(index, document));
+        }
+
+        return entries;
+    }
+
+    private int GetSelectedBrowseIndex()
+    {
+        for (var index = 0; index < _browseEntries.Count; index++)
+        {
+            if (_browseEntries[index].DocumentIndex == _selectedIndex)
+            {
+                return index;
+            }
+        }
+
+        return Math.Clamp(_selectedIndex, 0, Math.Max(0, _browseEntries.Count - 1));
+    }
+
+    private string FormatBrowseEntry(BrowseEntry entry, int width)
+    {
+        if (entry.Kind == BrowseEntryKind.Heading)
+        {
+            var heading = DocsConsoleText.PadOrClip($"~ {entry.Heading} ~", width);
+            return $"{Dim}{Bold}{heading}{Reset}";
+        }
+
+        var document = entry.Document!;
         var label = document.Href == "/"
+            || _browseEntries.Any(static browseEntry => browseEntry.Kind == BrowseEntryKind.Heading)
             ? document.Title
             : $"[{document.Category}] {document.Title}";
         var clipped = DocsConsoleText.PadOrClip(label, width);
-        return selected ? $"{Invert}{clipped}{Reset}" : clipped;
+        return entry.DocumentIndex == _selectedIndex ? $"{Invert}{clipped}{Reset}" : clipped;
     }
 
     private static bool ShouldRenderDocColors()
@@ -279,6 +335,21 @@ internal sealed class DocsConsoleBrowser
     {
         Browse,
         Page,
+    }
+
+    private enum BrowseEntryKind
+    {
+        Heading,
+        Document,
+    }
+
+    private sealed record BrowseEntry(BrowseEntryKind Kind, int DocumentIndex, DocsDocument? Document, string? Heading)
+    {
+        public static BrowseEntry ForDocument(int documentIndex, DocsDocument document)
+            => new(BrowseEntryKind.Document, documentIndex, document, null);
+
+        public static BrowseEntry ForHeading(string heading)
+            => new(BrowseEntryKind.Heading, -1, null, heading);
     }
 }
 

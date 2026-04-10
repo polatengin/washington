@@ -4,7 +4,13 @@ using System.Text.Json;
 
 namespace Washington.Services;
 
-public sealed record DocsDocument(string Title, string Category, string Href, string Body, int? SidebarPosition = null);
+public sealed record DocsDocument(
+    string Title,
+    string Category,
+    string Href,
+    string Body,
+    int? SidebarPosition = null,
+    string? SidebarGroup = null);
 
 public sealed class DocsClient : IDisposable
 {
@@ -13,7 +19,7 @@ public sealed class DocsClient : IDisposable
         PropertyNameCaseInsensitive = true,
     };
 
-    private static readonly IReadOnlyDictionary<string, int> EmptySidebarPositions = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+    private static readonly IReadOnlyDictionary<string, DocsNavigationMetadata> EmptySidebarMetadata = new Dictionary<string, DocsNavigationMetadata>(StringComparer.OrdinalIgnoreCase);
 
     private readonly HttpClient _httpClient;
     private readonly bool _ownsHttpClient;
@@ -60,7 +66,7 @@ public sealed class DocsClient : IDisposable
             return Array.Empty<DocsDocument>();
         }
 
-        var sidebarPositions = await TryGetSidebarPositionsAsync(cancellationToken);
+        var sidebarMetadata = await TryGetSidebarMetadataAsync(cancellationToken);
         var documents = new List<DocsDocument>(payload.Count);
         var seenRoutes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -82,7 +88,8 @@ public sealed class DocsClient : IDisposable
                 string.IsNullOrWhiteSpace(item.Category) ? "Documentation" : item.Category.Trim(),
                 href,
                 item.Body?.Trim() ?? string.Empty,
-                sidebarPositions.TryGetValue(href, out var sidebarPosition) ? sidebarPosition : null));
+                sidebarMetadata.TryGetValue(href, out var navigationMetadata) ? navigationMetadata.Order : null,
+                sidebarMetadata.TryGetValue(href, out navigationMetadata) ? navigationMetadata.Group : null));
         }
 
         return OrderDocuments(documents);
@@ -188,7 +195,7 @@ public sealed class DocsClient : IDisposable
             || document.Body.Contains(query, StringComparison.OrdinalIgnoreCase);
     }
 
-    private async Task<IReadOnlyDictionary<string, int>> TryGetSidebarPositionsAsync(CancellationToken cancellationToken)
+    private async Task<IReadOnlyDictionary<string, DocsNavigationMetadata>> TryGetSidebarMetadataAsync(CancellationToken cancellationToken)
     {
         try
         {
@@ -197,7 +204,7 @@ public sealed class DocsClient : IDisposable
 
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
-                return EmptySidebarPositions;
+                return EmptySidebarMetadata;
             }
 
             EnsureSuccess(response, "the online docs navigation metadata");
@@ -209,10 +216,10 @@ public sealed class DocsClient : IDisposable
                 cancellationToken);
             if (payload is null || payload.Count == 0)
             {
-                return EmptySidebarPositions;
+                return EmptySidebarMetadata;
             }
 
-            var sidebarPositions = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var sidebarPositions = new Dictionary<string, DocsNavigationMetadata>(StringComparer.OrdinalIgnoreCase);
             foreach (var item in payload.OrderBy(static item => item.Order ?? int.MaxValue))
             {
                 if (string.IsNullOrWhiteSpace(item.Href) || item.Order is null || item.Order < 0)
@@ -220,24 +227,30 @@ public sealed class DocsClient : IDisposable
                     continue;
                 }
 
-                sidebarPositions.TryAdd(NormalizeRoute(item.Href), item.Order.Value);
+                sidebarPositions.TryAdd(
+                    NormalizeRoute(item.Href),
+                    new DocsNavigationMetadata(
+                        item.Order.Value,
+                        string.IsNullOrWhiteSpace(item.Group) ? null : item.Group.Trim()));
             }
 
             return sidebarPositions;
         }
         catch (HttpRequestException)
         {
-            return EmptySidebarPositions;
+            return EmptySidebarMetadata;
         }
         catch (JsonException)
         {
-            return EmptySidebarPositions;
+            return EmptySidebarMetadata;
         }
         catch (TaskCanceledException)
         {
-            return EmptySidebarPositions;
+            return EmptySidebarMetadata;
         }
     }
+
+    private readonly record struct DocsNavigationMetadata(int Order, string? Group);
 
     private sealed class DocsDocumentPayload
     {
@@ -252,6 +265,8 @@ public sealed class DocsClient : IDisposable
 
     private sealed class DocsNavigationPayload
     {
+        public string? Group { get; init; }
+
         public string? Href { get; init; }
 
         public int? Order { get; init; }
