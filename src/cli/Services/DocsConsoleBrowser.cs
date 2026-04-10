@@ -320,10 +320,13 @@ internal sealed class DocsConsoleBrowser
         }
 
         var document = entry.Document!;
-        var label = document.Href == "/"
-            || _browseEntries.Any(static browseEntry => browseEntry.Kind == BrowseEntryKind.Heading)
-            ? document.Title
-            : $"[{document.Category}] {document.Title}";
+        var label = document.Href == "/" || _browseEntries.Any(static browseEntry => browseEntry.Kind == BrowseEntryKind.Heading) ? document.Title : $"[{document.Category}] {document.Title}";
+
+        if (!string.IsNullOrWhiteSpace(document.SidebarGroup))
+        {
+            label = $"  {label}";
+        }
+
         var clipped = DocsConsoleText.PadOrClip(label, width);
         return entry.DocumentIndex == _selectedIndex ? $"{Invert}{clipped}{Reset}" : clipped;
     }
