@@ -23,6 +23,13 @@ The following features are planned for future releases:
 - **Compare mode in the editor** - Compare the current file against another params file, a saved baseline, or another branch/workspace file directly inside VS Code
 - **Docs and Learn links from editor results** - Let users open supported-resources docs or Microsoft Learn pages from the VS Code tree view, hover, or CodeLens
 - **Remote environment support hardening** - Improve VS Code extension behavior in WSL, dev containers, and SSH remotes so CLI resolution and bundled binaries work predictably across environments
+- **Cross-project test coverage expansion** - Increase automated test coverage across the CLI, VS Code extension, website, and GitHub Action to catch regressions earlier
+- **Expanded fixture library** - Add more real-world Bicep, ARM, params, and module fixtures that cover additional Azure services, edge cases, and larger project layouts
+- **Fixture-backed regression tests** - Build more tests around shared fixtures so pricing logic, extraction behavior, and output formatting stay stable as support expands
+- **CLI integration and snapshot tests** - Add broader end-to-end CLI tests for commands, output formats, warnings, parameter handling, and comparison workflows
+- **VS Code extension integration tests** - Expand tests for LSP startup, commands, CodeLens, tree views, status bar updates, and editor workflows
+- **Website and playground test coverage** - Add automated tests for docs search, playground submissions, estimate rendering, upload flows, and browser-side error handling
+- **Coverage thresholds and CI quality gates** - Enforce minimum coverage and required test suites in CI before shipping changes to pricing, docs, playground, or extension features
 - **Project configuration file** - Support a `.bce.json` or `.bce.yaml` file for shared defaults like region, output format, cache TTL, and estimation settings
 - **Cost comparison between parameter sets** - Compare costs across different parameter sets (for example, `dev` vs `prod`)
 - **Workload profiles / usage assumptions** - Let users choose or define estimation profiles for things like storage growth, transaction volume, and baseline throughput
