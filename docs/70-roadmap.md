@@ -12,6 +12,9 @@ The following features are planned for future releases:
 - **Website playground support for modules and params files** - Let the browser playground load local modules and separate parameter files instead of requiring a single self-contained template
 - **Website playground file uploads** - Allow users to upload Bicep, ARM, and parameter files in the browser playground and run cost estimation without pasting template contents manually
 - **Website playground compare mode** - Run two templates or two parameter sets side by side in the browser and show total and per-resource cost deltas
+- **Generated CLI reference** - Generate command, option, and help output docs directly from the CLI to prevent the docs from drifting from the implementation
+- **Task-based recipe library** - Add end-to-end guides for common workflows like estimating a Bicep app, comparing dev vs prod, validating CI budgets, and debugging missing prices
+- **Interactive docs search improvements** - Improve the docs search with filters, highlighted matches, and better ranking so users can find commands, guides, and resource support pages faster
 - **Project configuration file** - Support a `.bce.json` or `.bce.yaml` file for shared defaults like region, output format, cache TTL, and estimation settings
 - **Cost comparison between parameter sets** - Compare costs across different parameter sets (for example, `dev` vs `prod`)
 - **Workload profiles / usage assumptions** - Let users choose or define estimation profiles for things like storage growth, transaction volume, and baseline throughput
