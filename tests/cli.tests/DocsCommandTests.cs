@@ -174,6 +174,52 @@ public class DocsCommandTests
     }
 
     [Fact]
+    public async Task ExecuteList_WhenNavigationMetadataExists_UsesSidebarOrder()
+    {
+        using var outputWriter = new StringWriter();
+        using var errorWriter = new StringWriter();
+
+        var result = await DocsCommand.TryHandleAsync(
+            new[] { "docs", "list" },
+            outputWriter,
+            errorWriter,
+            clientFactory: () => CreateClient(
+                new Dictionary<string, string>
+                {
+                    ["/"] = "Introduction page",
+                    ["/getting-started"] = "Getting Started page",
+                    ["/playground"] = "Playground page",
+                },
+                new[]
+                {
+                    new DocsDocument("Getting Started", "Documentation", "/getting-started", "Install the CLI"),
+                    new DocsDocument("Playground", "Playground", "/playground", "Interactive playground"),
+                    new DocsDocument("Introduction", "Documentation", "/", "Home"),
+                },
+                HttpStatusCode.OK,
+                new[]
+                {
+                    new DocsNavigationItem("/", 0),
+                    new DocsNavigationItem("/playground", 1),
+                    new DocsNavigationItem("/getting-started", 2),
+                }),
+            isInteractive: () => false);
+
+        Assert.True(result.Handled);
+        Assert.Equal(0, result.ExitCode);
+        Assert.Equal(
+            string.Join(Environment.NewLine, new[]
+            {
+                $"{"/".PadRight(32)} Introduction",
+                $"{"/playground".PadRight(32)} Playground",
+                $"{"/getting-started".PadRight(32)} Getting Started",
+                string.Empty,
+            }),
+            outputWriter.ToString());
+        Assert.Empty(errorWriter.ToString());
+    }
+
+    [Fact]
     public async Task ExecuteSearch_WhenMatchesExist_WritesMatches()
     {
         using var outputWriter = new StringWriter();
@@ -266,6 +312,33 @@ public class DocsCommandTests
         Assert.False(normalized.EndsWith("\n", StringComparison.Ordinal));
     }
 
+    [Fact]
+    public async Task GetDocuments_WhenNavigationMetadataMissing_FallsBackToLegacyBrowseOrder()
+    {
+        using var client = CreateClient(
+            new Dictionary<string, string>
+            {
+                ["/"] = "Introduction page",
+                ["/getting-started"] = "Getting Started page",
+                ["/playground"] = "Playground page",
+            },
+            new[]
+            {
+                new DocsDocument("Playground", "Playground", "/playground", "Interactive playground"),
+                new DocsDocument("Getting Started", "Documentation", "/getting-started", "Install the CLI"),
+                new DocsDocument("Introduction", "Documentation", "/", "Home"),
+            },
+            HttpStatusCode.OK);
+
+        var documents = await client.GetDocumentsAsync();
+
+        Assert.Collection(
+            documents,
+            document => Assert.Equal("/", document.Href),
+            document => Assert.Equal("/getting-started", document.Href),
+            document => Assert.Equal("/playground", document.Href));
+    }
+
     private static System.CommandLine.Command CreateCommand(
         TextWriter outputWriter,
         TextWriter errorWriter,
@@ -284,9 +357,10 @@ public class DocsCommandTests
     private static DocsClient CreateClient(
         IReadOnlyDictionary<string, string> pages,
         IReadOnlyList<DocsDocument> documents,
-        HttpStatusCode searchIndexStatusCode)
+        HttpStatusCode searchIndexStatusCode,
+        IReadOnlyList<DocsNavigationItem>? navigation = null)
     {
-        var httpClient = new HttpClient(new FakeDocsHandler(pages, documents, searchIndexStatusCode))
+        var httpClient = new HttpClient(new FakeDocsHandler(pages, documents, searchIndexStatusCode, navigation ?? Array.Empty<DocsNavigationItem>()))
         {
             BaseAddress = new Uri("https://example.test"),
         };
@@ -297,16 +371,19 @@ public class DocsCommandTests
     private sealed class FakeDocsHandler : HttpMessageHandler
     {
         private readonly IReadOnlyList<DocsDocument> _documents;
+        private readonly IReadOnlyList<DocsNavigationItem> _navigation;
         private readonly IReadOnlyDictionary<string, string> _pages;
         private readonly HttpStatusCode _searchIndexStatusCode;
 
         public FakeDocsHandler(
             IReadOnlyDictionary<string, string> pages,
             IReadOnlyList<DocsDocument> documents,
-            HttpStatusCode searchIndexStatusCode)
+            HttpStatusCode searchIndexStatusCode,
+            IReadOnlyList<DocsNavigationItem> navigation)
         {
             _pages = pages;
             _documents = documents;
+            _navigation = navigation;
             _searchIndexStatusCode = searchIndexStatusCode;
         }
 
@@ -322,6 +399,17 @@ public class DocsCommandTests
                 }
 
                 var json = BuildDocumentsJson(_documents);
+                return Task.FromResult(CreateResponse(HttpStatusCode.OK, json, "application/json"));
+            }
+
+            if (path == "/docfind/navigation.json")
+            {
+                if (_navigation.Count == 0)
+                {
+                    return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
+                }
+
+                var json = BuildNavigationJson(_navigation);
                 return Task.FromResult(CreateResponse(HttpStatusCode.OK, json, "application/json"));
             }
 
@@ -344,6 +432,15 @@ public class DocsCommandTests
             }));
         }
 
+        private static string BuildNavigationJson(IReadOnlyList<DocsNavigationItem> navigation)
+        {
+            return JsonSerializer.Serialize(navigation.Select(item => new
+            {
+                href = item.Href,
+                order = item.Order,
+            }));
+        }
+
         private static HttpResponseMessage CreateResponse(HttpStatusCode statusCode, string content, string mediaType)
         {
             return new HttpResponseMessage(statusCode)
@@ -352,4 +449,6 @@ public class DocsCommandTests
             };
         }
     }
+
+    private sealed record DocsNavigationItem(string Href, int Order);
 }
