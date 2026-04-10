@@ -15,6 +15,7 @@ The following features are planned for future releases:
 - **Regional cost comparison** - Compare the same deployment across Azure regions to highlight pricing deltas and default-region assumptions
 - **Historical price tracking** - Detect cost changes over time as Azure pricing evolves
 - **`diff` command** - Show cost delta vs current deployment (`bce estimate diff main.bicep`)
+- **Rich terminal output** - Add ANSI colors, styled tables, and clearer warning/success formatting in CLI output, with `--no-color` and plain-text fallbacks for CI and redirected output
 - **PR comment template customization** - Allow users to customize the GitHub Action PR comment format
 - **Currency selection** - Add a `--currency` flag to the CLI and GitHub Action for non-USD currencies
 - **Reserved Instances / Savings Plans** - Show RI and savings plan pricing alongside pay-as-you-go for comparison
