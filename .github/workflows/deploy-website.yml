@@ -20,6 +20,7 @@ concurrency:
 permissions:
   contents: read
   id-token: write
+  packages: write
 
 jobs:
   deploy:
@@ -30,14 +31,20 @@ jobs:
     env:
       RESOURCE_GROUP: ${{ secrets.PROJECT_NAME }}-prod-rg
       ACA_APP: "${{ secrets.PROJECT_NAME }}-website"
-      ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v4
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Azure login
         uses: azure/login@532459ea530d8321f2fb9bb10d1e0bcf23869a43 # v3.0.0
@@ -46,29 +53,17 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Log in to Azure Container Registry
-        run: az acr login --name "${ACR_NAME}"
-
-      - name: Resolve image tags
-        id: image
-        run: |
-          acr_login_server="$(az acr show \
-            --name "${ACR_NAME}" \
-            --query loginServer \
-            --output tsv)"
-
-          echo "image_sha=${acr_login_server}/${ACA_APP}:${GITHUB_SHA}" >> "$GITHUB_OUTPUT"
-          echo "image_latest=${acr_login_server}/${ACA_APP}:latest" >> "$GITHUB_OUTPUT"
-
       - name: Build and push website image
-        uses: docker/build-push-action@v7
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           context: .
           file: src/website/Dockerfile
           push: true
           tags: |
-            ${{ steps.image.outputs.image_sha }}
-            ${{ steps.image.outputs.image_latest }}
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ github.repository }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -95,25 +90,6 @@ jobs:
           az containerapp update \
             --name "${ACA_APP}" \
             --resource-group "${RESOURCE_GROUP}" \
-            --image "${{ steps.image.outputs.image_sha }}" \
+            --image "ghcr.io/${{ github.repository }}:${{ github.sha }}" \
             --secret-volume-mount "/mnt/secrets" \
             --set-env-vars SSH_PORT=2222 SSH_HOST_KEY_PATH=/mnt/secrets/ssh-host-key
-
-      - name: Purge old website images from Azure Container Registry
-        run: |
-          mapfile -t old_tags < <(
-            az acr repository show-tags \
-              --name "${ACR_NAME}" \
-              --repository "${ACA_APP}" \
-              --orderby time_desc \
-              --output tsv | \
-              awk -v keep="10" '/^[0-9a-f]{40}$/ { count++; if (count > keep) print }'
-          )
-
-          for tag in "${old_tags[@]}"; do
-            echo "Deleting ${ACA_APP}:$tag"
-            az acr repository delete \
-              --name "${ACR_NAME}" \
-              --image "${ACA_APP}:$tag" \
-              --yes
-          done
