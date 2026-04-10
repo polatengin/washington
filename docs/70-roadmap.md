@@ -9,6 +9,7 @@ The following features are planned for future releases:
 
 - **Pre-built CLI binaries** - Publish platform-specific binaries as GitHub releases for faster Action startup (no build step needed)
 - **Multi-file / module-aware projects** - Support Bicep projects that span multiple files and use modules
+- **Website playground support for modules and params files** - Let the browser playground load local modules and separate parameter files instead of requiring a single self-contained template
 - **Project configuration file** - Support a `.bce.json` or `.bce.yaml` file for shared defaults like region, output format, cache TTL, and estimation settings
 - **Cost comparison between parameter sets** - Compare costs across different parameter sets (for example, `dev` vs `prod`)
 - **Workload profiles / usage assumptions** - Let users choose or define estimation profiles for things like storage growth, transaction volume, and baseline throughput
