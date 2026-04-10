@@ -1,6 +1,7 @@
 ---
 title: Roadmap
 sidebar_position: 70
+hide_table_of_contents: true
 ---
 
 # Roadmap
