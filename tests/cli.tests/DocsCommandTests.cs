@@ -313,6 +313,96 @@ public class DocsCommandTests
     }
 
     [Fact]
+    public async Task GetDocuments_WhenNavigationMetadataExists_LoadsSidebarGroups()
+    {
+        using var client = CreateClient(
+            new Dictionary<string, string>
+            {
+                ["/"] = "Introduction page",
+                ["/cli/commands"] = "CLI Commands page",
+                ["/cli/configuration"] = "CLI Configuration page",
+            },
+            new[]
+            {
+                new DocsDocument("CLI Configuration", "CLI", "/cli/configuration", "Configure the CLI"),
+                new DocsDocument("CLI Commands", "CLI", "/cli/commands", "Command reference"),
+                new DocsDocument("Introduction", "Documentation", "/", "Home"),
+            },
+            HttpStatusCode.OK,
+            new[]
+            {
+                new DocsNavigationItem("/", 0),
+                new DocsNavigationItem("/cli/commands", 1, "CLI"),
+                new DocsNavigationItem("/cli/configuration", 2, "CLI"),
+            });
+
+        var documents = await client.GetDocumentsAsync();
+
+        Assert.Collection(
+            documents,
+            document =>
+            {
+                Assert.Equal("/", document.Href);
+                Assert.Null(document.SidebarGroup);
+            },
+            document =>
+            {
+                Assert.Equal("/cli/commands", document.Href);
+                Assert.Equal("CLI", document.SidebarGroup);
+            },
+            document =>
+            {
+                Assert.Equal("/cli/configuration", document.Href);
+                Assert.Equal("CLI", document.SidebarGroup);
+            });
+    }
+
+    [Fact]
+    public async Task RenderBrowse_WhenSidebarGroupsExist_RendersHeadingsAndPlainTitles()
+    {
+        using var outputWriter = new StringWriter();
+
+        var documents = new[]
+        {
+            new DocsDocument("Introduction", "Documentation", "/", "Home", 0, null),
+            new DocsDocument("Playground", "Playground", "/playground", "Interactive playground", 1, null),
+            new DocsDocument("Getting Started", "Documentation", "/getting-started", "Install the CLI", 2, null),
+            new DocsDocument("CLI Commands", "CLI", "/cli/commands", "Command reference", 3, "CLI"),
+            new DocsDocument("CLI Configuration", "CLI", "/cli/configuration", "Configuration reference", 4, "CLI"),
+        };
+
+        var browser = new DocsConsoleBrowser(
+            CreateClient(
+                new Dictionary<string, string>
+                {
+                    ["/"] = "Introduction page",
+                },
+                documents,
+                HttpStatusCode.OK),
+            documents,
+            outputWriter);
+
+        var method = typeof(DocsConsoleBrowser).GetMethod("RenderBrowseAsync", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        Assert.NotNull(method);
+
+        var output = await (Task<string>)method!.Invoke(browser, new object[] { 80, 8 })!;
+        var normalized = DocsConsoleText.StripAnsi(output).Replace("\r\n", "\n", StringComparison.Ordinal).Split('\n');
+        var leftColumn = normalized
+            .Take(6)
+            .Select(line => line.Split(" | ", 2, StringSplitOptions.None)[0].TrimEnd())
+            .ToArray();
+
+        Assert.Equal("Introduction", leftColumn[0].Trim());
+        Assert.Equal("Playground", leftColumn[1].Trim());
+        Assert.Equal("Getting Started", leftColumn[2].Trim());
+        Assert.Equal("~ CLI ~", leftColumn[3].Trim());
+        Assert.Equal("CLI Commands", leftColumn[4].Trim());
+        Assert.Equal("CLI Configuration", leftColumn[5].Trim());
+        Assert.DoesNotContain("[CLI]", leftColumn[4], StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task GetDocuments_WhenNavigationMetadataMissing_FallsBackToLegacyBrowseOrder()
     {
         using var client = CreateClient(
@@ -436,6 +526,7 @@ public class DocsCommandTests
         {
             return JsonSerializer.Serialize(navigation.Select(item => new
             {
+                group = item.Group,
                 href = item.Href,
                 order = item.Order,
             }));
@@ -450,5 +541,5 @@ public class DocsCommandTests
         }
     }
 
-    private sealed record DocsNavigationItem(string Href, int Order);
+    private sealed record DocsNavigationItem(string Href, int Order, string? Group = null);
 }
