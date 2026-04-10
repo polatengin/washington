@@ -15,6 +15,14 @@ The following features are planned for future releases:
 - **Generated CLI reference** - Generate command, option, and help output docs directly from the CLI to prevent the docs from drifting from the implementation
 - **Task-based recipe library** - Add end-to-end guides for common workflows like estimating a Bicep app, comparing dev vs prod, validating CI budgets, and debugging missing prices
 - **Interactive docs search improvements** - Improve the docs search with filters, highlighted matches, and better ranking so users can find commands, guides, and resource support pages faster
+- **Grouped and navigable cost breakdown view** - Let users group the VS Code extension tree by service, resource type, file, or warning status, and click items to jump to the corresponding resource declaration
+- **Live tree and status bar sync** - Keep the VS Code extension cost breakdown panel and status bar automatically in sync with LSP updates for the active file instead of relying mainly on manual commands
+- **Parameter file and override picker** - Add a VS Code command or UI to choose a matching `.bicepparam` file, switch between parameter sets, and apply temporary overrides from inside the editor
+- **Cost-aware code actions** - Offer VS Code quick fixes or suggestions when the estimate is incomplete, such as adding explicit locations, checking unsupported resource types, or opening related docs
+- **Rich estimate panel** - Add a dedicated VS Code webview for charts, top cost drivers, grouped subtotals, warnings, and copy/export actions for the current estimate
+- **Compare mode in the editor** - Compare the current file against another params file, a saved baseline, or another branch/workspace file directly inside VS Code
+- **Docs and Learn links from editor results** - Let users open supported-resources docs or Microsoft Learn pages from the VS Code tree view, hover, or CodeLens
+- **Remote environment support hardening** - Improve VS Code extension behavior in WSL, dev containers, and SSH remotes so CLI resolution and bundled binaries work predictably across environments
 - **Project configuration file** - Support a `.bce.json` or `.bce.yaml` file for shared defaults like region, output format, cache TTL, and estimation settings
 - **Cost comparison between parameter sets** - Compare costs across different parameter sets (for example, `dev` vs `prod`)
 - **Workload profiles / usage assumptions** - Let users choose or define estimation profiles for things like storage growth, transaction volume, and baseline throughput
