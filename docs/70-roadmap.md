@@ -9,6 +9,7 @@ hide_table_of_contents: true
 The following features are planned for future releases:
 
 - **Pre-built CLI binaries** - Publish platform-specific binaries as GitHub releases for faster Action startup (no build step needed)
+- **Separate website and CLI container images** - Publish purpose-built images for the docs site and the CLI so the website image stays focused on serving docs while the CLI image is smaller and optimized for local and CI command execution
 - **Multi-file / module-aware projects** - Support Bicep projects that span multiple files and use modules
 - **Website playground support for modules and params files** - Let the browser playground load local modules and separate parameter files instead of requiring a single self-contained template
 - **Website playground file uploads** - Allow users to upload Bicep, ARM, and parameter files in the browser playground and run cost estimation without pasting template contents manually
