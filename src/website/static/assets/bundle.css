@@ -28,6 +28,11 @@
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ifm-scrollbar-track-background-color) transparent;
+}
+
 .playground {
   --playground-border: rgba(20, 119, 94, 0.24);
   --playground-ink: #13231b;
