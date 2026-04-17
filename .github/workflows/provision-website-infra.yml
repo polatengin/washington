@@ -23,7 +23,6 @@ jobs:
       SUBNET_NAME: ${{ secrets.PROJECT_NAME }}-aca-subnet
       LOG_ANALYTICS_WORKSPACE: "law-${{ secrets.PROJECT_NAME }}-web-westus2"
       ACA_ENV: "${{ secrets.PROJECT_NAME }}-web-env"
-      ACR_NAME: ${{ secrets.AZURE_ACR_NAME }}
       ACA_APP: "${{ secrets.PROJECT_NAME }}-website"
       WEBSITE_HOSTNAME: bicepcostestimator.net
 
@@ -146,32 +145,16 @@ jobs:
 
           az account set --subscription "${SUBSCRIPTION_ID}"
 
-          az acr update \
-            --name "${ACR_NAME}" \
-            --admin-enabled true
-
-          acr_login_server="$(az acr show \
-            --name "${ACR_NAME}" \
-            --query loginServer \
-            --output tsv)"
-
-          acr_username="$(az acr credential show \
-            --name "${ACR_NAME}" \
-            --query username \
-            --output tsv)"
-
-          acr_password="$(az acr credential show \
-            --name "${ACR_NAME}" \
-            --query passwords[0].value \
-            --output tsv)"
-
           env_id="$(az containerapp env show \
             --name "${ACA_ENV}" \
             --resource-group "${RESOURCE_GROUP}" \
             --query id \
             --output tsv)"
 
-          image="${acr_login_server}/${ACA_APP}:latest"
+          ghcr_owner="${GITHUB_REPOSITORY_OWNER,,}"
+          ghcr_repo="${GITHUB_REPOSITORY#*/}"
+          ghcr_repo="${ghcr_repo,,}"
+          image="ghcr.io/${ghcr_owner}/${ghcr_repo}-website:latest"
 
           if ! az containerapp show \
             --name "${ACA_APP}" \
@@ -196,14 +179,6 @@ jobs:
                 traffic:
                   - latestRevision: true
                     weight: 100
-              registries:
-                - server: ${acr_login_server}
-                  username: ${acr_username}
-                  passwordSecretRef: acr-password
-              secrets:
-                - name: acr-password
-                  value: |-
-                    ${acr_password}
             template:
               containers:
                 - name: website
