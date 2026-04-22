@@ -3,9 +3,18 @@
   "displayName": "Bicep Cost Estimator",
   "description": "Estimate monthly Azure costs from Bicep files",
   "version": "0.1.0",
+  "publisher": "enginpolat",
   "repository": {
     "type": "git",
     "url": "https://github.com/polatengin/washington.git"
+  },
+  "author": {
+    "name": "Engin Polat"
+  },
+  "license": "MIT",
+  "galleryBanner": {
+    "color": "#1e1e1e",
+    "theme": "dark"
   },
   "engines": {
     "vscode": "^1.76.0"
