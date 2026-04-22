@@ -1,5 +1,5 @@
 {
-  "name": "washington",
+  "name": "bce",
   "displayName": "Bicep Cost Estimator",
   "description": "Estimate monthly Azure costs from Bicep files",
   "version": "0.1.0",
@@ -15,34 +15,34 @@
   "main": "./dist/extension.js",
   "contributes": {
     "configuration": {
-      "title": "Washington Cost Estimator",
+      "title": "Bicep Cost Estimator",
       "properties": {
-        "washington.defaultRegion": {
+        "bce.defaultRegion": {
           "type": "string",
           "default": "eastus",
           "description": "Default Azure region when not specified in resource"
         },
-        "washington.cliPath": {
+        "bce.cliPath": {
           "type": "string",
           "default": "",
           "description": "Path to the bce CLI binary. Auto-detected if empty."
         },
-        "washington.estimateOnSave": {
+        "bce.estimateOnSave": {
           "type": "boolean",
           "default": true,
           "description": "Automatically refresh estimates for open .bicep files"
         },
-        "washington.showCodeLens": {
+        "bce.showCodeLens": {
           "type": "boolean",
           "default": true,
           "description": "Show cost estimates as CodeLens above resources"
         },
-        "washington.showStatusBar": {
+        "bce.showStatusBar": {
           "type": "boolean",
           "default": true,
           "description": "Show total estimated cost in the status bar"
         },
-        "washington.cacheTtlHours": {
+        "bce.cacheTtlHours": {
           "type": "number",
           "default": 24,
           "description": "Pricing cache time-to-live in hours"
@@ -51,52 +51,52 @@
     },
     "commands": [
       {
-        "command": "washington.estimateFile",
+        "command": "bce.estimateFile",
         "title": "Estimate File Cost",
-        "category": "Washington"
+        "category": "Bicep Cost Estimator"
       },
       {
-        "command": "washington.estimateWorkspace",
+        "command": "bce.estimateWorkspace",
         "title": "Estimate Workspace Cost",
-        "category": "Washington"
+        "category": "Bicep Cost Estimator"
       },
       {
-        "command": "washington.clearCache",
+        "command": "bce.clearCache",
         "title": "Clear Pricing Cache",
-        "category": "Washington"
+        "category": "Bicep Cost Estimator"
       }
     ],
     "menus": {
       "editor/title": [
         {
-          "command": "washington.estimateFile",
+          "command": "bce.estimateFile",
           "when": "editorLangId == bicep",
           "group": "navigation"
         }
       ],
       "explorer/context": [
         {
-          "command": "washington.estimateFile",
+          "command": "bce.estimateFile",
           "when": "resourceLangId == bicep",
           "group": "0_estimation"
         }
       ],
       "commandPalette": [
         {
-          "command": "washington.estimateFile"
+          "command": "bce.estimateFile"
         },
         {
-          "command": "washington.estimateWorkspace"
+          "command": "bce.estimateWorkspace"
         },
         {
-          "command": "washington.clearCache"
+          "command": "bce.clearCache"
         }
       ]
     },
     "views": {
       "explorer": [
         {
-          "id": "washingtonCostBreakdown",
+          "id": "bceCostBreakdown",
           "name": "Cost Breakdown",
           "when": "resourceLangId == bicep || editorLangId == bicep"
         }
