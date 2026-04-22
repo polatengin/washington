@@ -60,7 +60,7 @@ jobs:
 
       - name: Update extension version in package.json
         working-directory: src/vscode-extension
-        run: npm pkg set version=${{ steps.version.outputs.version }}
+        run: npm version ${{ steps.version.outputs.version }} --allow-same-version --no-git-tag-version
 
       - name: Install dependencies
         working-directory: src/vscode-extension
