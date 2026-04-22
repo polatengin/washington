@@ -75,6 +75,12 @@ jobs:
           cp LICENSE src/vscode-extension/LICENSE
           cp README.md src/vscode-extension/README.md
 
+      - name: Prepare extension icon
+        working-directory: src/vscode-extension
+        run: |
+          mkdir -p dist
+          ln -f ../website/static/assets/favicon-180x180.png dist/favicon-180x180.png
+
       - name: Package extension
         working-directory: src/vscode-extension
         run: npx @vscode/vsce package --no-git-tag-version

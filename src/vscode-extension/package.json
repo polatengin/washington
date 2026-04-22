@@ -3,7 +3,7 @@
   "displayName": "Bicep Cost Estimator",
   "description": "Estimate monthly Azure costs from Bicep files",
   "version": "0.1.0",
-  "icon": "../../src/website/static/assets/favicon-180x180.png",
+  "icon": "dist/favicon-180x180.png",
   "publisher": "enginpolat",
   "repository": {
     "type": "git",
