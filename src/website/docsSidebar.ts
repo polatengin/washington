@@ -36,10 +36,11 @@ export const docsSidebar: DocsSidebarItem[] = [
   category('VS Code Extension', ['vscode-extension/index', 'vscode-extension/settings']),
   category('GitHub Action', ['github-action/index', 'github-action/examples']),
   category('Guides', [
-    'guides/contributing',
+    'guides/common-workflows',
     'guides/how-estimates-work',
     'guides/supported-resources',
     'guides/troubleshooting',
+    'guides/contributing',
   ]),
   doc('roadmap'),
   doc('release-notes'),
