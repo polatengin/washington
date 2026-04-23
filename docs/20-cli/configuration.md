@@ -1,5 +1,6 @@
 ---
 title: Configuration
+description: Configure per-run estimation flags and the Bicep compiler environment used by BCE.
 sidebar_position: 21
 ---
 
