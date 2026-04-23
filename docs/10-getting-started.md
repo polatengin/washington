@@ -86,6 +86,7 @@ bce estimate --file path/to/main.arm.json --output markdown
 
 - [CLI Commands](/cli/commands) for every command and flag
 - [CLI Configuration](/cli/configuration) for compiler environment variables and runtime defaults
+- [Common Workflows](/guides/common-workflows) for practical recipes across the CLI, VS Code extension, GitHub Action, and docs browser
 - [Playground](/playground) if you want to paste a self-contained template into the browser
 - [VS Code Extension](/vscode-extension) if you want estimates while editing
 - [GitHub Action](/github-action) if you want CI or pull request checks
