@@ -9,10 +9,10 @@ The Bicep Cost Estimator VS Code extension shows real-time Azure cost estimates 
 
 ## Installation
 
-Search for **Bicep Cost Estimator** in the VS Code Extensions marketplace, or install from the command line:
+Install from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=EnginPolat.bce), or from the command line:
 
 ```bash
-code --install-extension polatengin.bce
+code --install-extension enginpolat.bce
 ```
 
 ## Features

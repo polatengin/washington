@@ -56,6 +56,16 @@ make build-cli
 ./src/cli/bin/Release/net10.0/bce estimate --file ./tests/fixtures/simple-vm.bicep
 ```
 
+## VS Code Extension
+
+Install the published extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=EnginPolat.bce), or from the command line:
+
+```bash
+code --install-extension enginpolat.bce
+```
+
+Open a `.bicep` file after installation to get inline cost estimates, hover details, status bar totals, and workspace estimation commands. Full usage and settings are documented at [bicepcostestimator.net/vscode-extension](https://bicepcostestimator.net/vscode-extension).
+
 ## What It Does
 
 - Compiles Bicep to ARM JSON through the Bicep CLI via the Azure.Bicep.RpcClient package
