@@ -14,10 +14,25 @@ sidebar_position: 0
 curl -sL https://bicepcostestimator.net/install.sh | bash
 ```
 
+Run via Docker instead, without installing the CLI binary locally:
+
+> ```bash
+> bce() {
+>   docker run --rm \
+>     -v "$PWD:/work" \
+>     -w /work \
+>     --entrypoint /app/bin/bce \
+>     ghcr.io/polatengin/washington:latest \
+>     "$@"
+> }
+> ```
+>
+> Add that function to `~/.bashrc` or `~/.zshrc`, reload your shell, and then use `bce` like a normal command:
+
 ## Quick Start
 
 ```bash
-# Estimate costs for a Bicep file
+# Estimate costs for the given Bicep file
 bce estimate --file main.bicep
 ```
 
