@@ -55,3 +55,4 @@ The following features are planned for future releases:
 - **[Custom pricing overrides](https://github.com/polatengin/washington/issues/74)** - Support Enterprise Agreement and CSP pricing via user-provided rate cards
 - **[Annual / multi-year projections](https://github.com/polatengin/washington/issues/75)** - Show costs beyond monthly (quarterly, annual)
 - **[Bicep module registry support](https://github.com/polatengin/washington/issues/76)** - Resolve modules from Azure Container Registry and template specs
+- **[Local MCP server for Bicep cost insights](https://github.com/polatengin/washington/issues/80)** - Expose local MCP tools so editors and AI agents can inspect resources in a Bicep file, ask cost questions, run estimates, and surface savings opportunities
