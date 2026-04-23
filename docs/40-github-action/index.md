@@ -1,11 +1,13 @@
----
 title: GitHub Action
+description: Run BCE in GitHub Actions to estimate template costs and gate workflows on monthly totals.
 sidebar_position: 40
 ---
 
 # GitHub Action
 
 The Washington GitHub Action builds and runs the `bce` CLI in CI so you can estimate Azure costs directly from your workflow.
+
+The examples below use `ubuntu-latest`, which matches the current composite action assumptions around `bash`, `jq`, and `bc`.
 
 ## Usage
 
@@ -36,11 +38,11 @@ jobs:
 
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
-| `file` | Path to the `.bicep` file to estimate | Yes | - |
+| `file` | Path to the `.bicep` or ARM JSON file to estimate | Yes | - |
 | `params-file` | Optional `.bicepparam` file | No | - |
 | `base-file` | Base branch `.bicep` file for delta comparison | No | - |
-| `base-params-file` | Base branch `.bicepparam` file for delta comparison | No | - |
-| `output-format` | Result format: `json`, `table`, or `markdown` | No | `json` |
+| `base-params-file` | Base branch `.bicepparam` file | No | - |
+| `output-format` | Result format: `json`, `table`, `csv`, or `markdown` | No | `json` |
 | `fail-on-threshold` | Fail the step if the monthly total exceeds this value | No | - |
 
 ## Outputs
@@ -63,5 +65,6 @@ jobs:
 ## Current Behavior Notes
 
 - The action builds the CLI from source as part of the composite action run.
+- The `file` input is passed directly to `bce estimate`, so ARM JSON works in addition to Bicep.
 - `params-file` and `base-params-file` are passed through to the CLI and applied during parameter resolution.
 - Delta comparison is calculated as `current - base` using the two reported totals.
