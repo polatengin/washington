@@ -1,5 +1,6 @@
 ---
 title: VS Code Extension
+description: Use BCE inside VS Code for inline estimates, hover details, and workspace cost checks.
 sidebar_position: 30
 ---
 
