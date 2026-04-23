@@ -88,6 +88,24 @@ Request markdown output when you want to reuse the formatted result in a job sum
     echo '${{ steps.cost.outputs.estimation-result }}' >> "$GITHUB_STEP_SUMMARY"
 ```
 
+## Estimate An ARM Template And Keep CSV Output
+
+Use an exported or generated ARM JSON file when Bicep compilation is not part of the workflow, and keep the CSV result for downstream processing:
+
+```yaml
+- id: cost
+  uses: polatengin/washington@main
+  with:
+    file: infra/main.arm.json
+    output-format: csv
+
+- name: Save CSV artifact
+  run: |
+    cat <<'EOF' > estimate.csv
+    ${{ steps.cost.outputs.estimation-result }}
+    EOF
+```
+
 ## Related Reading
 
 - [GitHub Action](/github-action)
