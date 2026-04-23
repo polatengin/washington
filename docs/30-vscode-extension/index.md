@@ -22,7 +22,17 @@ code --install-extension enginpolat.bce
 - **Hover details** - hover over a resource to see a detailed cost breakdown
 - **Status bar totals** - view the current file's estimated monthly cost at a glance
 - **Cost breakdown panel** - inspect per-resource totals in the explorer view
-- **Automatic refresh** - when `bce.estimateOnSave` is enabled, estimates are refreshed when a `.bicep` file is opened, saved, or changed
+- **Automatic refresh** - estimates can refresh when a `.bicep` file is opened, saved, or changed
+
+## Commands
+
+The extension adds commands for:
+
+- estimating the active Bicep file
+- estimating all Bicep files under the current workspace
+- clearing the pricing cache
+
+Open the Command Palette and search for `Bicep Cost Estimator` to find them.
 
 ## Configuration
 
