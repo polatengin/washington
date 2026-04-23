@@ -1,3 +1,4 @@
+---
 title: GitHub Action
 description: Run BCE in GitHub Actions to estimate template costs and gate workflows on monthly totals.
 sidebar_position: 40
