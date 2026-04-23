@@ -117,6 +117,7 @@ See [How Estimates Work](/guides/how-estimates-work) for the full pipeline.
 ## Where To Go Next
 
 - [Getting Started](/getting-started) for installation paths, first estimates, and runtime defaults
+- [Common Workflows](/guides/common-workflows) for task-based recipes across the CLI, VS Code, GitHub Action, and docs browser
 - [CLI Commands](/cli/commands) for command and flag reference
 - [VS Code Extension](/vscode-extension) for editor workflows and settings
 - [GitHub Action](/github-action) for CI and pull request automation
