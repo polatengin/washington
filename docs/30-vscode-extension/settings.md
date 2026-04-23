@@ -1,5 +1,6 @@
 ---
 title: Extension Settings
+description: Reference the VS Code extension settings, CLI resolution order, and runtime behavior.
 sidebar_position: 31
 ---
 
