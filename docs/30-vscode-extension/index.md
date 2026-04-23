@@ -34,9 +34,46 @@ The extension adds commands for:
 
 Open the Command Palette and search for `Bicep Cost Estimator` to find them.
 
+## What The UI Shows
+
+After an estimate runs, the extension can surface the report in several places:
+
+- **CodeLens** above priced resources
+- **Hover content** with cost details for the current resource
+- **Status bar** with the current monthly total
+- **Cost Breakdown** in the explorer
+
+The `Cost Breakdown` view is more than a flat list. It shows:
+
+- a total row for the current report
+- one expandable row per priced resource
+- a warnings node when the estimate returned warnings
+
+When you expand a resource, the view shows its ARM type, pricing details, hourly cost, and monthly cost.
+
+The status bar tooltip also summarizes the current total, resource count, and warning count.
+
+## Typical Editor Flow
+
+1. Open a `.bicep` file.
+2. Wait for automatic estimation or trigger the estimate command manually.
+3. Read CodeLens or hover details on the resources you care about.
+4. Expand the `Cost Breakdown` view to inspect the whole report.
+5. Clear the cache or rerun after edits if the result looks stale.
+
+## Workspace Estimates
+
+The workspace estimate command aggregates all `.bicep` files under the current workspace root into one report.
+
+Use it when:
+
+- your repository contains several deployable Bicep templates
+- you want a combined monthly total for one infra folder or repo
+- you want to find the highest-cost files and resources quickly from the tree view
+
 ## Configuration
 
-Open VS Code settings and search for `bce`:
+Open VS Code settings and search for `Bicep Cost Estimator`.
 
 | Setting | Description | Default |
 |---------|-------------|---------|
@@ -57,3 +94,9 @@ For a full settings reference, see [Extension Settings](/vscode-extension/settin
 - Workspace estimation scans all `.bicep` files recursively under the current workspace root.
 - `bce.defaultRegion`, `bce.estimateOnSave`, `bce.showCodeLens`, `bce.showStatusBar`, and `bce.cacheTtlHours` are applied by the language server on startup.
 - If a matching `.bicepparam` file in the same directory targets the active `.bicep` file, the extension applies its parameter values automatically during estimation.
+
+## Practical Notes
+
+- If automatic refresh is disabled, the extension still works, but estimation happens only when you run the command manually.
+- If a file estimate returns warnings, those warnings appear in the breakdown view as a separate node instead of being hidden.
+- The extension is best at single-file authoring feedback. For repeatable CI workflows or exported artifacts, prefer the CLI or GitHub Action.
