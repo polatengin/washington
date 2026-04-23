@@ -18,7 +18,7 @@ inputs:
     description: 'Path to the base branch .bicepparam file'
     required: false
   output-format:
-    description: 'Output format: json, table, or markdown'
+    description: 'Output format: json, table, csv, or markdown'
     required: false
     default: 'json'
   fail-on-threshold:
@@ -26,17 +26,17 @@ inputs:
     required: false
 outputs:
   estimation-result:
-    description: 'JSON cost estimation result'
+    description: 'Cost estimation result in the selected output format'
     value: ${{ steps.cost-estimator.outputs.estimation-result }}
   total-cost:
     description: 'Estimated monthly total (numeric)'
-    value: ${{ steps.cost-estimator.outputs.total-cost }}
+    value: ${{ steps.cost-estimator.outputs.total-cost || '0' }}
   base-cost:
     description: 'Base branch estimated monthly total (numeric, 0 if no base-file)'
-    value: ${{ steps.base-cost-estimator.outputs.base-cost }}
+    value: ${{ steps.base-cost-estimator.outputs.base-cost || '0' }}
   delta-cost:
     description: 'Monthly cost delta (current - base, numeric)'
-    value: ${{ steps.delta.outputs.delta-cost }}
+    value: ${{ steps.delta.outputs.delta-cost || '0' }}
 runs:
   using: 'composite'
   steps:
@@ -48,11 +48,13 @@ runs:
     - name: Build CLI
       shell: bash
       run: |
+        set -euo pipefail
         dotnet build "${{ github.action_path }}/src/cli/washington.csproj" -c Release
 
     - name: Resolve CLI path
       shell: bash
       run: |
+        set -euo pipefail
         CLI_BIN="${{ github.action_path }}/src/cli/bin/Release/net10.0/bce"
         if [ "${{ runner.os }}" = "Windows" ]; then
           CLI_BIN="${CLI_BIN}.exe"
@@ -63,6 +65,7 @@ runs:
       id: cost-estimator
       shell: bash
       run: |
+        set -euo pipefail
         ARGS=(estimate --file "${{ inputs.file }}")
         if [ -n "${{ inputs.params-file }}" ]; then
           ARGS+=(--params-file "${{ inputs.params-file }}")
@@ -83,6 +86,7 @@ runs:
       if: inputs.base-file != ''
       shell: bash
       run: |
+        set -euo pipefail
         ARGS=(estimate --file "${{ inputs.base-file }}")
         if [ -n "${{ inputs.base-params-file }}" ]; then
           ARGS+=(--params-file "${{ inputs.base-params-file }}")
@@ -98,7 +102,8 @@ runs:
       id: delta
       shell: bash
       run: |
-        TOTAL="${{ steps.cost-estimator.outputs.total-cost }}"
+        set -euo pipefail
+        TOTAL="${{ steps.cost-estimator.outputs.total-cost || '0' }}"
         BASE="${{ steps.base-cost-estimator.outputs.base-cost || '0' }}"
         DELTA=$(echo "${TOTAL:-0} - ${BASE:-0}" | bc -l 2>/dev/null || echo "0")
         echo "delta-cost=$DELTA" >> $GITHUB_OUTPUT
@@ -107,7 +112,8 @@ runs:
       if: inputs.fail-on-threshold != ''
       shell: bash
       run: |
-        TOTAL="${{ steps.cost-estimator.outputs.total-cost }}"
+        set -euo pipefail
+        TOTAL="${{ steps.cost-estimator.outputs.total-cost || '0' }}"
         THRESHOLD="${{ inputs.fail-on-threshold }}"
         if [ "$(echo "${TOTAL:-0} > ${THRESHOLD}" | bc -l 2>/dev/null)" = "1" ]; then
           printf '::error::Estimated monthly cost ($%s) exceeds threshold ($%s)\n' "${TOTAL:-0}" "${THRESHOLD}"
