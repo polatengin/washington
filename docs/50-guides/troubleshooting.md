@@ -20,6 +20,8 @@ curl -sL https://bicepcostestimator.net/install.sh | bash
 
 When you estimate a `.bicep` file, Washington will use a configured `bicep` binary if one is available on `PATH` or through `WASHINGTON_BICEP_CLI_PATH`. Otherwise it downloads a pinned Bicep CLI release automatically.
 
+See [CLI Configuration](/cli/configuration) for the supported compiler environment variables.
+
 To restore the repo's .NET dependencies from a fresh clone, run:
 
 ```bash
