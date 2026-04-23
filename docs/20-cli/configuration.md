@@ -6,7 +6,7 @@ sidebar_position: 21
 
 # CLI Configuration
 
-The current CLI does not support a dedicated config file or `BCE_*` environment variables. Configure behavior on each invocation with command flags.
+The CLI does not support a dedicated project config file yet. Today you configure estimation behavior per run with command flags, and you can steer the Bicep compiler with environment variables.
 
 ## Per-Run Options
 
