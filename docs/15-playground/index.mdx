@@ -7,6 +7,47 @@ hide_table_of_contents: true
 
 import Playground from '@site/src/components/Playground';
 
-Paste a self-contained Bicep template below to run the same bicep cost estimation pipeline that powers the CLI and editor integration.
+Paste a self-contained Bicep template below to run the same estimation pipeline that powers the CLI and editor integration.
 
 <Playground />
+
+## What You Can Do Here
+
+- start from a built-in fixture and edit it in place
+- paste your own self-contained Bicep template
+- run an estimate without installing the CLI locally
+- inspect the monthly total, priced resource count, warnings, and per-resource cost lines
+
+## How To Use It Well
+
+For the best results in the browser playground:
+
+- keep the template self-contained in a single file
+- use explicit locations and SKUs when possible
+- start from a fixture if you want a known-good example quickly
+- treat warnings as part of the result, especially when the total looks lower than expected
+
+## What The Results Show
+
+After you run an estimate, the playground shows:
+
+- the estimated monthly total
+- the number of priced resources
+- any warnings emitted during extraction or pricing
+- a table with resource name, ARM type, pricing details, hourly cost, and monthly cost
+
+## Current Limitations
+
+The browser playground does not support:
+
+- local modules
+- separate `.bicepparam` files
+- uploading project folders
+
+If you need those workflows, use the CLI or the VS Code extension instead.
+
+## When To Use Another Surface
+
+- Use the [CLI](/cli/commands) when your template depends on `.bicepparam` files or scripted output formats.
+- Use the [VS Code Extension](/vscode-extension) when you want feedback while editing.
+- Use the [GitHub Action](/github-action) when you want pull request or CI enforcement.
