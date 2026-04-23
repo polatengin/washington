@@ -65,26 +65,6 @@ public class BicepCompiler
 
     private static BicepClientConfiguration CreateClientConfiguration()
     {
-        var configuredCliPath = GetConfiguredValue("WASHINGTON_BICEP_CLI_PATH", "BICEP_CLI_PATH");
-        if (!string.IsNullOrWhiteSpace(configuredCliPath))
-        {
-            return new BicepClientConfiguration
-            {
-                ExistingCliPath = configuredCliPath,
-                ConnectionMode = BicepConnectionMode.Stdio
-            };
-        }
-
-        var configuredVersion = GetConfiguredValue("WASHINGTON_BICEP_VERSION", "BICEP_VERSION");
-        if (!string.IsNullOrWhiteSpace(configuredVersion))
-        {
-            return new BicepClientConfiguration
-            {
-                BicepVersion = configuredVersion,
-                ConnectionMode = BicepConnectionMode.Stdio
-            };
-        }
-
         var cliFromPath = FindCliOnPath();
         if (!string.IsNullOrWhiteSpace(cliFromPath))
         {
@@ -195,20 +175,6 @@ public class BicepCompiler
         }
 
         return new BicepCompilationException(message.ToString());
-    }
-
-    private static string? GetConfiguredValue(params string[] variableNames)
-    {
-        foreach (var variableName in variableNames)
-        {
-            var value = Environment.GetEnvironmentVariable(variableName);
-            if (!string.IsNullOrWhiteSpace(value))
-            {
-                return value;
-            }
-        }
-
-        return null;
     }
 
     private static string? FindCliOnPath()
