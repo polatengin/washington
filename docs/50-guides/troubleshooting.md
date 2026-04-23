@@ -18,9 +18,7 @@ curl -sL https://bicepcostestimator.net/install.sh | bash
 ./src/cli/bin/Release/net10.0/bce estimate --file ./tests/fixtures/simple-vm.bicep
 ```
 
-When you estimate a `.bicep` file, Washington will use a configured `bicep` binary if one is available on `PATH` or through `WASHINGTON_BICEP_CLI_PATH`. Otherwise it downloads a pinned Bicep CLI release automatically.
-
-See [CLI Configuration](/cli/configuration) for the supported compiler environment variables.
+When you estimate a `.bicep` file, Washington will use a `bicep` binary if one is available on `PATH`. Otherwise it downloads the pinned Bicep CLI release automatically.
 
 To restore the repo's .NET dependencies from a fresh clone, run:
 
@@ -89,10 +87,11 @@ If the estimate still does not change, check:
 Check the following in order:
 
 1. Open a `.bicep` file, since the extension activates on the Bicep language.
-2. Set `washington.cliPath` if you want to force a known `bce` binary.
-3. If `washington.cliPath` is empty, the extension will try the bundled binary, then a workspace `src/cli/washington.csproj`, then `bce` on your `PATH`.
-4. If you expect automatic refresh, confirm `washington.estimateOnSave` is enabled.
-5. Run `Washington: Estimate File Cost` manually from the command palette to verify the LSP path is working.
+2. If you want to force a known `bce` binary, set the `CLI Path` setting from the Settings UI.
+3. If you edit `settings.json` directly, use the key prefix suggested by VS Code IntelliSense for your installed extension build.
+4. If `CLI Path` is empty, the extension will try the bundled binary, then a workspace `src/cli/washington.csproj`, then `bce` on your `PATH`.
+5. If you expect automatic refresh, confirm `Estimate On Save` is enabled.
+6. Run the extension's estimate command manually from the Command Palette to verify the LSP path is working.
 
 ## Workspace estimate looks larger than expected
 
