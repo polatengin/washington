@@ -1,3 +1,4 @@
+---
 title: Getting Started
 description: Install the BCE CLI, run your first estimate, and understand the estimator's defaults.
 sidebar_position: 10
