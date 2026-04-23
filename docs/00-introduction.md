@@ -14,20 +14,20 @@ sidebar_position: 0
 curl -sL https://bicepcostestimator.net/install.sh | bash
 ```
 
-Run via Docker instead, without installing the CLI binary locally:
+Alternatively run via Docker instead, without installing the CLI binary locally:
 
-> ```bash
-> bce() {
->   docker run --rm \
->     -v "$PWD:/work" \
->     -w /work \
->     --entrypoint /app/bin/bce \
->     ghcr.io/polatengin/washington:latest \
->     "$@"
-> }
-> ```
->
-> Add that function to `~/.bashrc` or `~/.zshrc`, reload your shell, and then use `bce` like a normal command:
+```bash
+bce() {
+  docker run --rm \
+    -v "$PWD:/work" \
+    -w /work \
+    --entrypoint /app/bin/bce \
+    ghcr.io/polatengin/washington:latest \
+    "$@"
+}
+```
+
+_Add this function to `~/.bashrc` or `~/.zshrc`, reload your shell, and then use `bce` like a normal command:_
 
 ## Quick Start
 
