@@ -52,7 +52,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(statusBarItem);
   context.subscriptions.push(
-    vscode.window.registerTreeDataProvider('washingtonCostBreakdown', treeDataProvider)
+    vscode.window.registerTreeDataProvider('bceCostBreakdown', treeDataProvider)
   );
 
   // Estimate active file command
