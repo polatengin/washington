@@ -3,7 +3,8 @@ SHELL := bash
 
 .DEFAULT_GOAL := help
 
-VERSION ?= $(strip $(shell git describe --tags --abbrev=0 2>/dev/null | sed 's/^v//'))
+RAW_VERSION ?= $(strip $(shell git describe --tags --abbrev=0 2>/dev/null))
+VERSION ?= $(strip $(shell printf '%s' "$(RAW_VERSION)" | sed -E 's/^[^0-9]*//'))
 SOURCE_REVISION_ID ?= $(strip $(shell git rev-parse HEAD 2>/dev/null))
 INFORMATIONAL_VERSION ?= $(if $(strip $(VERSION)),$(VERSION)$(if $(strip $(SOURCE_REVISION_ID)),+$(SOURCE_REVISION_ID),))
 
